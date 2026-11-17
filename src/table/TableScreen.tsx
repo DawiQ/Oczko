@@ -84,6 +84,9 @@ export function TableScreen({
   coach,
   endPanel,
   newBadges,
+  guest,
+  banner,
+  menuExtra,
 }: {
   game: TableGame;
   kv: KV;
@@ -104,6 +107,12 @@ export function TableScreen({
   endPanel?: ReactNode;
   /** Badges earned in this match (shown at its end). */
   newBadges?: { name: string; desc: string }[];
+  /** A Wi‑Fi guest: the host deals the next round and decides on a rematch. */
+  guest?: boolean;
+  /** Shown over the top of the felt (Wi‑Fi: connection, away players, time). */
+  banner?: ReactNode;
+  /** More menu rows (Wi‑Fi: quick reactions). */
+  menuExtra?: ReactNode;
 }) {
   const snap = useSyncExternalStore(game.subscribe, game.getSnapshot);
   const insets = useSafeAreaInsets();
@@ -205,6 +214,7 @@ export function TableScreen({
 
       <View style={s.felt} onLayout={onLayout}>
         <Image source={ART.felt} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        {banner ? <View style={s.banner}>{banner}</View> : null}
         {opp.map((seat, i) => (
           <View
             key={seat}
@@ -286,10 +296,14 @@ export function TableScreen({
         )}
       </View>
 
-      {snap.phase === "roundEnd" && <RoundEndPanel snap={snap} onNext={() => game.nextRound()} onReplay={() => game.replayRound()} />}
+      {snap.phase === "roundEnd" && <RoundEndPanel snap={snap} onNext={guest ? undefined : () => game.nextRound()} onReplay={() => game.replayRound()} />}
       {snap.phase === "matchEnd" && endPanel}
       {snap.phase === "matchEnd" && !endPanel && (
-        <MatchEndPanel snap={snap} newBadges={newBadges} onRematch={() => game.rematch()} onNewGame={onNewGame} onExit={onExit} onReplay={() => game.replayRound()} reduceMotion={reduceMotion} />
+        <MatchEndPanel
+          snap={snap}
+          newBadges={newBadges}
+          onRematch={guest ? undefined : () => game.rematch()}
+          onNewGame={guest ? undefined : onNewGame} onExit={onExit} onReplay={() => game.replayRound()} reduceMotion={reduceMotion} />
       )}
 
       {persian && (
@@ -310,8 +324,15 @@ export function TableScreen({
             <Text style={s.menuLabel}>{`Punkty · do ${snap.target}`}</Text>
             <ScoreBars snap={snap} />
           </View>
-          <MenuItem label="Wyjdź do lobby" hint="Partia zostanie zapisana" onPress={() => (setMenu(false), onExit())} />
-          <MenuItem label="Poddaj partię" danger onPress={() => void giveUp()} />
+          {menuExtra}
+          {onGiveUp ? (
+            <>
+              <MenuItem label="Wyjdź do lobby" hint="Partia zostanie zapisana" onPress={() => (setMenu(false), onExit())} />
+              <MenuItem label="Poddaj partię" danger onPress={() => void giveUp()} />
+            </>
+          ) : (
+            <MenuItem label="Opuść stół" danger onPress={() => (setMenu(false), onExit())} />
+          )}
         </BottomSheet>
       )}
     </View>
@@ -363,6 +384,7 @@ const s = StyleSheet.create({
   coach: { minHeight: 56 },
   tipBtn: { minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: 12, backgroundColor: P.accent },
   tipBtnText: { color: P.onAccent, fontWeight: "800" },
+  banner: { position: "absolute", top: 6, left: 10, right: 10, zIndex: 35, elevation: 35, gap: 6 },
   handBox: { position: "absolute", left: 0, right: 0, bottom: 10 },
   bottom: { overflow: "hidden", flexDirection: "row", gap: 10, paddingHorizontal: 12, paddingTop: 14, borderTopWidth: 3, borderTopColor: "#2B190B" },
   btn: { flex: 1 },

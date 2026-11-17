@@ -3,7 +3,7 @@
 // only an immutable `GameSnapshot` built from the human seat's view — never
 // the stock, the seed or a hidden hand.
 import { chunkedEvaluator, type ChunkedEvaluator } from "../ai/evaluate";
-import { personaById } from "../ai/personas";
+import { personaById, type PersonaId } from "../ai/personas";
 import { decideAsync, type PolicySpec } from "../ai/policies";
 import { matchApply, newMatch, nextRound as engineNextRound, type MatchState } from "../engine/match";
 import { makeRng, splitmix32, type Rng } from "../engine/rng";
@@ -107,7 +107,7 @@ export class GameController implements TableGame {
       this.visible = saved.match.round.revealed.slice();
       this.showdownDone = saved.match.round.result !== null;
     } else this.begin();
-    this.snapshot = this.build();
+    this.snapshot = this.build(this.me);
     if (!saved) this.save(); // a game just started can be resumed too
     void this.loop();
   }
@@ -326,10 +326,11 @@ export class GameController implements TableGame {
     return null;
   }
 
-  /** New engine events: shown furas become visible now, the final reveals wait for the showdown. */
+  /** New engine events (kept raw, filtered per viewer in `build`): shown
+   *  furas become visible now, the final reveals wait for the showdown. */
   private take(batch: readonly RoundEvent[]): void {
     const ends = batch.some((e) => e.t === "result");
-    const mine = eventsFor(batch, this.me, this.match.round);
+    const mine = batch;
     if (!ends) for (const e of mine) if (e.t === "reveal") this.visible[e.seat] = true;
     if (ends) {
       // Reveals before the end-of-round block belong to furas shown at once.
@@ -387,27 +388,51 @@ export class GameController implements TableGame {
 
   private emit(): void {
     if (this.disposed) return;
-    this.snapshot = this.build();
+    this.snapshot = this.build(this.me);
     this.listeners.forEach((l) => l());
   }
 
-  private phase(): Phase {
+  /** The table as `seat` may see it (Wi‑Fi guests). */
+  snapshotFor(seat: number): GameSnapshot {
+    return seat === this.me ? this.snapshot : this.build(seat, true);
+  }
+
+  /** A bot plays a seat from now on (a guest who left), under the same name. */
+  replaceWithBot(seat: number, persona: PersonaId): void {
+    const s = this.setup.seats[seat];
+    if (!s || s.kind === "bot" || seat === this.me) return;
+    this.setup = { ...this.setup, seats: this.setup.seats.map((x, i) => (i === seat ? { kind: "bot" as const, persona, name: s.name } : x)) };
+    this.emit();
+    void this.loop();
+  }
+
+  /** The guest is back: the seat is a person's again. */
+  restoreRemote(seat: number): void {
+    const s = this.setup.seats[seat];
+    if (!s || s.kind !== "bot" || seat === this.me) return;
+    this.setup = { ...this.setup, seats: this.setup.seats.map((x, i) => (i === seat ? { kind: "remote" as const, name: s.name } : x)) };
+    this.restart();
+  }
+
+  private phase(viewer: number): Phase {
     const r = this.match.round;
     if (r.result) return !this.showdownDone ? "showdown" : this.match.winner !== null ? "matchEnd" : "roundEnd";
     if (this.dealing) return "dealing";
-    if (r.turn === this.me) return "myTurn";
+    if (r.turn === viewer) return "myTurn";
     return r.turn === r.bank ? "bankTurn" : "othersTurn";
   }
 
-  private build(): GameSnapshot {
+  /** `guest`: a remote seat's snapshot (no skipping, rematch or replays there). */
+  private build(viewer: number, guest = false): GameSnapshot {
+    const me = viewer;
     const m = this.match;
     const r = m.round;
     const done = this.showdownDone;
-    const phase = this.phase();
+    const phase = this.phase(viewer);
     // Points of a round count once its hands are all shown.
     const scores = done || !r.result ? m.scores.slice() : m.scores.map((s, i) => s - r.result!.points[i]);
-    const shown = (i: number) => i === this.me || this.visible[i];
-    const raw = viewFor(m, this.me);
+    const shown = (i: number) => i === me || this.visible[i];
+    const raw = viewFor(m, me);
     const others: OtherSeat[] = raw.others.map((o) => {
       const status = o.status === "bust" && !shown(o.seat) ? ("stood" as const) : o.status;
       return shown(o.seat) ? { ...o, status, hand: r.hands[o.seat].slice() } : { seat: o.seat, cards: o.cards, status, persian: o.persian };
@@ -431,8 +456,8 @@ export class GameController implements TableGame {
         persona: persona?.id ?? null,
         color: persona?.color ?? (s.kind === "human" ? HUMAN_COLOR : REMOTE_COLOR),
         cards: r.hands[i].length,
-        status: i === this.me ? raw.myStatus : o!.status,
-        persian: i === this.me ? raw.myValue.persian : o!.persian,
+        status: i === me ? raw.myStatus : o!.status,
+        persian: i === me ? raw.myValue.persian : o!.persian,
         isBank: r.bank === i,
         isDealer: r.dealer === i,
         thinking: this.thinking === i,
@@ -440,22 +465,24 @@ export class GameController implements TableGame {
         ...(hand ? { hand, value: handValue(hand, m.rules) } : {}),
       };
     });
+    const st = r.status[me];
+    const iAmDone = st !== "waiting" && st !== "playing";
     return Object.freeze({
       phase,
       mode: this.setup.mode,
       rules: m.rules,
-      me: this.me,
+      me,
       roundNo: m.roundNo,
       view,
       seats,
-      lastEvents: this.events,
+      lastEvents: this.events.map(({ id, event }) => ({ id, event: eventsFor([event], me, r)[0] })),
       result: done ? r.result : null,
       scores,
       target: m.rules.target,
       winner: done ? m.winner : null,
-      canSkip: !done && !this.fast && this.myDone(),
-      canRematch: phase === "matchEnd",
-      canReplay: this.setup.mode === "training" && (phase === "roundEnd" || phase === "matchEnd"),
+      canSkip: !guest && !done && !this.fast && iAmDone,
+      canRematch: !guest && phase === "matchEnd",
+      canReplay: !guest && this.setup.mode === "training" && (phase === "roundEnd" || phase === "matchEnd"),
     });
   }
 }

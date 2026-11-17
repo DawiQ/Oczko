@@ -50,7 +50,7 @@ export function ScoreBars({ snap }: { snap: GameSnapshot }) {
   );
 }
 
-export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; onNext: () => void; onReplay?: () => void }) {
+export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; /** Absent at a Wi‑Fi guest's table: the host deals. */ onNext?: () => void; onReplay?: () => void }) {
   const insets = useSafeAreaInsets();
   const h = headline(snap);
   const order = snap.view.bank === null ? snap.seats : [...snap.seats.filter((x) => !x.isBank), ...snap.seats.filter((x) => x.isBank)];
@@ -91,7 +91,13 @@ export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; 
       <ScoreBars snap={snap} />
       <View style={{ gap: 10, marginTop: 14 }}>
         {snap.canReplay && onReplay && <Button3D label="Ta runda jeszcze raz" tone="dark" height={46} onPress={onReplay} />}
-        <Button3D label="Następna runda" big onPress={onNext} testID="next-round" />
+        {onNext ? (
+          <Button3D label="Następna runda" big onPress={onNext} testID="next-round" />
+        ) : (
+          <Text style={s.wait} accessibilityLiveRegion="polite">
+            Gospodarz rozdaje następną rundę…
+          </Text>
+        )}
       </View>
     </View>
   );
@@ -109,8 +115,9 @@ export function MatchEndPanel({
   snap: GameSnapshot;
   /** Badges earned in this match (names and descriptions). */
   newBadges?: { name: string; desc: string }[];
-  onRematch: () => void;
-  onNewGame: () => void;
+  /** Absent at a Wi‑Fi guest's table (the host decides). */
+  onRematch?: () => void;
+  onNewGame?: () => void;
   onExit: () => void;
   onReplay?: () => void;
   reduceMotion: boolean;
@@ -158,8 +165,8 @@ export function MatchEndPanel({
       <View style={{ flex: 1 }} />
       <View style={{ gap: 10, width: "100%" }}>
         {snap.canReplay && onReplay && <Button3D label="Ta runda jeszcze raz" tone="dark" height={46} onPress={onReplay} />}
-        <Button3D label="Rewanż" big onPress={onRematch} testID="rematch" accessibilityHint="Ci sami rywale, nowe karty" />
-        <Button3D label="Nowa gra" tone="dark" height={48} onPress={onNewGame} />
+        {onRematch && <Button3D label="Rewanż" big onPress={onRematch} testID="rematch" accessibilityHint="Ci sami rywale, nowe karty" />}
+        {onNewGame && <Button3D label="Nowa gra" tone="dark" height={48} onPress={onNewGame} />}
         <Button3D label="Do lobby" tone="dark" height={44} onPress={onExit} />
       </View>
     </View>
@@ -196,6 +203,7 @@ const s = StyleSheet.create({
   pillMuted: { backgroundColor: "rgba(255,255,255,0.07)" },
   pillText: { fontSize: 11, fontWeight: "800" },
   label: { color: P.muted, fontSize: 12, fontWeight: "700", letterSpacing: 0.6, textTransform: "uppercase", marginTop: 12, marginBottom: 6 },
+  wait: { color: P.muted, fontSize: 14, textAlign: "center", paddingVertical: 14 },
   barRow: { flexDirection: "row", alignItems: "center", gap: 8 },
   barName: { width: 64, color: P.textSoft, fontSize: 12, fontWeight: "700" },
   track: { flex: 1, height: 8, borderRadius: 4, backgroundColor: "rgba(255,255,255,0.1)", overflow: "hidden" },

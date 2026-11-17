@@ -98,7 +98,7 @@ describe("App", () => {
   it("opens a screen from the lobby and comes back with the back button", async () => {
     const r = await renderApp();
     await press(r, "Ze znajomymi przez Wi‑Fi");
-    expect(textOf(r)).toContain("Wkrótce");
+    expect(textOf(r)).toContain("Załóż stół");
     await press(r, "Wróć");
     expect(textOf(r)).toContain("Ze znajomymi");
   });

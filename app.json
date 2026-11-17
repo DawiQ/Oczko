@@ -2,7 +2,7 @@
   "expo": {
     "name": "Oczko",
     "slug": "oczko",
-    "description": "Oczko — polska gra w 21. Gra na punkty: rodzinnie albo z bankierem, z postaciami komputerowymi o różnym stylu gry.",
+    "description": "Oczko — polska gra w 21. Gra na punkty: rodzinnie albo z bankierem, z postaciami komputerowymi i ze znajomymi przez Wi‑Fi.",
     "version": "1.0.0",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
@@ -12,7 +12,11 @@
       "bundleIdentifier": "pl.dawiq.oczko",
       "supportsTablet": false,
       "infoPlist": {
-        "ITSAppUsesNonExemptEncryption": false
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocalNetworkUsageDescription": "Oczko łączy telefony w tej samej sieci Wi‑Fi, żeby grać przy wspólnym stole.",
+        "NSBonjourServices": [
+          "_oczko._tcp"
+        ]
       }
     },
     "android": {
@@ -30,6 +34,7 @@
       ]
     },
     "plugins": [
+      "expo-dev-client",
       [
         "expo-splash-screen",
         {
@@ -47,6 +52,15 @@
           "microphonePermission": false,
           "recordAudioAndroid": false,
           "enableBackgroundPlayback": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Aparat skanuje kod QR stołu, żeby dołączyć do gry ze znajomymi.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
         }
       ]
     ]

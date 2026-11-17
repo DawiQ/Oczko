@@ -21,8 +21,8 @@ import { PACES, type Pace } from "./src/game/pace";
 import { freshSeed, makeSetup } from "./src/game/setup";
 import { useGame, type GameSource, type UseGameOptions } from "./src/game/useGame";
 import { HomeScreen, type ResumeInfo } from "./src/home/HomeScreen";
+import { LanScreen, type LanDeps } from "./src/lan/LanScreen";
 import { SettingsSheet } from "./src/home/SettingsSheet";
-import { SoonScreen } from "./src/home/SoonScreen";
 import { TabBar, type Tab } from "./src/home/TabBar";
 import { RulesScreen } from "./src/info/RulesScreen";
 import { HouseRulesScreen } from "./src/newgame/HouseRulesScreen";
@@ -60,12 +60,15 @@ export type Screen =
   /** The rules opened from the table's menu (back resumes the game). */
   | { name: "rules"; backToGame: boolean }
   | { name: "history"; from: Tab }
+  /** Playing with friends over Wi‑Fi (its own steps and back handling). */
+  | { name: "lan"; key: number }
   | { name: "replay"; record: HistoryRecord; from: Tab }
-  /** A part still being built, opened from a tab (back returns to it). */
-  | { name: "soon"; title: string; from: Tab };
+  ;
 
 export interface AppProps {
   kv?: KV;
+  /** Tests: the Wi‑Fi network in memory. */
+  lanDeps?: LanDeps;
   /** Tests: the table's pace (otherwise from the settings). */
   pace?: Pace;
   /** Tests: bots' decisions and pauses. */
@@ -177,7 +180,7 @@ async function loadAll(kv: KV): Promise<Stored> {
   return { stats, saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
 }
 
-function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
+function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
   const confirm = useConfirm();
   const [screen, setScreen] = useState<Screen>({ name: "home", tab: "play" });
   const [stored, setStored] = useState<Stored | null>(null);
@@ -229,7 +232,6 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
   const back = useCallback((): boolean => {
     if (stored && !stored.onboarded) return false;
     switch (screen.name) {
-      case "soon":
       case "houseRules":
       case "history":
         home(screen.from);
@@ -237,6 +239,8 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
       case "replay":
         setScreen({ name: "history", from: screen.from });
         return true;
+      case "lan":
+        return false; // the Wi‑Fi screens go back step by step
       case "newGame":
       case "tutorial":
       case "game":
@@ -302,8 +306,8 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
     );
 
   switch (screen.name) {
-    case "soon":
-      return <SoonScreen title={screen.title} onBack={back} />;
+    case "lan":
+      return <LanScreen key={screen.key} kv={kv} rules={stored.rules} pace={tablePace} pro={false} onExit={() => home()} deps={lanDeps} />;
     case "history":
       return (
         <HistoryScreen
@@ -378,7 +382,6 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
   }
 
   const tab = screen.tab;
-  const open = (title: string) => setScreen({ name: "soon", title, from: tab });
   const changeSettings = (s: Settings) => {
     applySettings(s);
     void saveSettings(kv, s);
@@ -409,7 +412,7 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
             resume={stored.saved ? resumeInfo(stored.saved) : null}
             onResume={() => stored.saved && setScreen({ name: "game", source: { saved: stored.saved }, key: Date.now() })}
             onNewGame={() => setScreen({ name: "newGame", training: false })}
-            onFriends={() => open("Ze znajomymi")}
+            onFriends={() => setScreen({ name: "lan", key: Date.now() })}
             onTraining={() => setScreen({ name: "newGame", training: true })}
             onHouseRules={() => setScreen({ name: "houseRules", from: "play" })}
             onHistory={() => {

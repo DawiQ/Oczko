@@ -4,16 +4,17 @@
   "main": "index.ts",
   "private": true,
   "scripts": {
-    "start": "expo start",
-    "android": "expo start --android",
-    "ios": "expo start --ios",
+    "start": "expo start --dev-client",
+    "android": "expo run:android",
+    "ios": "expo run:ios",
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "art": "node tools/render-art.js && node tools/render-game-art.js",
     "stats": "tsx tools/stats.ts",
     "tournament": "tsx tools/tournament.ts",
-    "sounds": "python3 tools/render-sounds.py"
+    "sounds": "python3 tools/render-sounds.py",
+    "prebuild": "expo prebuild"
   },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",
@@ -21,14 +22,20 @@
     "expo": "~58.0.23",
     "expo-asset": "~58.0.21",
     "expo-audio": "~58.0.12",
+    "expo-camera": "~58.0.14",
+    "expo-dev-client": "~58.0.21",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
+    "expo-network": "~58.0.5",
     "expo-splash-screen": "~58.0.13",
     "expo-status-bar": "~58.0.4",
     "expo-system-ui": "~58.0.7",
+    "qrcode-generator": "^2.0.4",
     "react": "19.3.0",
     "react-native": "0.88.1",
-    "react-native-safe-area-context": "~5.11.1"
+    "react-native-safe-area-context": "~5.11.1",
+    "react-native-tcp-socket": "^6.4.3",
+    "react-native-zeroconf": "^0.17.7"
   },
   "devDependencies": {
     "@types/jest": "^30.0.0",

@@ -447,7 +447,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
   i per postać; sugestia kolejnego rywala; reset z potwierdzeniem.
 - **Gotowe, gdy:** testy `progress.ts` dla każdej odznaki i progu.
 
-### Etap 9 — Wi‑Fi
+### Etap 9 — Wi‑Fi ✅
 - Skopiuj `src/lan/` z Pana (TCP, mDNS, kod stołu, QR, ekrany, ping, tokeny,
   szybkie reakcje, obecność, statystyki). Usługa `_oczko._tcp`, port bazowy
   **47676**.

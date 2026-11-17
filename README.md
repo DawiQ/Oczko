@@ -16,13 +16,15 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 6 | Lobby, nowa gra, onboarding, samouczek, zasady, ustawienia | gotowe |
 | 7 | Trener, historia partii, powtórka, analiza decyzji, eksport | gotowe |
 | 8 | Profil: rangi, odznaki, statystyki, następny rywal | gotowe |
-| 9–11 | wg `PLAN.md` §7 | — |
+| 9 | Gra przez Wi‑Fi: stół u gospodarza, goście, kod, QR, mDNS, rozłączenia | gotowe |
+| 10–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
 ```bash
 npm install
-npx expo start          # Expo Go (do Etapu 8)
+npx expo run:android    # od Etapu 9 własny build (expo-dev-client: TCP, mDNS, aparat)
+npm start               # serwer Metro dla dev clienta
 ```
 
 ## Komendy
@@ -37,7 +39,7 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 8)
+## Architektura (stan na Etap 9)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -90,6 +92,15 @@ src/history/            record (partia = ziarno + reguły + decyzje, powtórka z
 src/storage/history.ts  oczko.history.v1: 50 ostatnich partii (bez Pro widać 10)
 src/profile/            progress (rangi wg doświadczenia: Dziewiątka → … → As → Perskie oczko;
                         7 odznak), suggest (następny rywal), ProfileScreen (makieta 9)
+src/lan/                gra ze znajomymi przez Wi‑Fi (z Pana, dopasowana)
+  protocol.ts           JSON w liniach, wersja protokołu, walidacja każdej wiadomości
+  host.ts               gospodarz = stół (ten sam GameController); goście jako miejsca zdalne;
+                        30 s na ruch (potem „Starczy”), po rozłączeniu 60 s, potem bot pod
+                        imieniem gościa, powrót tokenem; reakcje; 4 osoby (8 z Pro gospodarza)
+  guest.ts              gość: wysyła tylko Dobieram / Starczy, dostaje swój widok, ponawia połączenie
+  discovery.ts, code.ts mDNS `_oczko._tcp`, 4-znakowy kod stołu, QR (`oczko://stol?…`), port 47676
+  LanScreen.tsx         menu, lobby gospodarza (kod, QR, miejsca, boty), dołączanie, lobby gościa, stół
+src/storage/lan.ts      oczko.lanStats.v1: imię przy stole, wyniki przez Wi‑Fi
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
@@ -124,6 +135,15 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   (wygrana z 21 po dobraniu przy 17+), Żelazny bank (bank wygrywa wszystkie
   pojedynki, 2+ graczy), Seria (5 rund z rzędu), Weteran (100 partii).
   Trening się nie liczy.
+
+## Wi‑Fi
+
+- Gospodarz zakłada stół: kod (np. „K7 4Q”), QR i ogłoszenie mDNS; dodaje
+  miejsca dla znajomych i boty. Goście dołączają z listy, kodem albo QR.
+- Gospodarz prowadzi partię (ten sam kontroler co lokalnie); każdy gość
+  dostaje wyłącznie swój widok. Trener przy stole Wi‑Fi jest wyłączony.
+- Uprawnienia: iOS `NSLocalNetworkUsageDescription`, `NSBonjourServices`
+  (`_oczko._tcp`), aparat do QR.
 
 ## Zgodność: zero hazardu
 
@@ -201,6 +221,11 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   i powtórki, trener tylko w moim ruchu i z mojego widoku.
 - `src/profile/__tests__` — każda odznaka (z rundy i z liczników, także
   „o jeden za mało”), każdy próg rangi, sugestia rywala, ekran profilu.
+- `src/lan/__tests__` — protokół na transporcie pamięciowym: host + 3 gości
+  (family i bank), żaden gość nie dostaje cudzych zakrytych kart, rozłączenie
+  → bot → powrót, wynik = lokalna powtórka tych samych decyzji; odmowy
+  (pełny stół, gra trwa, inna wersja), „Starczy” po czasie, parsowanie;
+  ekrany: gospodarz z botem, gość po kodzie, obaj przy stole.
 - `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
   — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 
