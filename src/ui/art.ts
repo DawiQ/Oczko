@@ -1,5 +1,8 @@
 // Bitmap art of the app (rendered by tools/render-game-art.js).
 export const ART = {
+  felt: require("../../assets/game/felt.jpg"),
+  woodTop: require("../../assets/game/wood-top.jpg"),
+  woodBottom: require("../../assets/game/wood-bottom.jpg"),
   // White line icons, for tintColor:
   iconMenu: require("../../assets/game/icon-menu.png"),
   iconCards: require("../../assets/game/icon-cards.png"),

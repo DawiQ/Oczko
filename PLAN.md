@@ -389,7 +389,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
   `storage/save.ts`, `storage/stats.ts`.
 - **Gotowe, gdy:** testy z §6 przechodzą.
 
-### Etap 5 — Stół
+### Etap 5 — Stół ✅
 - Układ wg makiety 4–7: ręka gracza na dole jako wachlarz (karty odkryte dla
   siebie), rywale wokół: portret, liczba kart (rewersy w małym wachlarzu),
   status („myśli…”, „Starczy”, „Fura!”), punkty. Znacznik **Bank**

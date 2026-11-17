@@ -9,6 +9,14 @@ import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
+import { Portrait } from "../ui/Portrait";
+
+/** The saved game shown in the lobby. */
+export interface ResumeInfo {
+  title: string;
+  line: string;
+  seats: { name: string; color: string; score: number }[];
+}
 
 /** House rules in two short lines (until the rules come from the onboarding). */
 export const DEFAULT_RULES_SUMMARY = ["Rodzinne · W 2, D 3, K 4 · 52 karty", "Perskie oczko · As za 11"];
@@ -65,8 +73,31 @@ function Row({
   );
 }
 
+function ResumeCard({ info, onResume }: { info: ResumeInfo; onResume: () => void }) {
+  return (
+    <View style={[s.card, { borderColor: P.accentDark }]}>
+      <View style={s.resumeHead}>
+        <Text style={s.rowTitle}>Wznów partię</Text>
+        <Text style={s.resumeBadge}>{info.title}</Text>
+      </View>
+      <Text style={s.rowSub}>{info.line}</Text>
+      <View style={s.resumeSeats} accessible accessibilityLabel={`Punkty: ${info.seats.map((x) => `${x.name} ${x.score}`).join(", ")}`}>
+        {info.seats.map((x) => (
+          <View key={x.name} style={s.resumeSeat}>
+            <Portrait name={x.name} size={28} color={x.color} />
+            <Text style={s.resumeScore}>{x.score}</Text>
+          </View>
+        ))}
+      </View>
+      <Button3D label="Wznów" height={46} onPress={onResume} testID="home-resume" />
+    </View>
+  );
+}
+
 export function HomeScreen({
   rulesSummary = DEFAULT_RULES_SUMMARY,
+  resume,
+  onResume,
   onNewGame,
   onFriends,
   onTraining,
@@ -75,6 +106,8 @@ export function HomeScreen({
   onSettings,
 }: {
   rulesSummary?: string[];
+  resume?: ResumeInfo | null;
+  onResume?: () => void;
   onNewGame: () => void;
   onFriends: () => void;
   onTraining: () => void;
@@ -89,6 +122,8 @@ export function HomeScreen({
         <Logo />
         <IconButton icon={ART.iconGear} label="Ustawienia" onPress={onSettings} />
       </View>
+
+      {resume && onResume && <ResumeCard info={resume} onResume={onResume} />}
 
       <Button3D label="Nowa gra" big height={64} onPress={onNewGame} testID="home-new-game" />
 
@@ -127,6 +162,12 @@ const s = StyleSheet.create({
   btnInner: { flexDirection: "row", alignItems: "center", gap: 8 },
   btnIcon: { width: 18, height: 18, tintColor: P.text },
   btnText: { color: P.text, fontFamily: DISPLAY, fontSize: 15 },
+  card: { backgroundColor: P.surface, borderWidth: 1, borderRadius: 18, padding: 14, gap: 8 },
+  resumeHead: { flexDirection: "row", justifyContent: "space-between", alignItems: "center" },
+  resumeBadge: { color: P.muted, fontSize: 11, fontWeight: "700", backgroundColor: "rgba(255,255,255,0.07)", borderRadius: 999, paddingHorizontal: 9, paddingVertical: 3, overflow: "hidden" },
+  resumeSeats: { flexDirection: "row", gap: 6, marginBottom: 4 },
+  resumeSeat: { flex: 1, flexDirection: "row", alignItems: "center", gap: 6 },
+  resumeScore: { color: P.text, fontFamily: DISPLAY, fontSize: 15 },
   panel: {
     flexDirection: "row",
     alignItems: "center",

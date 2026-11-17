@@ -12,7 +12,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 2 | Silnik: reguły, punktacja, runda, partia, widok miejsca | gotowe |
 | 3 | Boty, ewaluator, turniej, statystyki | gotowe |
 | 4 | Kontroler gry, zapis i wznawianie, statystyki | gotowe |
-| 5–11 | wg `PLAN.md` §7 | — |
+| 5 | Stół: układ, animacje, dźwięki, koniec rundy i partii, menu, wskazówki | gotowe |
+| 6–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -30,9 +31,10 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run lint` | ESLint (konfiguracja Expo) |
 | `npm run tournament` | kalibracja poziomów botów → `docs/BOTS.md`, `src/ai/calibration.ts` |
 | `npm run stats` | statystyki reguł z symulacji → `docs/STATS.md` |
-| `npm run art` | generuje ikonę, splash i ikony interfejsu (`tools/render-*.js`, Chromium przez Playwright) |
+| `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
+| `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 4)
+## Architektura (stan na Etap 5)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -61,6 +63,15 @@ src/game/               logika gry bez Reacta
   TableGame.ts          interfejs stołu + GameSnapshot (tylko widok człowieka)
   pace.ts               tempo: wolne / normalne / szybkie
   useGame.ts            jedyne spoiwo z Reactem (autozapis, statystyki, sprzątanie)
+src/table/              stół (makiety 4–8), działa na dowolnym TableGame
+  TableScreen.tsx       bandy z drewna, sukno, rywale na łuku, talia, podpis „na żywo”,
+                        moja ręka (wachlarz + wynik), Dobieram / Starczy / Pokaż wynik, menu ☰
+  OpponentSeat.tsx      portret, punkty, karty (rewersy / odkryte), status, BANK, rozdający
+  Hand.tsx              wachlarz z animacją dobrania (lot + obrót)
+  Effects.tsx           stempel „Fura!”, „Perskie oczko!” (promienie, asy, konfetti), konfetti
+  RoundEnd.tsx          koniec rundy (ręce, kto punktuje, paski punktów), koniec partii (podium)
+  texts.ts, layout.ts   czyste funkcje: komunikaty (neutralne płciowo), rozmieszczenie miejsc
+  hints.ts              jednorazowe wskazówki (oczko.hints.v1)
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
@@ -74,6 +85,19 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   obsługują „wstecz” pierwsze.
 - Grafiki tylko własne, generowane skryptami z `tools/`. Plakietka „21”
   na ikonie jest prostokątna (nie przypomina żetonu).
+
+## Stół
+
+- Rywale na łuku nad stołem (od mojej lewej), mniejsze portrety przy 6–7
+  rywalach; ich karty zakryte do odsłonięcia (ujawniona fura od razu).
+- Na koniec rundy ręce odsłaniają się po kolei, potem panel z wynikiem.
+- Dźwięki (dobranie, Starczy, fura, perskie oczko, wygrana, koniec partii)
+  i haptyka; animacje przez `Animated` z native driverem, przy „ogranicz
+  ruch” — bez ruchu.
+- Dostępność: podpis „na żywo” (`accessibilityLiveRegion`), etykiety kart
+  i miejsc, cele ≥ 44 px, nakładki `accessibilityViewIsModal`.
+- „Nowa gra” w lobby na razie startuje stół z Olą, Helą i Markiem (wybór
+  rywali — Etap 6).
 
 ## Zgodność: zero hazardu
 
@@ -137,10 +161,13 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   w snapshotach, odsłanianie po kolei, zapis → odczyt → kontynuacja = ten sam
   wynik, rewanż, „ta runda jeszcze raz”, „Pokaż wynik” w trakcie ruchu banku,
   błędy; `useGame` (autozapis, statystyki, sprzątanie).
+- `src/table/__tests__/` — render stołu z zamockowanym kontrolerem (ruch,
+  „Pokaż wynik”, koniec rundy i partii, menu z poddaniem, wskazówki),
+  komunikaty dla każdego momentu partii (bez form rodzajowych), układ miejsc.
 - `src/storage/__tests__/save-stats.test.ts` — walidacja zapisu (zepsute
   dane → `null`), reduktory statystyk, brak utraconych aktualizacji.
 - `src/__tests__/App.render.test.tsx` — test dymny: lobby, zakładki,
-  ekran i powrót, „wstecz” Androida.
+  „wstecz” Androida, cała partia przy stole do końca, wyjście i wznowienie.
 
 ## Dokumenty
 
