@@ -66,7 +66,7 @@ export function BottomSheet({
   );
   const [height] = useState(() => new Animated.Value(0)); // visible sheet height
   const current = useRef(0); // height while dragging
-  const [index, setIndex] = useState(initialSnap);
+  const [index, setIndex] = useState(() => Math.max(0, Math.min(snapPoints.length - 1, initialSnap)));
   const [reduceMotion, setReduceMotion] = useState(false);
   const closing = useRef(false);
 
@@ -109,7 +109,7 @@ export function BottomSheet({
 
   // Open at the initial snap point (`index` starts there already).
   useEffect(() => {
-    animateTo(snaps[Math.max(0, Math.min(snaps.length - 1, initialSnap))]);
+    animateTo(snaps[index]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 

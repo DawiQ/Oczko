@@ -58,7 +58,8 @@ z początkiem słowa, więc „zakładka”, „wstawka” czy „podstawka” p
   walidator → `null`, kolejność zapisów, awaria magazynu.
 - `src/ui/__tests__/components.test.tsx` — Button3D, Dialog, BottomSheet,
   Header, karty (etykiety dla czytnika ekranu), Portrait.
-- `src/ui/__tests__/plural.test.ts`, `src/engine/__tests__/cards.test.ts`.
+- `src/ui/__tests__/plural.test.ts`, `src/ui/__tests__/haptics.test.ts`,
+  `src/engine/__tests__/cards.test.ts`.
 - `src/__tests__/App.render.test.tsx` — test dymny: lobby, zakładki,
   ekran i powrót, „wstecz” Androida.
 

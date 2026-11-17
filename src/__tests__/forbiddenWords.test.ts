@@ -24,13 +24,12 @@ export const FORBIDDEN: { name: string; re: RegExp }[] = [
   { name: "szuler", re: new RegExp(`${W}szuler`, "iu") },
   { name: "blackjack", re: new RegExp(`${W}black\\s*jack`, "iu") },
   { name: "liczenie kart", re: new RegExp(`${W}liczeni\\p{L}*\\s+kart`, "iu") },
-  { name: "wygraj pieniądze", re: new RegExp(`${W}wygra\\p{L}*\\s+pieni`, "iu") },
+  { name: "wygraj pieniądze", re: new RegExp(`${W}wygr\\p{L}*\\s+pieni`, "iu") },
   { name: "wager", re: new RegExp(`${W}wager`, "iu") },
 ];
 
 /** Phrases allowed despite a match (removed before checking). */
 const ALLOWED = [
-  "Oczko — polska gra w 21", // the only allowed context for the name of the other game
   "Gambling & Betting", // AdMob category to block (store/RELEASE.md)
   "Social Casino", // AdMob category to block
   "Simulated Gambling", // rating questionnaires
@@ -63,6 +62,9 @@ describe("forbidden words", () => {
     ["Zakładki: Graj · Profil · Zasady", []],
     ["Wstawka i podstawka", []],
     ["Oczko — polska gra w 21", []],
+    ["Oczko, czyli blackjack po polsku", ["blackjack"]],
+    ["Wygrywasz pieniądze", ["wygraj pieniądze"]],
+    ["Social Casino i Gambling & Betting zablokowane", []],
     ["Bank wygrywa remis", []],
     ["Liczy szanse przed każdym ruchem", []],
   ])("%s → %j", (text, found) => {
