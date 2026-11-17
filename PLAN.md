@@ -108,16 +108,18 @@ jest.setup.js
 
 ## 4. Silnik — specyfikacja
 
-### 4.1 Typy
+### 4.1 Typy (zaimplementowane w Etapie 2, `src/engine/`)
 
 ```ts
 // cards.ts
-export type Card = number;              // 0..51; rank = (id >> 2) + 2 (2..14; 11=W, 12=D, 13=K, 14=A), suit = id & 3
+export type Card = number;              // 0..51; rank = (id >> 2) + 2 (2..14; 11=W, 12=D, 13=K, 14=A), suit = id & 3 (kier, karo, trefl, pik)
 export function makeDeck(size: 24 | 32 | 52): Card[];   // 24: 9–A, 32: 7–A, 52: 2–A
 
 // rng.ts — mulberry32, stan serializowalny; ziarno rundy = splitmix32(seedBase, roundNo)
 export interface Rng { state: number }
+export function rngNext(r: Rng): [number, Rng];          // czyste: zwraca nowy stan
 export function roundSeed(seedBase: number, roundNo: number): number;
+export function shuffle<T>(items: readonly T[], seed: number): T[];
 
 // rules.ts
 export interface Rules {
@@ -126,7 +128,7 @@ export interface Rules {
   ace: 'eleven' | 'oneOrEleven';
   persian: boolean;                      // dokładnie dwa asy = wygrana ponad wszystko
   startCards: 1 | 2;
-  maxCards: number | null;               // limit kart w ręce (null = bez); ≥ startCards + 1
+  maxCards: number | null;               // limit kart w ręce (null = bez); startCards + 1..12
   mode: 'family' | 'bank';
   familyTie: 'allScore' | 'noneScore';
   bankTie: 'bankWins' | 'nobody';
@@ -139,7 +141,7 @@ export interface Rules {
 export const DEFAULT_RULES: Rules;
 export const PRESETS: Record<'family' | 'bank' | 'small24', Rules>;
 export const MAX_SEATS: Record<Rules['deck'], number>;   // 24: 4, 32: 5, 52: 8
-export function validateRules(r: unknown): Rules | null; // zakresy, spójność, nieznane pola → null
+export function validateRules(r: unknown): Rules | null; // zakresy, spójność, brak/nadmiar pól → null
 
 // score.ts
 export function handValue(hand: Card[], rules: Rules): { total: number; soft: boolean; bust: boolean; persian: boolean };
@@ -148,51 +150,57 @@ export function handValue(hand: Card[], rules: Rules): { total: number; soft: bo
 export type Action = 'hit' | 'stand';
 export type SeatStatus = 'waiting' | 'playing' | 'stood' | 'bust' | 'maxed';
 export interface RoundState {
-  v: 1;
-  rules: Rules;
-  seed: number;
+  v: 1; rules: Rules; seed: number;
   stock: Card[];                 // potasowana przy starcie; indeks 0 = wierzch
-  hands: Card[][];
-  status: SeatStatus[];
+  hands: Card[][]; status: SeatStatus[];
   order: number[];               // kolejność ruchów (bank ostatni)
   turn: number | null;           // miejsce na ruchu
-  bank: number | null;           // tryb bank
+  dealer: number; bank: number | null;
   revealed: boolean[];           // czyje karty są odkryte
-  log: RoundEvent[];
-  result: RoundResult | null;
+  log: RoundEvent[]; result: RoundResult | null;
 }
 export type RoundEvent =
   | { t: 'deal'; seat: number; count: number }
-  | { t: 'hit'; seat: number; card?: Card }     // card tylko dla właściciela ręki (lub po odkryciu)
+  | { t: 'hit'; seat: number; card?: Card }     // card tylko dla właściciela ręki (eventsFor)
   | { t: 'stand'; seat: number }
-  | { t: 'bust'; seat: number }                 // publiczne tylko przy bustRevealed
+  | { t: 'bust'; seat: number }                 // dla innych tylko przy bustRevealed (inaczej → 'stand')
   | { t: 'persian'; seat: number }              // zawsze publiczne
+  | { t: 'maxed'; seat: number }                // limit kart osiągnięty
   | { t: 'reveal'; seat: number; hand: Card[] }
   | { t: 'result'; result: RoundResult };
 export interface RoundResult {
   values: { seat: number; total: number; bust: boolean; persian: boolean }[];
   points: number[];                       // +punkty per miejsce w tej rundzie
-  duels?: { seat: number; winner: 'player' | 'bank' | 'none' }[];   // tryb bank
+  duels?: { seat: number; winner: 'player' | 'bank' | 'none' }[];   // tryb bank, wg miejsc
 }
-
 export function newRound(rules: Rules, seats: number, seed: number, dealer: number, bank: number | null): RoundState;
-export function legal(s: RoundState): Action[];               // dla s.turn; bez 'hit' przy pustej talii
-export function apply(s: RoundState, a: Action): { state: RoundState; events: RoundEvent[] } | { error: string };
+export function dealRound(rules, seats, stock, dealer, bank, seed?): RoundState;   // z podanej talii (testy, samouczek)
+export function legal(s: RoundState): Action[];               // bez 'hit' przy pustej talii
+export function apply(s: RoundState, seat: number, a: Action): { state: RoundState; events: RoundEvent[] } | { error: 'round-over' | 'not-your-turn' | 'illegal-action' };
+export function scoreRound(rules: Rules, hands: Card[][], bank: number | null): RoundResult;
 
-// match.ts — seria rund do `target`, rotacja rozdającego i banku, wynik partii
+// match.ts — rundy do `target`, rotacja rozdającego i banku
 export interface MatchState { v: 1; rules: Rules; seats: number; scores: number[]; round: RoundState; roundNo: number; dealer: number; bank: number | null; seedBase: number; winner: number | null }
+export function newMatch(rules: Rules, seats: number, seedBase: number, first?: number): MatchState;
+export function matchApply(m: MatchState, seat: number, a: Action): { state: MatchState; events: RoundEvent[] } | { error };
+export function nextRound(m: MatchState): MatchState | { error: 'match-over' | 'round-not-over' };
+export function rotation(m: MatchState): { dealer: number; bank: number | null };
+export function winnerOf(scores: number[], target: number): number | null;   // jedyny lider ≥ target
 
 // view.ts — to, co widzi miejsce (bez cudzych zakrytych kart, bez talii, bez ziarna)
 export interface SeatView {
-  me: number; rules: Rules; turn: number | null; bank: number | null; dealer: number;
+  me: number; rules: Rules; roundNo: number; turn: number | null; dealer: number; bank: number | null;
   myHand: Card[]; myValue: ReturnType<typeof handValue>; myStatus: SeatStatus;
-  others: { seat: number; cards: number; status: SeatStatus; hand?: Card[] }[];  // status 'bust' → 'stood', gdy fura nieujawniona
+  others: { seat: number; cards: number; status: SeatStatus; hand?: Card[] }[];  // nieujawniona fura → 'stood'
   seenCards: Card[];               // wszystkie karty widoczne dla mnie w tej rundzie
-  stockLeft: number;
-  scores: number[]; legal: Action[];
+  stockLeft: number; scores: number[]; legal: Action[];
+  result: RoundResult | null; winner: number | null;
 }
 export function viewFor(s: MatchState, seat: number): SeatView;
 export function eventsFor(events: RoundEvent[], seat: number, s: RoundState): RoundEvent[];
+
+// version.ts
+export const ENGINE_VERSION = 1;
 ```
 
 ### 4.2 Przebieg rundy
@@ -338,12 +346,12 @@ Każdy etap kończy się: `npm test`, `npm run typecheck` na zielono, self-revie
 aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 (wstępna: `docs/mockups/oczko-makiety.html`).
 
-### Etap 0 — Repozytorium
+### Etap 0 — Repozytorium ✅
 - `CLAUDE.md`, `PLAN.md`, `docs/BLUEPRINT.md`, makiety, README.
 - Klon `dawiq/pan` (gałąź `ccr-3c56375b-8hrsv2`) do `../pan` (tylko odczyt).
 - **Gotowe, gdy:** pliki na gałęzi roboczej (do `main` przez PR na prośbę).
 
-### Etap 1 — Szkielet
+### Etap 1 — Szkielet ✅
 - Expo + TS strict + Jest + ESLint; `App.tsx` ze stanem `Screen` i obsługą
   „wstecz” Androida; splash; safe area; edge-to-edge.
 - Z Pana: `src/ui/*` (akcent Miedź wg §0), `src/storage/kv.ts`,
@@ -352,7 +360,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** aplikacja startuje, lobby z TabBar, testy `kv.ts`,
   komponentów bazowych i słów zakazanych przechodzą.
 
-### Etap 2 — Silnik
+### Etap 2 — Silnik ✅
 - §4 w całości + presety.
 - **Gotowe, gdy:** testy z §4.3 przechodzą.
 
