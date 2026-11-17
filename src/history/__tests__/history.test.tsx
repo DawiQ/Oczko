@@ -150,3 +150,39 @@ describe("history screens", () => {
     expect(textOf(r)).toContain("Twoje decyzje:");
   });
 });
+
+describe("replay edge cases", () => {
+  it("replays a last round decided in the deal (no decisions in it)", () => {
+    // Bank 1:1 without perskie oczko, 2 start cards: find a seed whose round 2
+    // ends at once (the player gets two aces = fura), after round 1 played by "stand".
+    const { newMatch, matchApply, nextRound } = jest.requireActual("../../engine/match") as typeof import("../../engine/match");
+    const rules: Rules = { ...PRESETS.bank, startCards: 2, persian: false, target: 1, bankTie: "nobody" };
+    for (let seed = 0; seed < 50000; seed++) {
+      let m = newMatch(rules, 2, seed, 0);
+      if (m.round.result) continue;
+      const decisions = [];
+      while (m.round.turn !== null) {
+        decisions.push({ round: 1, seat: m.round.turn, action: "stand" as const });
+        m = (matchApply(m, m.round.turn, "stand") as { state: typeof m }).state;
+      }
+      if (m.winner !== null) continue;
+      const m2 = nextRound(m);
+      if ("error" in m2 || !m2.round.result || m2.winner === null) continue;
+      const rec: HistoryRecord = {
+        v: 1,
+        engineVersion: ENGINE_VERSION,
+        id: "x",
+        date: 1,
+        setup: { v: 1, rules, seats: [{ kind: "human", name: "Ty" }, { kind: "bot", persona: "ola", name: "Ola" }], seed, mode: "match", first: 0 },
+        me: 0,
+        decisions,
+        scores: m2.scores,
+        winner: m2.winner,
+        rounds: 2,
+      };
+      expect(replayMatches(rec)).toBe(true);
+      return;
+    }
+    throw new Error("no such seed");
+  });
+});

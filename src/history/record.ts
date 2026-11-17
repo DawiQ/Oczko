@@ -88,6 +88,13 @@ export function replay(r: HistoryRecord): Frame[] | { error: ReplayError } {
     m = res.state;
     frames.push({ match: m, roundNo: m.roundNo, decision: d, index: i, events: res.events });
   }
+  // Rounds at the end decided in the deal have no decisions of their own.
+  while (m.round.result && m.winner === null && m.roundNo < r.rounds) {
+    const n = nextRound(m);
+    if ("error" in n) return { error: "bad-decision" };
+    m = n;
+    frames.push({ match: m, roundNo: m.roundNo, decision: null, index: null, events: m.round.log });
+  }
   return frames;
 }
 
