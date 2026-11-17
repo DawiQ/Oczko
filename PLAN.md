@@ -435,7 +435,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - Eksport JSON.
 - **Gotowe, gdy:** zapis → odczyt → powtórka identyczna; testy klasyfikacji.
 
-### Etap 8 — Profil
+### Etap 8 — Profil ✅
 - Ranga wg punktów doświadczenia (rundy, wygrane partie), progi w
   `progress.ts`.
 - Odznaki: „Perskie oczko”, „Równe 21”, „Oczko z pięciu kart” (21 z 5+

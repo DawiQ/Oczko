@@ -2,6 +2,7 @@
 // (ranks, badges) is built on top of these numbers.
 import type { MatchState } from "../engine/match";
 import { handValue } from "../engine/score";
+import { roundBadges, type BadgeId } from "../profile/progress";
 import { readJSON, writeJSON, type KV } from "./kv";
 
 export const STATS_KEY = "oczko.stats.v1";
@@ -33,6 +34,8 @@ export interface Stats {
   byMode: { family: ModeStats; bank: ModeStats };
   /** Matches against a character (by persona id) and how many you won. */
   byPersona: Record<string, { matches: number; won: number }>;
+  /** Badges that only a single round can show (the rest come from the counters). */
+  badges: BadgeId[];
 }
 
 const emptyMode = (): ModeStats => ({ rounds: 0, roundsWon: 0, matches: 0, matchesWon: 0 });
@@ -52,6 +55,7 @@ export const emptyStats = (): Stats => ({
   bestStreak: 0,
   byMode: { family: emptyMode(), bank: emptyMode() },
   byPersona: {},
+  badges: [],
 });
 
 const nat = (x: unknown) => Number.isInteger(x) && (x as number) >= 0;
@@ -65,6 +69,7 @@ export function looksLikeStats(x: unknown): x is Stats {
   if (s.v !== 1 || !counts.every((k) => nat(s[k]))) return false;
   if (typeof s.byMode !== "object" || s.byMode === null || !looksLikeMode(s.byMode.family) || !looksLikeMode(s.byMode.bank)) return false;
   if (typeof s.byPersona !== "object" || s.byPersona === null || Array.isArray(s.byPersona)) return false;
+  if (!Array.isArray(s.badges) || !s.badges.every((b) => typeof b === "string")) return false;
   return Object.values(s.byPersona).every((p) => p && nat(p.matches) && nat(p.won));
 }
 
@@ -77,6 +82,7 @@ export function recordRound(s: Stats, m: MatchState, me: number): Stats {
   const mode = m.rules.mode;
   const stood = !v.bust && (r.status[me] === "stood" || r.status[me] === "maxed");
   const streak = won ? s.streak + 1 : 0;
+  const fresh = roundBadges(m, me).filter((b) => !s.badges.includes(b));
   return {
     ...s,
     rounds: s.rounds + 1,
@@ -89,6 +95,7 @@ export function recordRound(s: Stats, m: MatchState, me: number): Stats {
     streak,
     bestStreak: Math.max(s.bestStreak, streak),
     byMode: { ...s.byMode, [mode]: { ...s.byMode[mode], rounds: s.byMode[mode].rounds + 1, roundsWon: s.byMode[mode].roundsWon + (won ? 1 : 0) } },
+    badges: fresh.length ? [...s.badges, ...fresh] : s.badges,
   };
 }
 

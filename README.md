@@ -15,7 +15,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 5 | Stół: układ, animacje, dźwięki, koniec rundy i partii, menu, wskazówki | gotowe |
 | 6 | Lobby, nowa gra, onboarding, samouczek, zasady, ustawienia | gotowe |
 | 7 | Trener, historia partii, powtórka, analiza decyzji, eksport | gotowe |
-| 8–11 | wg `PLAN.md` §7 | — |
+| 8 | Profil: rangi, odznaki, statystyki, następny rywal | gotowe |
+| 9–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -36,7 +37,7 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 7)
+## Architektura (stan na Etap 8)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -87,6 +88,8 @@ src/history/            record (partia = ziarno + reguły + decyzje, powtórka z
                         analysis (najlepsza / dobra / ryzykowna / błąd: utrata szansy ≤ 3 / ≤ 10 pp),
                         HistoryScreen (lista, eksport JSON), ReplayScreen (rundy, suwak, autoodtwarzanie)
 src/storage/history.ts  oczko.history.v1: 50 ostatnich partii (bez Pro widać 10)
+src/profile/            progress (rangi wg doświadczenia: Dziewiątka → … → As → Perskie oczko;
+                        7 odznak), suggest (następny rywal), ProfileScreen (makieta 9)
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
@@ -111,6 +114,16 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   ruch” — bez ruchu.
 - Dostępność: podpis „na żywo” (`accessibilityLiveRegion`), etykiety kart
   i miejsc, cele ≥ 44 px, nakładki `accessibilityViewIsModal`.
+
+## Profil
+
+- Doświadczenie: runda +1, runda z punktem +2, wygrana partia +10, odznaka +15.
+- Rangi (nazwy kart, neutralne płciowo): Dziewiątka 0, Dziesiątka 50,
+  Walet 150, Dama 350, Król 700, As 1200, Perskie oczko 2000.
+- Odznaki: Perskie oczko, Równe 21, Oczko z pięciu kart, Na krawędzi
+  (wygrana z 21 po dobraniu przy 17+), Żelazny bank (bank wygrywa wszystkie
+  pojedynki, 2+ graczy), Seria (5 rund z rzędu), Weteran (100 partii).
+  Trening się nie liczy.
 
 ## Zgodność: zero hazardu
 
@@ -186,6 +199,8 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   powtórka identyczna (family i bank), inna wersja silnika / zła decyzja,
   tabela klasyfikacji decyzji, limit 50 i zepsute rekordy, ekrany historii
   i powtórki, trener tylko w moim ruchu i z mojego widoku.
+- `src/profile/__tests__` — każda odznaka (z rundy i z liczników, także
+  „o jeden za mało”), każdy próg rangi, sugestia rywala, ekran profilu.
 - `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
   — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 

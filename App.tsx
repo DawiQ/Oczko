@@ -36,7 +36,9 @@ import { DEFAULT_CHOICES, loadChoices, saveChoices, type NewGameChoices } from "
 import { loadOnboardingDone, saveOnboardingDone } from "./src/storage/onboarding";
 import { clearSavedGame, isResumable, loadSavedGame } from "./src/storage/save";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "./src/storage/settings";
-import { loadStats } from "./src/storage/stats";
+import { emptyStats, loadStats, saveStats, type Stats } from "./src/storage/stats";
+import { ProfileScreen } from "./src/profile/ProfileScreen";
+import type { PersonaId } from "./src/ai/personas";
 import { resetHints } from "./src/table/hints";
 import { TableScreen } from "./src/table/TableScreen";
 import { DialogProvider, useConfirm } from "./src/ui/Dialog";
@@ -50,7 +52,7 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export type Screen =
   | { name: "home"; tab: Tab }
-  | { name: "newGame"; training: boolean }
+  | { name: "newGame"; training: boolean; bots?: PersonaId[] }
   | { name: "game"; source: GameSource; key: number }
   | { name: "tutorial"; key: number }
   | { name: "houseRules"; from: Tab }
@@ -71,6 +73,7 @@ export interface AppProps {
 }
 
 interface Stored {
+  stats: Stats;
   saved: SavedGame | null;
   rules: Rules;
   choices: NewGameChoices;
@@ -158,7 +161,7 @@ async function loadAll(kv: KV): Promise<Stored> {
   ]);
   // Anyone who has played already skips the onboarding.
   const onboarded = done || stats.rounds > 0 || saved !== null;
-  return { saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
+  return { stats, saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
 }
 
 function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
@@ -336,7 +339,8 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
     case "newGame":
       return (
         <NewGameScreen
-          initial={stored.choices ?? DEFAULT_CHOICES}
+          key={screen.bots?.join(",") ?? "last"}
+          initial={screen.bots ? { ...(stored.choices ?? DEFAULT_CHOICES), bots: screen.bots } : stored.choices ?? DEFAULT_CHOICES}
           rules={stored.rules}
           training={screen.training}
           onStart={(c, r) => start(c, r, screen.training)}
@@ -370,7 +374,19 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
     <View style={{ flex: 1, backgroundColor: P.bg }}>
       <View style={{ flex: 1 }}>
         {tab === "profile" ? (
-          <SoonScreen title="Profil" />
+          <ProfileScreen
+            stats={stored.stats}
+            onPlay={(persona) => setScreen({ name: "newGame", training: false, bots: [persona as PersonaId] })}
+            onHistory={() => {
+              void loadHistory(kv).then(setHistory);
+              setScreen({ name: "history", from: tab });
+            }}
+            onReset={() => {
+              const fresh = emptyStats();
+              void saveStats(kv, fresh);
+              setStored((old) => (old ? { ...old, stats: fresh } : old));
+            }}
+          />
         ) : tab === "rules" ? (
           <RulesScreen rules={stored.rules} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />
         ) : (
