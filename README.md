@@ -13,7 +13,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 3 | Boty, ewaluator, turniej, statystyki | gotowe |
 | 4 | Kontroler gry, zapis i wznawianie, statystyki | gotowe |
 | 5 | Stół: układ, animacje, dźwięki, koniec rundy i partii, menu, wskazówki | gotowe |
-| 6–11 | wg `PLAN.md` §7 | — |
+| 6 | Lobby, nowa gra, onboarding, samouczek, zasady, ustawienia | gotowe |
+| 7–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -34,7 +35,7 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 5)
+## Architektura (stan na Etap 6)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -72,6 +73,13 @@ src/table/              stół (makiety 4–8), działa na dowolnym TableGame
   RoundEnd.tsx          koniec rundy (ręce, kto punktuje, paski punktów), koniec partii (podium)
   texts.ts, layout.ts   czyste funkcje: komunikaty (neutralne płciowo), rozmieszczenie miejsc
   hints.ts              jednorazowe wskazówki (oczko.hints.v1)
+src/onboarding/         „Jak grasz u siebie?” (Welcome), samouczek: skryptowana runda z ziarna
+                        (tutorialScript, tools/find-tutorial-seed.ts, sprawdzana testem)
+src/newgame/            NewGameScreen (rywale − n +, tryb, długość, reguły w BottomSheet),
+                        RulesEditor (wszystkie warianty), HouseRulesScreen, rulesText (opisy)
+src/info/RulesScreen    zasady: rodzinne, z bankierem, warianty, przykłady rąk, wartości kart
+src/home/SettingsSheet  dźwięk, wibracje, trener, tempo rywali, reguły domowe, wskazówki od nowa
+src/storage/settings, houseRules, onboarding, newGame   oczko.settings / rules / onboarding / newgame .v1
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
@@ -96,8 +104,6 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   ruch” — bez ruchu.
 - Dostępność: podpis „na żywo” (`accessibilityLiveRegion`), etykiety kart
   i miejsc, cele ≥ 44 px, nakładki `accessibilityViewIsModal`.
-- „Nowa gra” w lobby na razie startuje stół z Olą, Helą i Markiem (wybór
-  rywali — Etap 6).
 
 ## Zgodność: zero hazardu
 
@@ -166,8 +172,11 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   komunikaty dla każdego momentu partii (bez form rodzajowych), układ miejsc.
 - `src/storage/__tests__/save-stats.test.ts` — walidacja zapisu (zepsute
   dane → `null`), reduktory statystyk, brak utraconych aktualizacji.
-- `src/__tests__/App.render.test.tsx` — test dymny: lobby, zakładki,
-  „wstecz” Androida, cała partia przy stole do końca, wyjście i wznowienie.
+- `src/__tests__/App.render.test.tsx` — test dymny: onboarding → nowa gra →
+  cała partia („Pokaż wynik”) → lobby → wznowienie; samouczek; ustawienia
+  i reguły domowe; zakładki i „wstecz” Androida.
+- `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
+  — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 
 ## Dokumenty
 

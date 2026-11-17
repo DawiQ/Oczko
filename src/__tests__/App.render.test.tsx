@@ -24,6 +24,7 @@ import App from "../../App";
 import { threshold } from "../ai/policies";
 import { INSTANT } from "../game/pace";
 import { memoryKV, type KV } from "../storage/kv";
+import { ONBOARDING_KEY } from "../storage/onboarding";
 import { loadSavedGame } from "../storage/save";
 import { loadStats } from "../storage/stats";
 /* eslint-enable import/first */
@@ -53,7 +54,10 @@ async function press(r: ReactTestRenderer, label: string) {
   await settle();
 }
 
-async function renderApp(kv: KV = memoryKV()): Promise<ReactTestRenderer> {
+/** Storage of someone past the onboarding. */
+const onboarded = () => memoryKV({ [ONBOARDING_KEY]: JSON.stringify({ v: 1, done: true }) });
+
+async function renderApp(kv: KV = onboarded()): Promise<ReactTestRenderer> {
   let r!: ReactTestRenderer;
   await act(async () => {
     r = create(<App kv={kv} pace={INSTANT} sleep={() => Promise.resolve()} decide={async (_s, v, rng) => threshold(17)(v, rng)} />);
@@ -67,6 +71,7 @@ async function playToEnd(r: ReactTestRenderer) {
   for (let i = 0; i < 400; i++) {
     if (button(r, "Rewanż")) return;
     if (button(r, "Następna runda")) await press(r, "Następna runda");
+    else if (button(r, "Pokaż wynik")) await press(r, "Pokaż wynik");
     else if (button(r, "Starczy")) {
       const m = /masz (\d+)/.exec(textOf(r));
       await press(r, m && Number(m[1]) < 15 && button(r, "Dobieram") ? "Dobieram" : "Starczy");
@@ -89,7 +94,7 @@ describe("App", () => {
 
   it("opens a screen from the lobby and comes back with the back button", async () => {
     const r = await renderApp();
-    await press(r, "Ustawienia");
+    await press(r, "Ze znajomymi przez Wi‑Fi");
     expect(textOf(r)).toContain("Wkrótce");
     await press(r, "Wróć");
     expect(textOf(r)).toContain("Ze znajomymi");
@@ -100,7 +105,7 @@ describe("App", () => {
     await press(r, "Zasady");
     expect(textOf(r)).not.toContain("Nowa gra");
     await press(r, "Graj");
-    await press(r, "Ustawienia");
+    await press(r, "Ze znajomymi przez Wi‑Fi");
     await act(async () => void pressBack());
     await settle();
     expect(textOf(r)).toContain("Nowa gra");
@@ -116,10 +121,15 @@ describe("App", () => {
     expect(handled).toBe(false); // the system closes the app
   });
 
-  it("plays a whole match, then back to the lobby", async () => {
+  it("onboarding → new game → a whole match → lobby → resume", async () => {
     const kv = memoryKV();
     const r = await renderApp(kv);
+    expect(textOf(r)).toContain("Jak grasz u siebie?");
+    await press(r, "Gotowe");
+    expect(textOf(r)).toContain("Nowa gra");
     await press(r, "Nowa gra");
+    expect(textOf(r)).toContain("Rywale");
+    await press(r, "Graj");
     expect(textOf(r)).toContain("Runda 1");
     await playToEnd(r);
     expect(textOf(r)).toMatch(/Partia dla Ciebie!|Partię wygrywa/);
@@ -130,12 +140,54 @@ describe("App", () => {
     await press(r, "Do lobby");
     expect(textOf(r)).toContain("Nowa gra");
     expect(textOf(r)).not.toContain("Wznów partię");
+    // A new game, left in the middle and resumed.
+    await press(r, "Nowa gra");
+    await press(r, "Graj");
+    if (button(r, "Rozumiem")) await press(r, "Rozumiem");
+    await press(r, "Menu");
+    await press(r, "Wyjdź do lobby");
+    await settle();
+    expect(textOf(r)).toContain("Wznów partię");
+    await press(r, "Wznów");
+    expect(textOf(r)).toContain("Runda");
+    // The onboarding does not come back.
+    const again = await renderApp(kv);
+    expect(textOf(again)).not.toContain("Jak grasz u siebie?");
+  });
+
+  it("the tutorial: only the expected button works, then a real game", async () => {
+    const r = await renderApp(memoryKV());
+    await press(r, "Pokaż mi zasady na przykładzie");
+    for (let i = 0; i < 20 && !button(r, "Zagraj partię"); i++) {
+      const hit = button(r, "Dobieram");
+      const stand = button(r, "Starczy");
+      expect(!!hit && !!stand).toBe(false); // never both
+      if (hit) await press(r, "Dobieram");
+      else if (stand) await press(r, "Starczy");
+      else await settle();
+    }
+    expect(textOf(r)).toContain("Tak się gra w Oczko!");
+    await press(r, "Zagraj partię");
+    expect(textOf(r)).toContain("Rywale");
+  });
+
+  it("settings and house rules from the lobby", async () => {
+    const kv = onboarded();
+    const r = await renderApp(kv);
+    await press(r, "Ustawienia");
+    expect(textOf(r)).toContain("Tempo rywali");
+    await press(r, "Jak grasz u siebie");
+    await press(r, "Z bankierem, każdy gra z bankiem");
+    await press(r, "Zapisz");
+    expect(textOf(r)).toContain("Z bankierem · W 2, D 3, K 4");
+    expect(JSON.parse((await kv.get("oczko.rules.v1"))!).mode).toBe("bank");
   });
 
   it("leaves a game and resumes it from the lobby", async () => {
-    const kv = memoryKV();
+    const kv = onboarded();
     const r = await renderApp(kv);
     await press(r, "Nowa gra");
+    await press(r, "Graj");
     if (button(r, "Rozumiem")) await press(r, "Rozumiem");
     await press(r, "Menu");
     await press(r, "Wyjdź do lobby");

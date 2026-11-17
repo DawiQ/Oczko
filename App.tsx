@@ -1,6 +1,6 @@
-// App root: the main tabs (Graj · Profil · Zasady), the table and the screens
-// opened from them. Navigation is a plain `Screen` state (no library);
-// Android "back" is handled here.
+// App root: the onboarding, the main tabs (Graj · Profil · Zasady), new game,
+// the table and the screens opened from them. Navigation is a plain `Screen`
+// state (no library); Android "back" is handled here.
 import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
@@ -8,38 +8,66 @@ import { useCallback, useEffect, useState } from "react";
 import { BackHandler, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
-import { DEFAULT_RULES } from "./src/engine/rules";
-import type { Pace } from "./src/game/pace";
+import { personaById } from "./src/ai/personas";
+import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
+import type { SavedGame } from "./src/game/GameController";
+import { PACES, type Pace } from "./src/game/pace";
 import { freshSeed, makeSetup } from "./src/game/setup";
 import { useGame, type GameSource, type UseGameOptions } from "./src/game/useGame";
 import { HomeScreen, type ResumeInfo } from "./src/home/HomeScreen";
+import { SettingsSheet } from "./src/home/SettingsSheet";
 import { SoonScreen } from "./src/home/SoonScreen";
 import { TabBar, type Tab } from "./src/home/TabBar";
+import { RulesScreen } from "./src/info/RulesScreen";
+import { HouseRulesScreen } from "./src/newgame/HouseRulesScreen";
+import { NewGameScreen } from "./src/newgame/NewGameScreen";
+import { summaryLines } from "./src/newgame/rulesText";
+import { TutorialScreen } from "./src/onboarding/TutorialScreen";
+import { Welcome } from "./src/onboarding/Welcome";
+import { loadHouseRules, saveHouseRules } from "./src/storage/houseRules";
 import { deviceKV, type KV } from "./src/storage/kv";
+import { DEFAULT_CHOICES, loadChoices, saveChoices, type NewGameChoices } from "./src/storage/newGame";
+import { loadOnboardingDone, saveOnboardingDone } from "./src/storage/onboarding";
 import { clearSavedGame, isResumable, loadSavedGame } from "./src/storage/save";
+import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "./src/storage/settings";
+import { loadStats } from "./src/storage/stats";
+import { resetHints } from "./src/table/hints";
 import { TableScreen } from "./src/table/TableScreen";
-import type { SavedGame } from "./src/game/GameController";
-import { personaById } from "./src/ai/personas";
-import { DialogProvider } from "./src/ui/Dialog";
+import { DialogProvider, useConfirm } from "./src/ui/Dialog";
 import { FONT_SOURCES } from "./src/ui/fonts";
+import { setHapticsEnabled } from "./src/ui/haptics";
 import { P } from "./src/ui/palette";
-import { initSounds } from "./src/ui/sound";
+import { initSounds, setSoundEnabled } from "./src/ui/sound";
 
 // Keep the native splash screen up until the font and stored data are ready.
 SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export type Screen =
   | { name: "home"; tab: Tab }
+  | { name: "newGame"; training: boolean }
   | { name: "game"; source: GameSource; key: number }
+  | { name: "tutorial"; key: number }
+  | { name: "houseRules"; from: Tab }
+  /** The rules opened from the table's menu (back resumes the game). */
+  | { name: "rules"; backToGame: boolean }
   /** A part still being built, opened from a tab (back returns to it). */
   | { name: "soon"; title: string; from: Tab };
 
 export interface AppProps {
   kv?: KV;
+  /** Tests: the table's pace (otherwise from the settings). */
   pace?: Pace;
   /** Tests: bots' decisions and pauses. */
   decide?: UseGameOptions["decide"];
   sleep?: UseGameOptions["sleep"];
+}
+
+interface Stored {
+  saved: SavedGame | null;
+  rules: Rules;
+  choices: NewGameChoices;
+  settings: Settings;
+  onboarded: boolean;
 }
 
 export default function App(props: AppProps) {
@@ -56,10 +84,10 @@ export default function App(props: AppProps) {
 function resumeInfo(saved: SavedGame): ResumeInfo {
   const m = saved.match;
   const mode = saved.setup.rules.mode === "bank" ? "Z bankierem" : "Rodzinne";
-  const target = saved.setup.mode === "single" ? "jedna runda" : `do ${saved.setup.rules.target} pkt`;
+  const kind = saved.setup.mode === "training" ? "trening" : saved.setup.mode === "single" ? "jedna runda" : `do ${saved.setup.rules.target} pkt`;
   return {
     title: `Runda ${m.roundNo}`,
-    line: `${mode} · ${target} · ${saved.setup.seats.map((s) => s.name).join(", ")}`,
+    line: `${mode} · ${kind} · ${saved.setup.seats.map((s) => s.name).join(", ")}`,
     seats: saved.setup.seats.map((s, i) => ({
       name: s.name,
       color: s.kind === "bot" ? personaById(s.persona)?.color ?? P.muted : P.accent,
@@ -68,52 +96,74 @@ function resumeInfo(saved: SavedGame): ResumeInfo {
   };
 }
 
-function GameScreen({ source, opts, onExit, onNewGame, onRules }: { source: GameSource; opts: UseGameOptions; onExit: () => void; onNewGame: () => void; onRules: () => void }) {
+function GameScreen({
+  source,
+  opts,
+  onExit,
+  onNewGame,
+  onRules,
+}: {
+  source: GameSource;
+  opts: UseGameOptions;
+  onExit: () => void;
+  onNewGame: () => void;
+  onRules: () => void;
+}) {
   const { game } = useGame(source, opts);
-  return (
-    <TableScreen
-      game={game}
-      kv={opts.kv}
-      onExit={onExit}
-      onNewGame={onNewGame}
-      onRules={onRules}
-      onGiveUp={() => void clearSavedGame(opts.kv)}
-    />
-  );
+  return <TableScreen game={game} kv={opts.kv} onExit={onExit} onNewGame={onNewGame} onRules={onRules} onGiveUp={() => void clearSavedGame(opts.kv)} />;
+}
+
+function applySettings(s: Settings): void {
+  setSoundEnabled(s.sound);
+  setHapticsEnabled(s.haptics);
+}
+
+async function loadAll(kv: KV): Promise<Stored> {
+  const [saved, rules, choices, settings, done, stats] = await Promise.all([
+    loadSavedGame(kv),
+    loadHouseRules(kv),
+    loadChoices(kv),
+    loadSettings(kv),
+    loadOnboardingDone(kv),
+    loadStats(kv),
+  ]);
+  // Anyone who has played already skips the onboarding.
+  const onboarded = done || stats.rounds > 0 || saved !== null;
+  return { saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
 }
 
 function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
+  const confirm = useConfirm();
   const [screen, setScreen] = useState<Screen>({ name: "home", tab: "play" });
-  const [saved, setSaved] = useState<SavedGame | null>(null);
-  const [loaded, setLoaded] = useState(false);
+  const [stored, setStored] = useState<Stored | null>(null);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [fontsLoaded, fontError] = useFonts(FONT_SOURCES);
   // A missing font must not block the app: it falls back to the system font.
-  const ready = loaded && (fontsLoaded || !!fontError);
+  const ready = !!stored && (fontsLoaded || !!fontError);
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
 
-  const reload = useCallback(
-    () =>
-      loadSavedGame(kv).then((s) => {
-        setSaved(isResumable(s) ? s : null);
-        setLoaded(true);
-      }),
-    [kv]
-  );
-
   useEffect(() => {
     let alive = true;
-    loadSavedGame(kv).then((s) => {
+    loadAll(kv).then((s) => {
       if (!alive) return;
-      setSaved(isResumable(s) ? s : null);
-      setLoaded(true);
+      applySettings(s.settings);
+      setStored(s);
     });
     void initSounds();
     return () => {
       alive = false;
     };
   }, [kv]);
+
+  const reload = useCallback(
+    () =>
+      loadAll(kv).then((s) => {
+        setStored((old) => (old ? { ...s, onboarded: true } : s));
+      }),
+    [kv]
+  );
 
   const home = useCallback(
     (tab: Tab = "play") => {
@@ -124,74 +174,181 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
     [reload]
   );
 
-  const back = useCallback((): boolean => {
-    if (screen.name === "soon") {
-      home(screen.from);
-      return true;
-    }
-    if (screen.name === "game") {
-      home();
-      return true;
-    }
-    if (screen.tab !== "play") {
-      setScreen({ name: "home", tab: "play" });
-      return true;
-    }
-    return false; // the lobby: leave the app
-  }, [screen, home]);
+  const finishOnboarding = (rules: Rules) => {
+    void saveHouseRules(kv, rules);
+    void saveOnboardingDone(kv);
+    setStored((s) => (s ? { ...s, rules, onboarded: true } : s));
+  };
 
-  // Android back: screens go back to where they were opened from, other tabs
-  // go to "Graj", the lobby leaves the app. Open bottom sheets handle back first.
+  const back = useCallback((): boolean => {
+    if (stored && !stored.onboarded) return false;
+    switch (screen.name) {
+      case "soon":
+      case "houseRules":
+        home(screen.from);
+        return true;
+      case "newGame":
+      case "tutorial":
+      case "game":
+        home();
+        return true;
+      case "rules":
+        if (screen.backToGame)
+          // The table saved the game on leaving; storage reads wait for queued writes.
+          void loadSavedGame(kv).then((s) => (isResumable(s) ? setScreen({ name: "game", source: { saved: s }, key: Date.now() }) : home()));
+        else home();
+        return true;
+      default:
+        if (screen.tab === "play") return false; // the lobby: leave the app
+        setScreen({ name: "home", tab: "play" });
+        return true;
+    }
+  }, [screen, home, stored, kv]);
+
+  // Android back: screens go back to where they came from, other tabs go to
+  // "Graj", the lobby leaves the app. Open bottom sheets handle back first.
   useEffect(() => {
     const sub = BackHandler.addEventListener("hardwareBackPress", back);
     return () => sub.remove();
   }, [back]);
 
-  const startNew = () => {
-    const setup = makeSetup(DEFAULT_RULES, ["ola", "hela", "marek"], "match", freshSeed());
-    setSaved(null);
-    setScreen({ name: "game", source: { setup }, key: Date.now() });
+  if (!ready || !stored) return <View style={{ flex: 1, backgroundColor: P.bg }} />;
+
+  const tablePace = pace ?? PACES[stored.settings.pace];
+  const gameOpts: UseGameOptions = { kv, pace: tablePace, decide, sleep };
+
+  const start = (choices: NewGameChoices, rules: Rules, training: boolean) => {
+    const go = () => {
+      void saveChoices(kv, choices);
+      void clearSavedGame(kv);
+      const mode = training ? "training" : choices.length === "single" ? "single" : "match";
+      const setup = makeSetup(rules, choices.bots, mode, freshSeed());
+      setStored((s) => (s ? { ...s, choices, saved: null } : s));
+      setScreen({ name: "game", source: { setup }, key: Date.now() });
+    };
+    if (stored.saved)
+      void confirm({
+        title: "Masz niedokończoną partię",
+        message: "Nowa gra zastąpi zapisaną — tamtej nie będzie już można wznowić.",
+        confirmText: "Zacznij nową",
+        destructive: true,
+      }).then((ok) => ok && go());
+    else go();
   };
 
-  if (!ready) return <View style={{ flex: 1, backgroundColor: P.bg }} />;
-
-  if (screen.name === "soon") return <SoonScreen title={screen.title} onBack={back} />;
-
-  if (screen.name === "game")
+  if (!stored.onboarded && screen.name !== "tutorial")
     return (
-      <GameScreen
-        key={screen.key}
-        source={screen.source}
-        opts={{ kv, pace, decide, sleep }}
-        onExit={() => home()}
-        onNewGame={startNew}
-        onRules={() => setScreen({ name: "soon", title: "Zasady", from: "play" })}
+      <Welcome
+        initial={stored.rules}
+        onDone={(r) => {
+          finishOnboarding(r);
+          setScreen({ name: "home", tab: "play" });
+        }}
+        onTutorial={(r) => {
+          finishOnboarding(r);
+          setScreen({ name: "tutorial", key: Date.now() });
+        }}
       />
     );
 
+  switch (screen.name) {
+    case "soon":
+      return <SoonScreen title={screen.title} onBack={back} />;
+    case "tutorial":
+      return (
+        <TutorialScreen
+          key={screen.key}
+          kv={kv}
+          pace={tablePace}
+          sleep={sleep}
+          onPlay={() => setScreen({ name: "newGame", training: false })}
+          onExit={() => home()}
+        />
+      );
+    case "houseRules":
+      return (
+        <HouseRulesScreen
+          initial={stored.rules}
+          onBack={back}
+          onSave={(rules) => {
+            void saveHouseRules(kv, rules);
+            setStored((s) => (s ? { ...s, rules } : s));
+            home(screen.from);
+          }}
+        />
+      );
+    case "rules":
+      return <RulesScreen rules={stored.rules} onBack={back} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />;
+    case "newGame":
+      return (
+        <NewGameScreen
+          initial={stored.choices ?? DEFAULT_CHOICES}
+          rules={stored.rules}
+          training={screen.training}
+          onStart={(c, r) => start(c, r, screen.training)}
+          onBack={back}
+        />
+      );
+    case "game":
+      return (
+        <GameScreen
+          key={screen.key}
+          source={screen.source}
+          opts={gameOpts}
+          onExit={() => home()}
+          onNewGame={() => setScreen({ name: "newGame", training: false })}
+          onRules={() => setScreen({ name: "rules", backToGame: true })}
+        />
+      );
+    default:
+      break;
+  }
+
   const tab = screen.tab;
   const open = (title: string) => setScreen({ name: "soon", title, from: tab });
+  const changeSettings = (s: Settings) => {
+    applySettings(s);
+    void saveSettings(kv, s);
+    setStored((old) => (old ? { ...old, settings: s } : old));
+  };
   return (
     <View style={{ flex: 1, backgroundColor: P.bg }}>
       <View style={{ flex: 1 }}>
         {tab === "profile" ? (
           <SoonScreen title="Profil" />
         ) : tab === "rules" ? (
-          <SoonScreen title="Zasady" />
+          <RulesScreen rules={stored.rules} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />
         ) : (
           <HomeScreen
-            resume={saved ? resumeInfo(saved) : null}
-            onResume={() => saved && setScreen({ name: "game", source: { saved }, key: Date.now() })}
-            onNewGame={startNew}
+            rulesSummary={summaryLines(stored.rules)}
+            resume={stored.saved ? resumeInfo(stored.saved) : null}
+            onResume={() => stored.saved && setScreen({ name: "game", source: { saved: stored.saved }, key: Date.now() })}
+            onNewGame={() => setScreen({ name: "newGame", training: false })}
             onFriends={() => open("Ze znajomymi")}
-            onTraining={() => open("Trening")}
-            onHouseRules={() => open("Jak grasz u siebie?")}
+            onTraining={() => setScreen({ name: "newGame", training: true })}
+            onHouseRules={() => setScreen({ name: "houseRules", from: "play" })}
             onHistory={() => open("Historia")}
-            onSettings={() => open("Ustawienia")}
+            onSettings={() => setSettingsOpen(true)}
           />
         )}
       </View>
       <TabBar tab={tab} onChange={(t) => setScreen({ name: "home", tab: t })} />
+      {settingsOpen && (
+        <SettingsSheet
+          settings={stored.settings ?? DEFAULT_SETTINGS}
+          rules={stored.rules ?? DEFAULT_RULES}
+          onChange={changeSettings}
+          onHouseRules={() => {
+            setSettingsOpen(false);
+            setScreen({ name: "houseRules", from: tab });
+          }}
+          onResetTips={() => {
+            void resetHints(kv);
+            setSettingsOpen(false);
+          }}
+          onClose={() => setSettingsOpen(false)}
+        />
+      )}
     </View>
   );
 }

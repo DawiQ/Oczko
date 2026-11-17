@@ -105,6 +105,7 @@ export class GameController implements TableGame {
       this.showdownDone = saved.match.round.result !== null;
     } else this.begin();
     this.snapshot = this.build();
+    if (!saved) this.save(); // a game just started can be resumed too
     void this.loop();
   }
 

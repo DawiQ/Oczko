@@ -409,7 +409,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** pełna partia family i bank 2–6 graczy grywalna, test
   renderu stołu z zamockowanym kontrolerem.
 
-### Etap 6 — Lobby, nowa gra, onboarding, zasady
+### Etap 6 — Lobby, nowa gra, onboarding, zasady ✅
 - Zakładki **Graj · Profil · Zasady**; „Wznów partię”; ustawienia ⚙︎
   (dźwięk, haptyka, tempo botów, trener, prywatność reklam, wygląd).
 - Onboarding „Jak grasz u siebie?”: tryb (rodzinne / z bankierem), wartości

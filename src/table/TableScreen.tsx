@@ -80,6 +80,9 @@ export function TableScreen({
   onGiveUp,
   trainer,
   recommend,
+  allowed,
+  coach,
+  endPanel,
 }: {
   game: TableGame;
   kv: KV;
@@ -93,6 +96,11 @@ export function TableScreen({
   trainer?: (s: GameSnapshot) => ReactNode;
   /** The button the trainer recommends. */
   recommend?: "hit" | "stand" | null;
+  /** Tutorial: only these moves are allowed, with a coach's line. */
+  allowed?: ("hit" | "stand")[];
+  coach?: string | null;
+  /** Replaces the match-end panel (tutorial). */
+  endPanel?: ReactNode;
 }) {
   const snap = useSyncExternalStore(game.subscribe, game.getSnapshot);
   const insets = useSafeAreaInsets();
@@ -140,7 +148,7 @@ export function TableScreen({
       alive = false;
     };
   }, [kv]);
-  const hint = seen && !persian ? hintFor(snap, seen) : null;
+  const hint = seen && !persian && !coach ? hintFor(snap, seen) : null;
   const dismissHint = useCallback(() => {
     if (!hint || !seen) return;
     const next = [...seen, hint];
@@ -159,7 +167,8 @@ export function TableScreen({
   const size = seatSize(opp.length);
   const seatW = PORTRAIT_SIZE[size] + 56;
   const myTurn = snap.phase === "myTurn";
-  const canHit = myTurn && snap.view.legal.includes("hit");
+  const canHit = myTurn && snap.view.legal.includes("hit") && (!allowed || allowed.includes("hit"));
+  const canStand = myTurn && (!allowed || allowed.includes("stand"));
   const at21 = myTurn && snap.view.myValue.total === 21;
 
   const giveUp = async () => {
@@ -215,6 +224,12 @@ export function TableScreen({
 
         {trainer && myTurn && <View style={s.trainer}>{trainer(snap)}</View>}
 
+        {coach ? (
+          <View style={[s.tip, s.coach]} accessibilityLiveRegion="polite">
+            <Text style={s.tipText}>{coach}</Text>
+          </View>
+        ) : null}
+
         {hint && (
           <View style={s.tip} accessibilityLiveRegion="polite">
             <Text style={s.tipText}>{HINT_TEXT[hint]}</Text>
@@ -246,6 +261,7 @@ export function TableScreen({
             <Button3D
               label="Starczy"
               tone={recommend === "hit" ? "dark" : "accent"}
+              disabled={!canStand}
               onPress={() => game.stand()}
               style={[s.btn, (at21 || recommend === "stand") && s.glow]}
               big
@@ -266,7 +282,8 @@ export function TableScreen({
       </ImageBackground>
 
       {snap.phase === "roundEnd" && <RoundEndPanel snap={snap} onNext={() => game.nextRound()} onReplay={() => game.replayRound()} />}
-      {snap.phase === "matchEnd" && (
+      {snap.phase === "matchEnd" && endPanel}
+      {snap.phase === "matchEnd" && !endPanel && (
         <MatchEndPanel snap={snap} onRematch={() => game.rematch()} onNewGame={onNewGame} onExit={onExit} onReplay={() => game.replayRound()} reduceMotion={reduceMotion} />
       )}
 
@@ -338,6 +355,7 @@ const s = StyleSheet.create({
     elevation: 30,
   },
   tipText: { flex: 1, color: P.text, fontSize: 13, lineHeight: 18 },
+  coach: { minHeight: 56 },
   tipBtn: { minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: 12, backgroundColor: P.accent },
   tipBtnText: { color: P.onAccent, fontWeight: "800" },
   handBox: { position: "absolute", left: 0, right: 0, bottom: 10 },
