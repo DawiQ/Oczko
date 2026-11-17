@@ -10,7 +10,9 @@
     "test": "jest",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
-    "art": "node tools/render-art.js && node tools/render-game-art.js"
+    "art": "node tools/render-art.js && node tools/render-game-art.js",
+    "stats": "tsx tools/stats.ts",
+    "tournament": "tsx tools/tournament.ts"
   },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",
@@ -37,6 +39,7 @@
     "jest": "^30.0.0",
     "jest-expo": "~58.0.14",
     "react-test-renderer": "19.3.0",
+    "tsx": "^4.23.15",
     "typescript": "~6.0.3"
   },
   "jest": {

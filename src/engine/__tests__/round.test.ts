@@ -46,7 +46,7 @@ describe("deal and order", () => {
   it.each([
     ["too few seats", family, 1, 0, null],
     ["too many seats for 52", family, 9, 0, null],
-    ["too many seats for 24", PRESETS.small24, 5, 0, null],
+    ["too many seats for 24", PRESETS.small24, 6, 0, null],
     ["a dealer off the table", family, 3, 3, null],
     ["no bank in bank mode", bank, 3, 0, null],
     ["a bank off the table", bank, 3, 0, 5],

@@ -35,6 +35,8 @@ function checkView(m: MatchState, viewer: number): void {
   for (const o of v.others) {
     expect(o.cards).toBe(m.round.hands[o.seat].length);
     expect(o.hand !== undefined).toBe(m.round.revealed[o.seat]);
+    // perskie oczko is announced the moment it is formed
+    expect(o.persian).toBe(m.round.log.some((e) => e.t === "persian" && e.seat === o.seat));
     const real = m.round.status[o.seat];
     expect(o.status).toBe(real === "bust" && !m.round.revealed[o.seat] ? "stood" : real);
   }

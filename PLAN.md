@@ -36,7 +36,7 @@ Makiety zaakceptowane przez właściciela (akcent Miedź) — obowiązują w Eta
 | Partia | do 10 punktów; wygrywa jedyny lider z wynikiem ≥ celu po pełnej rundzie |
 | Rewanż | ci sami rywale, **nowe karty**; te same karty tylko w Treningu, bez punktów i statystyk (§6) |
 | Trener w grze Wi‑Fi | wyłączony dla wszystkich |
-| Limity graczy wg talii | 24 → 2–4, 32 → 2–5, 52 → 2–8 (do potwierdzenia pomiarem w `npm run stats`) |
+| Limity graczy wg talii | 24 → 2–5, 32 → 2–7, 52 → 2–8 (zmierzone: `docs/STATS.md`) |
 | Zawartość Pro i limity portfela | wg §10 |
 
 ---
@@ -140,7 +140,7 @@ export interface Rules {
 }
 export const DEFAULT_RULES: Rules;
 export const PRESETS: Record<'family' | 'bank' | 'small24', Rules>;
-export const MAX_SEATS: Record<Rules['deck'], number>;   // 24: 4, 32: 5, 52: 8
+export const MAX_SEATS: Record<Rules['deck'], number>;   // 24: 5, 32: 7, 52: 8
 export function validateRules(r: unknown): Rules | null; // zakresy, spójność, brak/nadmiar pól → null
 
 // score.ts
@@ -191,7 +191,7 @@ export function winnerOf(scores: number[], target: number): number | null;   // 
 export interface SeatView {
   me: number; rules: Rules; roundNo: number; turn: number | null; dealer: number; bank: number | null;
   myHand: Card[]; myValue: ReturnType<typeof handValue>; myStatus: SeatStatus;
-  others: { seat: number; cards: number; status: SeatStatus; hand?: Card[] }[];  // nieujawniona fura → 'stood'
+  others: { seat: number; cards: number; status: SeatStatus; persian: boolean; hand?: Card[] }[];  // nieujawniona fura → 'stood'; persian = ogłoszone perskie
   seenCards: Card[];               // wszystkie karty widoczne dla mnie w tej rundzie
   stockLeft: number; scores: number[]; legal: Action[];
   result: RoundResult | null; winner: number | null;
@@ -364,7 +364,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - §4 w całości + presety.
 - **Gotowe, gdy:** testy z §4.3 przechodzą.
 
-### Etap 3 — Boty i ewaluator
+### Etap 3 — Boty i ewaluator ✅
 - §5.1, §5.2, `tools/tournament.ts`, `tools/stats.ts` → `docs/STATS.md`,
   `docs/BOTS.md`. Statystyki: średnia liczba dobrań, % fur, przewaga banku
   dla presetów, udział wygranych partii per miejsce w trybie bank (obie

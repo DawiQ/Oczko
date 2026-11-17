@@ -5,12 +5,14 @@ import type { Card } from "./cards";
 import type { MatchState } from "./match";
 import { legal, type Action, type RoundEvent, type RoundResult, type RoundState, type SeatStatus } from "./round";
 import type { Rules } from "./rules";
-import { handValue, type HandValue } from "./score";
+import { handValue, isPersian, type HandValue } from "./score";
 
 export interface OtherSeat {
   seat: number;
   cards: number;
   status: SeatStatus;
+  /** Perskie oczko announced (public: everyone knows it is two aces). */
+  persian: boolean;
   /** Only when face up. */
   hand?: Card[];
 }
@@ -50,7 +52,12 @@ export function viewFor(m: MatchState, seat: number): SeatView {
   const seen = myHand.slice();
   for (let o = 0; o < m.seats; o++) {
     if (o === seat) continue;
-    const other: OtherSeat = { seat: o, cards: s.hands[o].length, status: visibleStatus(s, o, seat) };
+    const other: OtherSeat = {
+      seat: o,
+      cards: s.hands[o].length,
+      status: visibleStatus(s, o, seat),
+      persian: isPersian(s.hands[o], m.rules),
+    };
     if (s.revealed[o]) {
       other.hand = s.hands[o].slice();
       seen.push(...other.hand);

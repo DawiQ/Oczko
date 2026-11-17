@@ -21,7 +21,7 @@ describe("rules", () => {
     expect(DEFAULT_RULES.values).toMatchObject({ 2: 2, 10: 10, 11: 2, 12: 3, 13: 4 });
     expect(PRESETS.bank.mode).toBe("bank");
     expect(PRESETS.small24.deck).toBe(24);
-    expect(MAX_SEATS).toEqual({ 24: 4, 32: 5, 52: 8 });
+    expect(MAX_SEATS).toEqual({ 24: 5, 32: 7, 52: 8 });
   });
 
   it("accepts every preset after a JSON round trip", () => {

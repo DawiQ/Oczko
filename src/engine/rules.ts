@@ -59,8 +59,10 @@ export const PRESETS: Record<"family" | "bank" | "small24", Rules> = {
   small24: { ...DEFAULT_RULES, deck: 24 },
 };
 
-/** Seats per deck: enough cards for everyone (verified by `npm run stats`). */
-export const MAX_SEATS: Record<DeckSize, number> = { 24: 4, 32: 5, 52: 8 };
+/** Seats per deck: the stock never runs out in practice — measured by
+ *  `npm run stats` (docs/STATS.md): with one more seat the 24-card deck runs
+ *  out in ~5% of rounds and the 32-card one in ~0.1%. */
+export const MAX_SEATS: Record<DeckSize, number> = { 24: 5, 32: 7, 52: 8 };
 export const MIN_SEATS = 2;
 
 export const MAX_TARGET = 50;
