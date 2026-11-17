@@ -1,0 +1,621 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oczko — makiety</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0F1720; --surface: #17222E; --surface2: #1F2C3A; --line: #2A3A4B;
+    --text: #EEF2F6; --soft: #C9D3DD; --muted: #9AA8B7;
+    --felt: #123D30; --feltLine: #1C5443; --feltDark: #0C2C22; --feltText: #CFE6DC; --feltMuted: #9FD8C0;
+    --card: #FBF7EE; --cardLine: #E4DCCB; --red: #C8352C; --black: #1B232C; --back: #2D5B8A;
+    --danger: #FF8A80; --dangerBg: #3A1D22; --ok: #6FCF97;
+    --acc: #E8925A; --accDark: #A85E2E; --onAcc: #1E0F06;
+    --tableA: #1f7358; --tableB: #123D30; --tableC: #0c2c22;
+    --serif: "Fraunces", Georgia, serif;
+    --sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  body[data-acc="gold"] { --acc: #F0B44C; --accDark: #B07A1E; --onAcc: #1A1206; }
+  body[data-acc="blue"] { --acc: #7FB2FF; --accDark: #3F6FBF; --onAcc: #0A1426; }
+  body[data-table="wood"] { --tableA: #9A6A40; --tableB: #7A4F2C; --tableC: #4E3119; --feltText: #F6E7D5; --feltMuted: #E8CFAF; }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: #0A0F15; color: var(--text); font-family: var(--sans); padding: 24px 16px 64px; }
+  .page-head { max-width: 1200px; margin: 0 auto 24px; }
+  .page-head h1 { font-family: var(--serif); font-weight: 800; font-size: 32px; }
+  .page-head p { color: var(--muted); margin-top: 6px; font-size: 14px; line-height: 1.5; max-width: 760px; }
+  .toggles { display: flex; flex-wrap: wrap; gap: 16px; margin-top: 16px; }
+  .toggle { display: flex; align-items: center; gap: 8px; font-size: 13px; color: var(--soft); }
+  .toggle button { background: var(--surface); color: var(--soft); border: 1px solid var(--line); border-radius: 999px; padding: 7px 14px; font: 600 13px var(--sans); cursor: pointer; }
+  .toggle button.on { background: var(--acc); color: var(--onAcc); border-color: var(--acc); }
+  .grid { display: flex; flex-wrap: wrap; gap: 32px 28px; justify-content: center; max-width: 1240px; margin: 0 auto; }
+  figure { width: 360px; max-width: 100%; }
+  figcaption { margin-top: 12px; font-size: 13px; color: var(--muted); line-height: 1.45; }
+  figcaption b { color: var(--text); font-weight: 600; display: block; font-size: 14px; margin-bottom: 2px; }
+
+  /* Phone */
+  .phone { width: 360px; max-width: 100%; height: 760px; border-radius: 38px; background: var(--bg); border: 8px solid #1A1F26; box-shadow: 0 24px 60px rgba(0,0,0,.5); overflow: hidden; position: relative; display: flex; flex-direction: column; }
+  .status { height: 26px; flex: none; display: flex; justify-content: space-between; align-items: center; padding: 0 22px; font-size: 11px; font-weight: 600; color: var(--soft); }
+  .scroll { flex: 1; overflow: hidden; padding: 6px 16px 0; display: flex; flex-direction: column; }
+
+  /* Common UI */
+  .h1 { font-family: var(--serif); font-weight: 800; font-size: 26px; }
+  .h2 { font-family: var(--serif); font-weight: 800; font-size: 19px; }
+  .sub { color: var(--muted); font-size: 13px; }
+  .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 14px; }
+  .row { display: flex; align-items: center; gap: 10px; }
+  .between { justify-content: space-between; }
+  .btn3d { display: flex; align-items: center; justify-content: center; gap: 8px; height: 54px; border-radius: 16px; font: 800 18px var(--serif); background: var(--acc); color: var(--onAcc); border-bottom: 5px solid var(--accDark); text-align: center; }
+  .btn3d.dark { background: var(--surface2); color: var(--text); border-bottom-color: #0B1118; }
+  .btn3d.off { background: #26313D; color: #6B7988; border-bottom-color: #141B23; }
+  .btn3d.sm { height: 46px; font-size: 15px; border-bottom-width: 4px; border-radius: 14px; }
+  .btn3d.glow { box-shadow: 0 0 0 3px rgba(255,255,255,.12), 0 0 22px var(--acc); }
+  .iconbtn { width: 44px; height: 44px; border-radius: 14px; background: var(--surface); border: 1px solid var(--line); display: grid; place-items: center; color: var(--soft); flex: none; }
+  .pill { display: inline-flex; align-items: center; gap: 4px; padding: 3px 9px; border-radius: 999px; font-size: 11px; font-weight: 700; white-space: nowrap; }
+  .pill.ok { background: rgba(111,207,151,.16); color: var(--ok); }
+  .pill.bust { background: var(--dangerBg); color: var(--danger); }
+  .pill.think { background: rgba(255,255,255,.1); color: var(--feltText); }
+  .pill.acc { background: var(--acc); color: var(--onAcc); }
+  .pill.muted { background: rgba(255,255,255,.07); color: var(--muted); }
+  .seg { display: flex; gap: 6px; flex-wrap: wrap; }
+  .seg span { flex: 1 1 0; min-width: 0; text-align: center; padding: 10px 6px; border-radius: 12px; background: var(--surface2); border: 1px solid var(--line); font-size: 13px; font-weight: 600; color: var(--soft); min-height: 44px; display: flex; flex-direction: column; justify-content: center; }
+  .seg span small { display: block; font-weight: 500; font-size: 10.5px; color: var(--muted); margin-top: 2px; }
+  .seg span.on { border-color: var(--acc); background: color-mix(in srgb, var(--acc) 18%, var(--surface2)); color: var(--text); }
+  .label { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 14px 0 7px; }
+
+  /* Tab bar */
+  .tabbar { flex: none; height: 70px; border-top: 1px solid var(--line); background: var(--surface); display: flex; padding-bottom: 8px; }
+  .tabbar div { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 3px; font-size: 11px; font-weight: 600; color: var(--muted); }
+  .tabbar div.on { color: var(--acc); }
+  .tabbar svg { width: 22px; height: 22px; }
+
+  /* Cards */
+  .card { position: relative; background: var(--card); border: 1px solid var(--cardLine); border-radius: 8px; box-shadow: 0 2px 6px rgba(0,0,0,.35); color: var(--black); font-family: var(--serif); font-weight: 800; flex: none; }
+  .card.r { color: var(--red); }
+  .card .i { position: absolute; top: 4px; left: 6px; line-height: .95; text-align: center; }
+  .card .i em { display: block; font-style: normal; font-size: .8em; }
+  .card .c { position: absolute; inset: 0; display: grid; place-items: center; }
+  .card.lg { width: 66px; height: 94px; font-size: 20px; } .card.lg .c { font-size: 34px; }
+  .card.md { width: 46px; height: 66px; font-size: 15px; border-radius: 6px; } .card.md .c { font-size: 22px; }
+  .card.sm { width: 30px; height: 43px; font-size: 11px; border-radius: 5px; } .card.sm .c { display: none; } .card.sm .i { top: 3px; left: 4px; }
+  .back { border-radius: 6px; border: 2px solid #F3EEE2; background:
+      repeating-linear-gradient(45deg, rgba(255,255,255,.13) 0 2px, transparent 2px 7px),
+      repeating-linear-gradient(-45deg, rgba(255,255,255,.13) 0 2px, transparent 2px 7px), var(--back);
+      box-shadow: 0 1px 3px rgba(0,0,0,.4); flex: none; }
+  .back.sm { width: 22px; height: 32px; border-radius: 4px; border-width: 1.5px; }
+  .back.md { width: 46px; height: 66px; }
+  .minifan { display: flex; justify-content: center; height: 34px; }
+  .minifan .back { margin-left: -12px; } .minifan .back:first-child { margin-left: 0; }
+  .minifan .card.sm { margin-left: -10px; } .minifan .card.sm:first-child { margin-left: 0; }
+
+  /* Portraits */
+  .por { border-radius: 50%; position: relative; flex: none; }
+  .por svg { width: 100%; height: 100%; display: block; border-radius: 50%; }
+  .por .score { position: absolute; right: -6px; bottom: -4px; min-width: 22px; height: 22px; border-radius: 11px; background: var(--bg); border: 2px solid currentColor; font: 800 12px/18px var(--serif); text-align: center; color: var(--text); padding: 0 4px; }
+  .por .tag { position: absolute; left: -8px; top: -6px; }
+
+  /* Table */
+  .table { flex: 1; display: flex; flex-direction: column; position: relative; }
+  .band { flex: none; background: linear-gradient(#5B3B20, #43291499), repeating-linear-gradient(90deg, rgba(255,255,255,.035) 0 2px, transparent 2px 9px), #4A2E17; border-color: #2B190B; }
+  .band.top { height: 56px; border-bottom: 3px solid #2B190B; display: flex; align-items: center; justify-content: space-between; padding: 0 10px; }
+  .band.bottom { height: 104px; border-top: 3px solid #2B190B; display: flex; gap: 10px; align-items: center; padding: 0 12px 10px; }
+  .band .iconbtn { background: rgba(0,0,0,.25); border-color: rgba(255,255,255,.08); color: #F3E3CF; }
+  .band .title { text-align: center; color: #F3E3CF; }
+  .band .title b { font: 800 16px var(--serif); display: block; }
+  .band .title span { font-size: 11px; opacity: .75; }
+  .felt { flex: 1; position: relative; overflow: hidden; color: var(--feltText);
+      background: radial-gradient(ellipse at 50% 45%, var(--tableA) 0%, var(--tableB) 62%, var(--tableC) 100%); }
+  body[data-table="wood"] .felt { background:
+      repeating-linear-gradient(92deg, rgba(0,0,0,.06) 0 3px, transparent 3px 14px, rgba(255,255,255,.04) 14px 16px, transparent 16px 31px),
+      radial-gradient(ellipse at 50% 45%, var(--tableA) 0%, var(--tableB) 65%, var(--tableC) 100%); }
+  .seat { position: absolute; width: 104px; display: flex; flex-direction: column; align-items: center; gap: 4px; text-align: center; }
+  .seat .name { font-size: 12px; font-weight: 700; color: var(--feltText); }
+  .seat.dim { opacity: .55; }
+  .chip-bank { background: var(--acc); color: var(--onAcc); font: 800 10px var(--sans); padding: 3px 7px; border-radius: 6px; letter-spacing: .03em; box-shadow: 0 2px 4px rgba(0,0,0,.3); }
+  .chip-dealer { width: 22px; height: 22px; border-radius: 50%; background: #F3EEE2; color: #1B232C; font: 800 11px/22px var(--serif); text-align: center; box-shadow: 0 2px 4px rgba(0,0,0,.35); }
+  .stock { position: absolute; left: 50%; top: 44%; transform: translate(-50%, -50%); }
+  .stock .back { position: absolute; }
+  .live { position: absolute; left: 50%; transform: translateX(-50%); padding: 6px 12px; border-radius: 999px; background: rgba(0,0,0,.32); font-size: 12px; font-weight: 600; white-space: nowrap; color: var(--feltText); }
+  .myhand { position: absolute; left: 0; right: 0; bottom: 14px; height: 130px; }
+  .fan { position: absolute; left: 50%; bottom: 0; width: 0; height: 0; }
+  .fan .card { position: absolute; bottom: 0; transform-origin: 50% 160%; }
+  .total { position: absolute; width: 58px; height: 58px; border-radius: 50%; background: rgba(0,0,0,.4); border: 2px solid var(--feltMuted); display: grid; place-items: center; font: 800 26px var(--serif); color: #fff; }
+  .total small { position: absolute; bottom: -18px; font: 600 10px var(--sans); color: var(--feltMuted); white-space: nowrap; }
+  .trainer { position: absolute; left: 10px; right: 10px; bottom: 150px; background: rgba(8,20,16,.72); border: 1px solid rgba(255,255,255,.1); border-radius: 14px; padding: 9px 12px; font-size: 12px; color: var(--feltText); backdrop-filter: blur(3px); }
+  .bar { height: 6px; border-radius: 3px; background: rgba(255,255,255,.12); overflow: hidden; }
+  .bar i { display: block; height: 100%; border-radius: 3px; }
+
+  /* Stamps & overlays */
+  .stamp { font: 800 18px var(--serif); color: var(--danger); border: 3px solid var(--danger); border-radius: 8px; padding: 1px 8px; transform: rotate(-10deg); background: rgba(58,29,34,.85); letter-spacing: .02em; }
+  .overlay { position: absolute; inset: 0; background: rgba(6,10,14,.62); display: flex; flex-direction: column; align-items: center; justify-content: center; }
+  .rays { position: absolute; width: 520px; height: 520px; left: 50%; top: 46%; transform: translate(-50%, -50%); background: repeating-conic-gradient(from 0deg, color-mix(in srgb, var(--acc) 30%, transparent) 0 8deg, transparent 8deg 20deg); border-radius: 50%; -webkit-mask: radial-gradient(circle, #000 0, #000 30%, transparent 68%); mask: radial-gradient(circle, #000 0, #000 30%, transparent 68%); }
+  .persian-title { position: relative; font: 800 38px/1 var(--serif); color: var(--acc); text-shadow: 0 3px 0 var(--accDark), 0 0 30px color-mix(in srgb, var(--acc) 60%, transparent); transform: rotate(-4deg); text-align: center; }
+  .confetti { position: absolute; width: 8px; height: 14px; border-radius: 2px; pointer-events: none; }
+  #matchEnd > *:not(.confetti) { position: relative; z-index: 1; }
+
+  /* Sheets */
+  .sheet { position: absolute; left: 0; right: 0; bottom: 0; background: var(--surface); border-radius: 24px 24px 0 0; border-top: 1px solid var(--line); padding: 10px 16px 18px; box-shadow: 0 -10px 40px rgba(0,0,0,.5); }
+  .grab { width: 40px; height: 5px; border-radius: 3px; background: var(--line); margin: 0 auto 12px; }
+  .res-row { display: flex; align-items: center; gap: 10px; padding: 8px 0; border-bottom: 1px solid var(--line); }
+  .res-row:last-child { border-bottom: 0; }
+  .res-row .who { width: 74px; font-size: 13px; font-weight: 700; }
+  .res-row .hand { flex: 1; display: flex; gap: 3px; }
+  .res-row .val { width: 34px; text-align: right; font: 800 17px var(--serif); }
+  .res-row .pts { width: 42px; text-align: right; }
+
+  /* Lists */
+  .persona { display: flex; align-items: center; gap: 10px; padding: 5px 0; border-bottom: 1px solid var(--line); }
+  .persona:last-child { border-bottom: 0; }
+  .persona .info { flex: 1; min-width: 0; }
+  .persona .info b { font-size: 14px; display: block; }
+  .persona .info span { font-size: 11.5px; color: var(--muted); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .counter { display: flex; align-items: center; gap: 0; background: var(--surface2); border: 1px solid var(--line); border-radius: 12px; }
+  .counter span { width: 32px; height: 34px; display: grid; place-items: center; font-weight: 700; color: var(--soft); }
+  .counter b { width: 20px; text-align: center; font: 800 16px var(--serif); }
+  .counter.zero b { color: var(--muted); }
+  .badge { background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 6px; text-align: center; font-size: 10.5px; font-weight: 600; color: var(--soft); }
+  .badge .ico { width: 42px; height: 42px; border-radius: 50%; margin: 0 auto 6px; display: grid; place-items: center; font: 800 15px var(--serif); }
+  .badge.lock { opacity: .4; }
+  .stat { background: var(--surface2); border: 1px solid var(--line); border-radius: 14px; padding: 10px 12px; }
+  .stat b { font: 800 22px var(--serif); display: block; }
+  .stat span { font-size: 11px; color: var(--muted); }
+</style>
+</head>
+<body data-acc="copper" data-table="felt">
+
+<div class="page-head">
+  <h1>Oczko — makiety</h1>
+  <p>Propozycja wyglądu aplikacji na bazie Pana: stała ciemna paleta, stół między drewnianymi bandami, przyciski 3D, Fraunces w tytułach. Portrety i grafiki są tu zastępcze — docelowo generowane skryptami z <code>tools/</code>. Akcent do wyboru poniżej (Pan używa złotego).</p>
+  <div class="toggles">
+    <div class="toggle">Akcent:
+      <button data-k="acc" data-v="copper" class="on">Miedź (propozycja)</button>
+      <button data-k="acc" data-v="gold">Złoto (jak Pan)</button>
+      <button data-k="acc" data-v="blue">Błękit</button>
+    </div>
+    <div class="toggle">Stół:
+      <button data-k="table" data-v="felt" class="on">Sukno</button>
+      <button data-k="table" data-v="wood">Drewniany blat</button>
+    </div>
+  </div>
+</div>
+
+<div class="grid">
+
+<!-- 1. Lobby -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll" style="gap:12px">
+      <div class="row between" style="margin-top:4px">
+        <div class="row" style="gap:8px">
+          <div style="position:relative;width:44px;height:44px">
+            <div class="card sm r" style="position:absolute;left:0;top:4px;transform:rotate(-12deg)"><div class="i">A<em>♥</em></div></div>
+            <div class="card sm" style="position:absolute;left:14px;top:0;transform:rotate(8deg)"><div class="i">A<em>♠</em></div></div>
+          </div>
+          <div><div class="h1" style="font-size:30px;line-height:1">Oczko</div><div class="sub" style="font-size:11px">gra w karty do 21</div></div>
+        </div>
+        <div class="iconbtn">⚙︎</div>
+      </div>
+
+      <div class="panel" style="border-color:color-mix(in srgb,var(--acc) 45%,var(--line))">
+        <div class="row between"><b style="font-size:15px">Wznów partię</b><span class="pill muted">Runda 6</span></div>
+        <div class="sub" style="margin:4px 0 10px">Rodzinne · do 10 pkt · Ty, Ola, Hela, Witek</div>
+        <div class="row" style="gap:6px;margin-bottom:12px" id="resumeScores"></div>
+        <div class="btn3d sm">Wznów</div>
+      </div>
+
+      <div class="btn3d" style="height:64px;font-size:22px">Nowa gra</div>
+      <div class="row" style="gap:10px">
+        <div class="btn3d dark sm" style="flex:1">📶 Ze znajomymi</div>
+        <div class="btn3d dark sm" style="flex:1">🎯 Trening</div>
+      </div>
+
+      <div class="panel" style="padding:12px 14px">
+        <div class="row between">
+          <div><div class="label" style="margin:0 0 3px">Jak grasz u siebie</div>
+            <div style="font-size:13px;color:var(--soft)">Rodzinne · W 2, D 3, K 4 · 52 karty<br>Perskie oczko · As za 11</div></div>
+          <span style="color:var(--acc);font-weight:700;font-size:13px">Zmień</span>
+        </div>
+      </div>
+      <div class="panel row between" style="padding:12px 14px">
+        <div class="row"><span style="font-size:18px">🕘</span><div><b style="font-size:14px">Historia</b><div class="sub" style="font-size:11.5px">Ostatnia partia: wygrana 10 : 8</div></div></div>
+        <span style="color:var(--muted)">›</span>
+      </div>
+    </div>
+    <div class="tabbar" data-tab="0"></div>
+  </div>
+  <figcaption><b>1. Lobby — Graj</b>Wznów partię, nowa gra, Wi‑Fi, trening, skrót do reguł domowych i historii.</figcaption>
+</figure>
+
+<!-- 2. Onboarding -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll">
+      <div class="row" style="gap:5px;margin:4px 0 14px"><i style="flex:1;height:4px;border-radius:2px;background:var(--acc)"></i><i style="flex:1;height:4px;border-radius:2px;background:var(--acc)"></i><i style="flex:1;height:4px;border-radius:2px;background:var(--line)"></i></div>
+      <div class="h1">Jak grasz u siebie?</div>
+      <div class="sub" style="margin-top:4px">Każdy dom ma swoje Oczko. Ustaw zasady raz — można je zmienić w każdej chwili.</div>
+
+      <div class="label">Tryb</div>
+      <div class="seg"><span class="on">Rodzinne<small>wszyscy na wszystkich</small></span><span>Z bankierem<small>każdy gra z bankiem</small></span></div>
+      <div class="label">Figury</div>
+      <div class="seg"><span class="on">2 · 3 · 4<small>W · D · K</small></span><span>3 · 4 · 5<small>W · D · K</small></span><span>Własne<small>dowolne</small></span></div>
+      <div class="label">Talia</div>
+      <div class="seg"><span class="on">52 karty</span><span>24 karty<small>od dziewiątki</small></span></div>
+      <div class="row" style="gap:10px">
+        <div style="flex:1"><div class="label">Perskie oczko</div><div class="seg"><span class="on">Tak</span><span>Nie</span></div></div>
+        <div style="flex:1"><div class="label">As</div><div class="seg"><span class="on">11</span><span>1 lub 11</span></div></div>
+      </div>
+
+      <div class="panel" style="margin-top:14px;background:var(--surface2);font-size:13px;line-height:1.45;color:var(--soft)">
+        <b style="color:var(--text)">W skrócie:</b> każdy dobiera karty i mówi „Starczy”, gdy chce. Punkt dostaje najbliższy 21 bez fury. Dwa asy to perskie oczko — wygrywa wszystko.
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn3d" style="margin-bottom:10px">Gotowe</div>
+      <div style="text-align:center;color:var(--acc);font-weight:700;font-size:14px;padding:6px 0 18px">Pokaż mi zasady na przykładzie</div>
+    </div>
+  </div>
+  <figcaption><b>2. Onboarding „Jak grasz u siebie?”</b>Pięć wyborów, podgląd zasad jednym zdaniem; „Pokaż mi zasady” uruchamia samouczek.</figcaption>
+</figure>
+
+<!-- 3. New game -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll">
+      <div class="row" style="margin:2px 0 8px"><div class="iconbtn">‹</div><div class="h2">Nowa gra</div></div>
+      <div class="seg" style="margin-bottom:6px"><span class="on">Rodzinne</span><span>Z bankierem</span></div>
+      <div class="row between" style="margin:8px 0 2px"><div class="label" style="margin:0">Rywale</div><span class="sub">Ty + 3 · max 5</span></div>
+      <div class="panel" style="padding:2px 12px" id="personaList"></div>
+      <div class="label">Do ilu punktów</div>
+      <div class="seg"><span>5</span><span class="on">10</span><span>15</span><span>1 runda</span></div>
+      <div class="panel row between" style="margin-top:10px;padding:10px 14px">
+        <div style="font-size:13px"><b>Zasady</b><div class="sub" style="font-size:11.5px">W 2 · D 3 · K 4 · perskie oczko · 52 karty</div></div>
+        <span style="color:var(--acc);font-weight:700;font-size:13px">Zmień</span>
+      </div>
+      <div style="flex:1"></div>
+      <div class="btn3d" style="margin:10px 0 18px">Graj</div>
+    </div>
+  </div>
+  <figcaption><b>3. Nowa gra</b>Postacie z licznikiem − n + (powtórzenia: „Ola II”), tryb, cel partii, reguły w BottomSheet.</figcaption>
+</figure>
+
+<!-- 4. Table family, my turn -->
+<figure>
+  <div class="phone">
+    <div class="status" style="background:#4A2E17"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="table">
+      <div class="band top">
+        <div class="iconbtn">☰</div>
+        <div class="title"><b>Runda 6</b><span>Rodzinne · do 10 pkt</span></div>
+        <div class="iconbtn" style="font:800 15px var(--serif)">5</div>
+      </div>
+      <div class="felt" id="t4">
+        <div class="live" style="top:248px">Twój ruch · masz 17</div>
+        <div class="trainer">
+          <div class="row between" style="margin-bottom:6px"><b style="font-size:12px">🎯 Trener</b><span style="font-size:11px;opacity:.8">Szansa na furę: <b style="color:var(--danger)">38%</b></span></div>
+          <div class="row" style="gap:8px;margin-bottom:4px"><span style="width:66px">Starczy</span><div class="bar" style="flex:1"><i style="width:54%;background:var(--acc)"></i></div><b style="width:34px;text-align:right">54%</b></div>
+          <div class="row" style="gap:8px"><span style="width:66px">Dobieram</span><div class="bar" style="flex:1"><i style="width:41%;background:var(--feltMuted)"></i></div><b style="width:34px;text-align:right">41%</b></div>
+        </div>
+        <div class="myhand"><div class="fan" id="fan4"></div><div class="total" style="right:22px;bottom:30px">17<small>Ty</small></div></div>
+      </div>
+      <div class="band bottom">
+        <div class="btn3d dark" style="flex:1">Dobieram</div>
+        <div class="btn3d glow" style="flex:1">Starczy</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>4. Stół — tryb rodzinny, Twój ruch</b>Rywale z portretem, wachlarzem rewersów i statusem; wynik ręki; trener podświetla lepszy przycisk.</figcaption>
+</figure>
+
+<!-- 5. Table bank, bank's turn -->
+<figure>
+  <div class="phone">
+    <div class="status" style="background:#4A2E17"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="table">
+      <div class="band top">
+        <div class="iconbtn">☰</div>
+        <div class="title"><b>Runda 3</b><span>Z bankierem · do 10 pkt</span></div>
+        <div class="iconbtn" style="font:800 15px var(--serif)">2</div>
+      </div>
+      <div class="felt" id="t5">
+        <div class="live" style="top:256px">Bank dobiera… Hrabia ma 3 karty</div>
+        <div class="myhand"><div class="fan" id="fan5"></div><div class="total" style="right:22px;bottom:30px">19<small>Starczy</small></div></div>
+      </div>
+      <div class="band bottom">
+        <div class="btn3d off" style="flex:1">Dobieram</div>
+        <div class="btn3d dark" style="flex:1">Pokaż wynik ⏭</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>5. Stół — z bankierem, ruch banku</b>Znacznik <b style="display:inline">Bank</b> i rozdającego (R); fura od razu odkryta (opcja); „Pokaż wynik” przewija do końca.</figcaption>
+</figure>
+
+<!-- 6. Persian -->
+<figure>
+  <div class="phone">
+    <div class="status" style="background:#4A2E17"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="table">
+      <div class="band top">
+        <div class="iconbtn">☰</div>
+        <div class="title"><b>Runda 7</b><span>Rodzinne · do 10 pkt</span></div>
+        <div class="iconbtn" style="font:800 15px var(--serif)">5</div>
+      </div>
+      <div class="felt" id="t6">
+        <div class="overlay" id="persian">
+          <div class="rays"></div>
+          <div class="row" style="position:relative;gap:0;margin-bottom:22px">
+            <div class="card lg r" style="transform:rotate(-10deg) translateX(10px)"><div class="i">A<em>♥</em></div><div class="c">♥</div></div>
+            <div class="card lg" style="transform:rotate(10deg) translateX(-10px)"><div class="i">A<em>♠</em></div><div class="c">♠</div></div>
+          </div>
+          <div class="persian-title">Perskie<br>oczko!</div>
+          <div style="position:relative;margin-top:16px;font-size:14px;color:var(--feltText);font-weight:600">Dwa asy — ta ręka wygrywa wszystko</div>
+        </div>
+      </div>
+      <div class="band bottom">
+        <div class="btn3d off" style="flex:1">Dobieram</div>
+        <div class="btn3d off" style="flex:1">Starczy</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>6. Perskie oczko!</b>Osobna, efektowna animacja: promienie, karty wlatują i obracają się, konfetti, dźwięk i haptyka.</figcaption>
+</figure>
+
+<!-- 7. Round end -->
+<figure>
+  <div class="phone">
+    <div class="status" style="background:#4A2E17"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="table">
+      <div class="band top">
+        <div class="iconbtn">☰</div>
+        <div class="title"><b>Runda 6</b><span>Rodzinne · do 10 pkt</span></div>
+        <div class="iconbtn" style="font:800 15px var(--serif)">6</div>
+      </div>
+      <div class="felt"></div>
+      <div class="sheet" style="top:150px">
+        <div class="grab"></div>
+        <div class="row between"><div class="h2">Punkt dla Ciebie</div><span class="pill acc">+1</span></div>
+        <div class="sub" style="margin:2px 0 6px">Najbliżej 21: Ty z 20</div>
+        <div id="results"></div>
+        <div class="label" style="margin-top:10px">Punkty · do 10</div>
+        <div id="scoreBars"></div>
+        <div class="btn3d" style="margin-top:14px">Następna runda</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>7. Koniec rundy</b>Odsłonięte ręce po kolei, kto punktuje, tabela punktów z paskami do celu.</figcaption>
+</figure>
+
+<!-- 8. Match end -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll" style="position:relative;align-items:center;text-align:center" id="matchEnd">
+      <div class="sub" style="margin-top:14px">Partia do 10 punktów · 14 rund</div>
+      <div class="h1" style="font-size:32px;margin-top:4px">Partia dla Ciebie!</div>
+      <div class="row" style="align-items:flex-end;gap:10px;margin-top:30px" id="podium"></div>
+      <div class="row" style="gap:8px;margin-top:22px;width:100%">
+        <div class="stat" style="flex:1"><b>2</b><span>perskie oczka</span></div>
+        <div class="stat" style="flex:1"><b>3</b><span>fury</span></div>
+        <div class="stat" style="flex:1"><b>18,6</b><span>średnio przy „Starczy”</span></div>
+      </div>
+      <div class="panel row" style="margin-top:12px;width:100%;text-align:left;padding:10px 12px">
+        <span style="font-size:22px">🏅</span><div><b style="font-size:13px">Nowa odznaka: Na krawędzi</b><div class="sub" style="font-size:11.5px">21 po dobraniu przy 17 lub więcej</div></div>
+      </div>
+      <div style="flex:1"></div>
+      <div style="width:100%;display:flex;flex-direction:column;gap:10px;margin-bottom:18px">
+        <div class="btn3d">Rewanż</div>
+        <div class="btn3d dark sm">Nowa gra</div>
+        <div style="color:var(--muted);font-size:13px;font-weight:600;padding:4px">Do lobby</div>
+      </div>
+    </div>
+  </div>
+  <figcaption><b>8. Koniec partii</b>Podium, konfetti, podsumowanie, nowa odznaka. „Rewanż” = ci sami rywale, nowe karty.</figcaption>
+</figure>
+
+<!-- 9. Profile -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll" style="gap:12px">
+      <div class="row between" style="margin-top:4px"><div class="h1">Profil</div><div class="iconbtn">⚙︎</div></div>
+      <div class="panel row" style="gap:14px">
+        <div style="width:64px;height:64px;border-radius:50%;background:color-mix(in srgb,var(--acc) 22%,var(--surface2));border:2px solid var(--acc);display:grid;place-items:center;font:800 26px var(--serif);color:var(--acc)">21</div>
+        <div style="flex:1">
+          <div class="sub" style="font-size:11px">Ranga</div>
+          <b style="font:800 19px var(--serif)">Bywalec stołu</b>
+          <div class="bar" style="margin:7px 0 4px"><i style="width:62%;background:var(--acc)"></i></div>
+          <div class="sub" style="font-size:11px">620 / 1000 do rangi „Mistrz oczka”</div>
+        </div>
+      </div>
+      <div class="row" style="gap:8px">
+        <div class="stat" style="flex:1"><b>47</b><span>partii</span></div>
+        <div class="stat" style="flex:1"><b>53%</b><span>wygranych</span></div>
+        <div class="stat" style="flex:1"><b>21%</b><span>rund z furą</span></div>
+      </div>
+      <div class="row between"><div class="label" style="margin:4px 0 0">Odznaki · 4 z 7</div></div>
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px" id="badges"></div>
+      <div class="panel row" style="padding:10px 12px">
+        <div class="por" style="width:40px;height:40px" data-p="profesor"></div>
+        <div style="flex:1"><div class="sub" style="font-size:11px">Następny rywal</div><b style="font-size:14px">Profesor</b><div class="sub" style="font-size:11px">Wygrane z Markiem: 6 z 8</div></div>
+        <div class="btn3d sm" style="padding:0 14px;height:42px">Zagraj</div>
+      </div>
+    </div>
+    <div class="tabbar" data-tab="1"></div>
+  </div>
+  <figcaption><b>9. Profil</b>Ranga, statystyki, odznaki, sugestia kolejnego rywala.</figcaption>
+</figure>
+
+<!-- 10. Rules -->
+<figure>
+  <div class="phone">
+    <div class="status"><span>9:41</span><span>● ● ▮</span></div>
+    <div class="scroll" style="gap:10px">
+      <div class="h1" style="margin-top:4px">Zasady</div>
+      <div class="seg"><span class="on">Rodzinne</span><span>Z bankierem</span><span>Warianty</span></div>
+      <div class="panel">
+        <b style="font-size:14px">Cel</b>
+        <div style="font-size:13px;color:var(--soft);line-height:1.45;margin-top:4px">Zbierz jak najbliżej 21 oczek, ale nie więcej. Każdy po kolei mówi „Dobieram” albo „Starczy”.</div>
+      </div>
+      <div class="panel" id="examples"></div>
+      <div class="panel">
+        <b style="font-size:14px">Wartości kart</b>
+        <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:6px;margin-top:8px;font-size:12px;text-align:center" id="values"></div>
+        <div class="sub" style="font-size:11.5px;margin-top:8px">Twoje ustawienia — zmienisz je w „Jak grasz u siebie”.</div>
+      </div>
+    </div>
+    <div class="tabbar" data-tab="2"></div>
+  </div>
+  <figcaption><b>10. Zasady</b>Opis wariantów i przykłady rąk z grafiką kart; wartości z bieżących reguł domowych.</figcaption>
+</figure>
+
+</div>
+
+<script>
+const PERS = {
+  you:      { name: "Ty",       color: "#F3EEE2", hair: "#3B2A1E", skin: "#F1C9A5", hat: null },
+  zosia:    { name: "Zosia",    color: "#7FD3E6", hair: "#E3B34C", skin: "#F6D2B4", hat: "bow",   label: "Początki",   blurb: "Dobiera, póki karty są ładne" },
+  kuba:     { name: "Kuba",     color: "#6FCF97", hair: "#6B4226", skin: "#EFC29C", hat: "cap",   label: "Łatwy",      blurb: "Staje już przy 14" },
+  hela:     { name: "Hela",     color: "#B9D86A", hair: "#C9CDD3", skin: "#F0C7A6", hat: "bun",   label: "Ostrożna",   blurb: "Nie lubi ryzyka — staje przy 15" },
+  ola:      { name: "Ola",      color: "#F0B44C", hair: "#8E3B2A", skin: "#F3CBA9", hat: null,    label: "Średni",     blurb: "Gra rozsądnie, staje przy 17" },
+  witek:    { name: "Witek",    color: "#FF8FA3", hair: "#2B2B2B", skin: "#D9A47F", hat: "cap",   label: "Ryzykant",   blurb: "Ciągnie do 19, często ma furę" },
+  marek:    { name: "Marek",    color: "#F2785C", hair: "#4A3020", skin: "#E8B992", hat: null,    label: "Trudny",     blurb: "Patrzy, kto już powiedział „Starczy”" },
+  profesor: { name: "Profesor", color: "#7FA8FF", hair: "#DADDE2", skin: "#F1C9A5", hat: "glasses", label: "Ekspert",  blurb: "Liczy szanse przed każdym ruchem" },
+  hrabia:   { name: "Hrabia",   color: "#B39DFF", hair: "#2B2B2B", skin: "#F1C9A5", hat: "top",   label: "Mistrz",     blurb: "Rozważa tysiące rozdań na ruch" },
+};
+
+function face(key) {
+  const p = PERS[key];
+  let extra = "";
+  if (p.hat === "top") extra = '<rect x="30" y="10" width="40" height="24" rx="3" fill="#1d1d2b"/><rect x="22" y="31" width="56" height="6" rx="3" fill="#1d1d2b"/><rect x="30" y="26" width="40" height="5" fill="#6d4bd1"/><path d="M38 64 q12 -6 24 0" stroke="#2b1a10" stroke-width="4" fill="none" stroke-linecap="round"/>';
+  else if (p.hat === "cap") extra = '<path d="M28 40 q22 -26 44 0 z" fill="' + shade(p.color) + '"/><rect x="58" y="36" width="22" height="6" rx="3" fill="' + shade(p.color) + '"/>';
+  else if (p.hat === "bun") extra = '<circle cx="50" cy="20" r="9" fill="' + p.hair + '"/>';
+  else if (p.hat === "bow") extra = '<path d="M60 24 l10 -6 v14 z M60 24 l-8 -6 v12 z" fill="#E8577A"/>';
+  else if (p.hat === "glasses") extra = '<circle cx="42" cy="50" r="6" stroke="#222" stroke-width="2" fill="none"/><circle cx="58" cy="50" r="6" stroke="#222" stroke-width="2" fill="none"/><path d="M48 50 h4" stroke="#222" stroke-width="2"/>';
+  return '<svg viewBox="0 0 100 100"><rect width="100" height="100" fill="' + p.color + '"/>' +
+    '<path d="M18 100 q32 -34 64 0" fill="#2A3442"/>' +
+    '<ellipse cx="50" cy="40" rx="22" ry="20" fill="' + p.hair + '"/>' +
+    '<ellipse cx="50" cy="52" rx="19" ry="21" fill="' + p.skin + '"/>' +
+    '<circle cx="42" cy="50" r="2.4" fill="#2b1a10"/><circle cx="58" cy="50" r="2.4" fill="#2b1a10"/>' +
+    '<path d="M43 61 q7 5 14 0" stroke="#9a4a3a" stroke-width="2.4" fill="none" stroke-linecap="round"/>' +
+    extra + '</svg>';
+}
+function shade(hex) { const n = parseInt(hex.slice(1), 16); const f = .62; return "rgb(" + [(n >> 16) & 255, (n >> 8) & 255, n & 255].map(v => Math.round(v * f)).join(",") + ")"; }
+function por(key, size, score, tag) {
+  return '<div class="por" style="width:' + size + 'px;height:' + size + 'px;box-shadow:0 0 0 3px ' + PERS[key].color + ',0 4px 10px rgba(0,0,0,.4);color:' + PERS[key].color + '">' + face(key) +
+    (score != null ? '<div class="score">' + score + '</div>' : '') + (tag ? '<div class="tag">' + tag + '</div>' : '') + '</div>';
+}
+const RED = { "♥": 1, "♦": 1 };
+function card(r, s, size = "lg") { return '<div class="card ' + size + (RED[s] ? " r" : "") + '"><div class="i">' + r + '<em>' + s + '</em></div><div class="c">' + s + '</div></div>'; }
+function backs(n) { return '<div class="minifan">' + Array.from({ length: n }, () => '<div class="back sm"></div>').join("") + '</div>'; }
+function shown(cards) { return '<div class="minifan" style="height:44px">' + cards.map(c => card(c[0], c[1], "sm")).join("") + '</div>'; }
+function seat(key, x, y, opts) {
+  return '<div class="seat' + (opts.dim ? " dim" : "") + '" style="left:' + x + 'px;top:' + y + 'px">' + por(key, 50, opts.score, opts.tag) +
+    '<div class="name">' + PERS[key].name + '</div>' + (opts.cards || "") + (opts.status || "") + '</div>';
+}
+function fan(id, cards) {
+  const el = document.getElementById(id); const n = cards.length; const step = 13;
+  el.innerHTML = cards.map((c, i) => {
+    const a = (i - (n - 1) / 2) * step;
+    return card(c[0], c[1], "lg").replace('class="card lg', 'style="left:-33px;transform:rotate(' + a + 'deg)" class="card lg');
+  }).join("");
+}
+
+// tab bars
+const TABS = [
+  ["Graj", '<path d="M7 4l13 8-13 8z" fill="currentColor"/>'],
+  ["Profil", '<circle cx="12" cy="8" r="4" fill="currentColor"/><path d="M4 21c1-5 15-5 16 0z" fill="currentColor"/>'],
+  ["Zasady", '<path d="M5 4h9a4 4 0 014 4v12H9a4 4 0 01-4-4z" fill="none" stroke="currentColor" stroke-width="2"/><path d="M9 9h6M9 13h6" stroke="currentColor" stroke-width="2"/>'],
+];
+document.querySelectorAll(".tabbar").forEach(tb => {
+  const on = +tb.dataset.tab;
+  tb.innerHTML = TABS.map((t, i) => '<div class="' + (i === on ? "on" : "") + '"><svg viewBox="0 0 24 24">' + t[1] + '</svg>' + t[0] + '</div>').join("");
+});
+
+// 1. resume scores
+document.getElementById("resumeScores").innerHTML = [["you", 5], ["ola", 4], ["hela", 3], ["witek", 2]]
+  .map(([k, s]) => '<div class="row" style="gap:6px;flex:1">' + por(k, 30) + '<b style="font:800 15px var(--serif)">' + s + '</b></div>').join("");
+
+// 3. persona list
+const counts = { zosia: 0, kuba: 0, hela: 1, ola: 1, witek: 1, marek: 0, profesor: 0, hrabia: 0 };
+document.getElementById("personaList").innerHTML = Object.keys(counts).map(k =>
+  '<div class="persona">' + por(k, 32) + '<div class="info"><b>' + PERS[k].name + ' <span class="pill" style="display:inline-flex;background:' + PERS[k].color + '22;color:' + PERS[k].color + ';font-size:10px;padding:1px 7px">' + PERS[k].label + '</span></b><span>' + PERS[k].blurb + '</span></div>' +
+  '<div class="counter' + (counts[k] ? "" : " zero") + '"><span>−</span><b>' + counts[k] + '</b><span>+</span></div></div>').join("");
+
+// 4. family table
+document.getElementById("t4").insertAdjacentHTML("afterbegin",
+  seat("ola", 8, 70, { score: 4, cards: backs(3), status: '<span class="pill ok">Starczy</span>', tag: '<div class="chip-dealer">R</div>' }) +
+  seat("hela", 128, 12, { score: 3, cards: backs(2), status: '<span class="pill think">myśli…</span>' }) +
+  seat("witek", 248, 70, { score: 2, cards: shown([["K", "♣"], ["9", "♦"], ["10", "♠"]]), status: '<div class="stamp" style="font-size:14px">Fura!</div>' }) +
+  '<div class="stock" style="top:200px">' + [0, 1, 2, 3].map(i => '<div class="back md" style="left:' + (-23 + i * 1.5) + 'px;top:' + (-33 - i * 1.5) + 'px"></div>').join("") + '</div>');
+fan("fan4", [["7", "♥"], ["K", "♠"], ["6", "♦"]]);
+
+// 5. bank table
+document.getElementById("t5").insertAdjacentHTML("afterbegin",
+  seat("kuba", 8, 78, { score: 1, cards: shown([["10", "♥"], ["8", "♣"], ["5", "♠"]]), status: '<div class="stamp" style="font-size:14px">Fura!</div>', dim: true }) +
+  seat("hrabia", 128, 12, { score: 4, cards: backs(3), status: '<span class="pill think">myśli…</span>', tag: '<div class="chip-bank">BANK</div>' }) +
+  seat("marek", 248, 78, { score: 2, cards: backs(3), status: '<span class="pill ok">Starczy</span>', tag: '<div class="chip-dealer">R</div>' }) +
+  '<div class="stock" style="top:210px">' + [0, 1, 2].map(i => '<div class="back md" style="left:' + (-23 + i * 1.5) + 'px;top:' + (-33 - i * 1.5) + 'px"></div>').join("") + '</div>');
+fan("fan5", [["9", "♣"], ["8", "♦"], ["W", "♥"]]);
+
+// 6. confetti
+const conf = document.getElementById("persian");
+const COL = ["#F0B44C", "#7FD3E6", "#FF8FA3", "#6FCF97", "#B39DFF", "#F3EEE2"];
+for (let i = 0; i < 26; i++) {
+  const x = (i * 37) % 340, y = (i * 61) % 440, r = (i * 47) % 180;
+  conf.insertAdjacentHTML("beforeend", '<div class="confetti" style="left:' + x + 'px;top:' + y + 'px;transform:rotate(' + r + 'deg);background:' + COL[i % COL.length] + ';opacity:.85"></div>');
+}
+
+// 7. results
+const RES = [
+  ["you", [["10", "♠"], ["7", "♦"], ["K", "♥"]], 20, '<span class="pill acc">+1</span>'],
+  ["ola", [["9", "♣"], ["D", "♠"], ["6", "♥"]], 18, '<span class="pill muted">—</span>'],
+  ["hela", [["10", "♦"], ["5", "♣"]], 15, '<span class="pill muted">—</span>'],
+  ["witek", [["K", "♣"], ["9", "♦"], ["10", "♠"]], 23, '<span class="pill bust">Fura</span>'],
+];
+document.getElementById("results").innerHTML = RES.map(([k, cs, v, p]) =>
+  '<div class="res-row">' + por(k, 30) + '<div class="who">' + PERS[k].name + '</div><div class="hand">' + cs.map(c => card(c[0], c[1], "sm")).join("") +
+  '</div><div class="val" style="' + (v > 21 ? "color:var(--danger)" : "") + '">' + v + '</div><div class="pts">' + p + '</div></div>').join("");
+document.getElementById("scoreBars").innerHTML = [["you", 6], ["ola", 4], ["hela", 3], ["witek", 2]].map(([k, s]) =>
+  '<div class="row" style="gap:8px;margin:5px 0"><span style="width:44px;font-size:12px;font-weight:700">' + PERS[k].name + '</span><div class="bar" style="flex:1;height:8px"><i style="width:' + s * 10 + '%;background:' + (k === "you" ? "var(--acc)" : PERS[k].color) + '"></i></div><b style="width:22px;text-align:right;font:800 14px var(--serif)">' + s + '</b></div>').join("");
+
+// 8. podium
+const POD = [["ola", 8, 2, 92], ["you", 10, 1, 128], ["hela", 6, 3, 70]];
+document.getElementById("podium").innerHTML = POD.map(([k, s, place, h]) =>
+  '<div style="display:flex;flex-direction:column;align-items:center;gap:8px;width:96px">' + (place === 1 ? '<div style="font-size:26px;margin-bottom:-6px">👑</div>' : '') + por(k, place === 1 ? 70 : 54) +
+  '<b style="font-size:13px">' + PERS[k].name + '</b><div style="width:100%;height:' + h + 'px;border-radius:12px 12px 0 0;background:' + (place === 1 ? "var(--acc)" : "var(--surface2)") + ';color:' + (place === 1 ? "var(--onAcc)" : "var(--text)") + ';display:flex;flex-direction:column;align-items:center;justify-content:center;border:1px solid var(--line)"><b style="font:800 28px var(--serif)">' + s + '</b><span style="font-size:11px;font-weight:700;opacity:.8">' + place + '. miejsce</span></div></div>').join("");
+const me = document.getElementById("matchEnd");
+for (let i = 0; i < 30; i++) {
+  const x = (i * 53) % 330, y = 40 + (i * 29) % 220, r = (i * 71) % 180;
+  me.insertAdjacentHTML("afterbegin", '<div class="confetti" style="left:' + x + 'px;top:' + y + 'px;transform:rotate(' + r + 'deg);background:' + COL[i % COL.length] + ';opacity:.75"></div>');
+}
+
+// 9. badges
+const BADGES = [["AA", "Perskie oczko", 1], ["21", "Równe 21", 1], ["5×", "Oczko z pięciu kart", 0], ["17+", "Na krawędzi", 1], ["B", "Żelazny bank", 0], ["×5", "Seria", 1], ["100", "Weteran", 0], ["?", "Wkrótce", 0]];
+document.getElementById("badges").innerHTML = BADGES.map(([ic, n, on], i) =>
+  '<div class="badge' + (on ? "" : " lock") + '"><div class="ico" style="background:' + (on ? COL[i % COL.length] + "33" : "var(--surface)") + ';color:' + (on ? COL[i % COL.length] : "var(--muted)") + '">' + ic + '</div>' + n + '</div>').join("");
+document.querySelectorAll(".por[data-p]").forEach(el => { el.outerHTML = por(el.dataset.p, 40); });
+
+// 10. rules examples
+const EX = [
+  ["Perskie oczko", "Dwa asy — wygrywa wszystko.", [["A", "♥"], ["A", "♠"]], "AA", "var(--acc)"],
+  ["Oczko", "Równe 21.", [["10", "♣"], ["A", "♦"]], "21", "var(--ok)"],
+  ["Fura", "Więcej niż 21 — ręka przegrywa.", [["K", "♠"], ["9", "♥"], ["10", "♦"]], "23", "var(--danger)"],
+];
+document.getElementById("examples").innerHTML = EX.map(([t, d, cs, v, c], i) =>
+  '<div class="row" style="gap:12px;padding:8px 0;' + (i ? "border-top:1px solid var(--line)" : "") + '"><div class="row" style="gap:3px;width:104px">' + cs.map(x => card(x[0], x[1], "sm")).join("") +
+  '</div><div style="flex:1"><b style="font-size:14px">' + t + '</b><div class="sub" style="font-size:12px">' + d + '</div></div><b style="font:800 18px var(--serif);color:' + c + '">' + v + '</b></div>').join("");
+document.getElementById("values").innerHTML = [["2–10", "wg oczek"], ["W", "2"], ["D", "3"], ["K", "4"], ["A", "11"]].map(([a, b]) =>
+  '<div style="background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:7px 2px"><b style="font:800 15px var(--serif);display:block">' + a + '</b><span style="color:var(--muted)">' + b + '</span></div>').join("");
+
+// toggles
+document.querySelectorAll(".toggle button").forEach(b => b.addEventListener("click", () => {
+  document.body.dataset[b.dataset.k] = b.dataset.v;
+  document.querySelectorAll('.toggle button[data-k="' + b.dataset.k + '"]').forEach(x => x.classList.toggle("on", x === b));
+}));
+</script>
+</body>
+</html>
