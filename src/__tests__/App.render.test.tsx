@@ -171,6 +171,22 @@ describe("App", () => {
     expect(textOf(r)).toContain("Rywale");
   });
 
+  it("the rules from the table's menu, then back to the same game", async () => {
+    const kv = onboarded();
+    const r = await renderApp(kv);
+    await press(r, "Nowa gra");
+    await press(r, "Graj");
+    if (button(r, "Rozumiem")) await press(r, "Rozumiem");
+    const before = JSON.parse((await kv.get("oczko.save.v1"))!).match.round.hands;
+    await press(r, "Menu");
+    await press(r, "Zasady");
+    expect(textOf(r)).toContain("Wartości kart");
+    await act(async () => void pressBack());
+    await settle();
+    expect(textOf(r)).toContain("Runda 1");
+    expect(JSON.parse((await kv.get("oczko.save.v1"))!).match.round.hands).toEqual(before);
+  });
+
   it("settings and house rules from the lobby", async () => {
     const kv = onboarded();
     const r = await renderApp(kv);
