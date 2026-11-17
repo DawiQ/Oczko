@@ -179,3 +179,13 @@ describe("GameController", () => {
     expect(game.hit()).toBe("disposed");
   });
 });
+
+describe("with the real bots", () => {
+  it("plays a round against Profesor and Hrabia (chunked evaluator)", async () => {
+    const setup = makeSetup({ ...DEFAULT_RULES, target: 1 }, ["profesor", "hrabia"], "single", 3);
+    const game = new GameController(setup, { sleep: () => Promise.resolve(), pace: INSTANT });
+    const end = await playMatch(game, 3);
+    expect(["roundEnd", "matchEnd"]).toContain(end.phase);
+    expect(end.result).not.toBeNull();
+  });
+});

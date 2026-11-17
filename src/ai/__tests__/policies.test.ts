@@ -135,3 +135,24 @@ describe("contextual as the bank", () => {
     expect(threshold(17)(v, rng).action).toBe("hit");
   });
 });
+
+describe("decideAsync", () => {
+  it("gives the same decision as the policy, the evaluator in chunks", async () => {
+    const { decideAsync } = jest.requireActual("../policies") as typeof import("../policies");
+    const { chunkedEvaluator } = jest.requireActual("../evaluate") as typeof import("../evaluate");
+    const specs = [
+      { kind: "threshold", t: 17 },
+      { kind: "noisy", t: 17, eps: 0.3 },
+      { kind: "contextual", t: 17 },
+      { kind: "evaluator", samples: 400, standAt: 17 },
+    ] as const;
+    for (const hand of [["10♥", "6♠"], ["10♥", "2♠"], ["9♥", "9♠"]] as const) {
+      const v = viewWith(hand[0], hand[1]);
+      for (const spec of specs) {
+        const sync = policyOf(spec)(v, makeRng(3));
+        const async_ = await decideAsync(spec, v, makeRng(3), chunkedEvaluator(64, () => Promise.resolve()));
+        expect(async_).toEqual(sync);
+      }
+    }
+  });
+});
