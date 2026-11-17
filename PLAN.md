@@ -260,41 +260,46 @@ export const ENGINE_VERSION = 1;
 
 ## 5. Boty, ewaluator, trener
 
-### 5.1 Ewaluator (`ai/evaluate.ts`, czysty)
+### 5.1 Ewaluator (`ai/evaluate.ts`, czysty) ✅
 
 ```ts
+export interface OpponentModel { standAt: number }      // rywale dobierają poniżej progu
 export interface Evaluation {
-  bustIfHit: number;          // karty niewidziane dające furę / liczba niewidzianych
-  winIfStand: number;         // Monte Carlo
-  winIfHit: number;           // Monte Carlo (dobieranie dalej wg polityki referencyjnej)
+  bustIfHit: number;          // dokładne: niewidziane karty dające furę / liczba niewidzianych
+  winIfStand: number;         // Monte Carlo: oczekiwany udział w punktach rundy (0..1)
+  winIfHit: number;           // Monte Carlo (po dobraniu gra dalej do `continueAt`)
   best: Action;
-  confidence: number;
+  confidence: number;         // z błędu standardowego różnicy (próbki sparowane)
   samples: number;
 }
-export function evaluate(view: SeatView, opts: { samples: number; rng: Rng; opponentModel: Policy }): Evaluation;
+export function evaluate(view: SeatView, opts: { samples: number; rng: Rng; opponentModel: OpponentModel; continueAt?: number }): Evaluation;
+export function chunkedEvaluator(chunk?, yieldNow?): { evaluate(view, opts, onProgress?): Promise<Evaluation | null>; cancel(): void };
 ```
 
 - Karty niewidziane = talia − `seenCards`. `bustIfHit` jest dokładne przy
-  założeniu, że każda niewidziana karta jest równie prawdopodobna (ignoruje
-  informację z decyzji rywali) — tak to opisujemy w UI i testach.
-- Monte Carlo: losuje cudze zakryte ręce zgodne z obserwacjami (liczba kart,
-  status `stood` → model przeciwnika musiał się zatrzymać przy tej ręce —
-  próbkowanie odrzucające z limitem prób), dogrywa resztę rundy politykami
-  modelu, liczy wynik. Domyślnie 1500 próbek, cel ≤ 30 ms na średnim
-  telefonie; obliczenia w kawałkach (`setTimeout(0)`), anulowanie licznikiem
-  epok jak w Panie.
+  założeniu, że każda niewidziana karta jest równie prawdopodobna.
+- Monte Carlo: cudze zakryte ręce losowane z niewidzianych kart, zgodne
+  z obserwacjami (liczba kart, ogłoszone perskie oczko, „Starczy” → ręka
+  ≥ progu modelu; ukryta fura możliwa tylko bez `bustRevealed`) —
+  odrzucanie do 100 prób na rękę, a dla miejsca, które wyraźnie nie pasuje
+  do modelu, tylko 6. Obie gałęzie (Starczy / Dobieram) na tej samej
+  kolejności talii. Tablice typowane, bez alokacji na próbkę.
+- Pomiar (Node): 7–11 ms na 1500 próbek (`docs/STATS.md`). Na telefonie
+  w kawałkach po 250 próbek z anulowaniem licznikiem epok.
 
-### 5.2 Polityki i poziomy (`ai/policies.ts`, `ai/levels.ts`)
+### 5.2 Polityki i poziomy (`ai/policies.ts`, `ai/personas.ts`) ✅
 
-- `threshold(t)` — dobiera poniżej t; `noisy(t, ε)`; `evaluator(samples, model)`.
-- 8–10 postaci = poziomy (portret, imię, kolor, etykieta, reakcje).
-  Propozycja (makieta): Zosia, Kuba, Hela „Ostrożna” (próg 15), Ola (17),
-  Witek „Ryzykant” (19), Marek, Profesor (ewaluator), Hrabia (ewaluator,
-  dużo próbek). Postać = polityka + parametry. Bez imion i etykiet
-  kojarzonych z hazardem (np. nie „Szuler”).
-- `tools/tournament.ts` — turnieje (family 4 graczy, bank 1 na 1 z zamianą
-  ról) → udział wygranych per poziom; `docs/BOTS.md` z tabelą; poziomy ułożone
-  rosnąco i rozróżnialne (sąsiednie poziomy różnią się istotnie statystycznie).
+- `threshold(t)`, `noisy(t, ε)`, `contextual(t)` (patrzy na stół),
+  `evaluatorPolicy(samples, model)`; opis serializowalny `PolicySpec`.
+- 8 postaci (kolejność z turnieju, `docs/BOTS.md`): Zosia (15 + 25% szumu),
+  Kuba (14), Witek „Ryzykant” (20), Hela „Ostrożna” (16), Ola (17),
+  Marek (17, patrzy na stół), Profesor (ewaluator, 40 próbek), Hrabia
+  (ewaluator, 1500 próbek). Bez imion i etykiet kojarzonych z hazardem.
+- `tools/tournament.ts` — każda postać gra te same rozdania (porównanie
+  parami): rodzinne 4 graczy (rywale referencyjni 15/17/19) i bank 1 na 1
+  (rola banku co drugie rozdanie). Siła = średnia obu odsetków; sąsiednie
+  poziomy z > 2. Wynik: `docs/BOTS.md` i `src/ai/calibration.ts` (test
+  pilnuje, by kolejność postaci = zmierzona siła).
 
 ### 5.3 Trener (`trainer/`)
 

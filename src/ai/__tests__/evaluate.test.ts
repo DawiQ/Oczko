@@ -212,3 +212,16 @@ describe("limits", () => {
     expect(cards("10♥ A♠")).toEqual([c("10♥"), c("A♠")]);
   });
 });
+
+describe("a rival who ignores the model", () => {
+  it("still gives sane chances (a person who stopped at 12)", () => {
+    // seat 0 stops on 10 + 2 = 12, face down, far below the model's 17
+    const m = play(table(DEFAULT_RULES, ["10♥", "9♣"], "2♠", 1), "hit", "stand");
+    const e = evaluate(viewFor(m, 1), { samples: 1500, rng: { state: 8 }, opponentModel: model });
+    for (const x of [e.winIfStand, e.winIfHit, e.bustIfHit, e.confidence]) {
+      expect(x).toBeGreaterThanOrEqual(0);
+      expect(x).toBeLessThanOrEqual(1);
+    }
+    expect(e.samples).toBe(1500);
+  });
+});

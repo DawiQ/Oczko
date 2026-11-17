@@ -120,3 +120,18 @@ describe("policyOf", () => {
     expect(["hit", "stand"]).toContain(policyOf({ kind: "contextual", t: 17 })(viewFor(m, 0), rng).action);
   });
 });
+
+describe("contextual as the bank", () => {
+  it("stops early when most players are out", () => {
+    // bank 0; seats 1 and 2 bust openly, seat 3 stops face down; the bank holds 9 + 6 = 15
+    const m = play(
+      table(PRESETS.bank, ["9♥", "10♣", "10♦", "8♠"], "K♣ 9♦ K♦ 9♠ 7♣ 6♥", 0, 0),
+      "hit", "hit", "hit", "hit", "hit", "stand", "hit"
+    );
+    const v = viewFor(m, 0);
+    expect(v.turn).toBe(0);
+    expect(v.myValue.total).toBe(15);
+    expect(contextual(17)(v, rng).action).toBe("stand");
+    expect(threshold(17)(v, rng).action).toBe("hit");
+  });
+});
