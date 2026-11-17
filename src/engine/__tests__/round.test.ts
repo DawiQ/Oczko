@@ -246,3 +246,24 @@ describe("invariants over random rounds", () => {
     }
   });
 });
+
+describe("edge cases", () => {
+  it("a round can end in the deal (everyone has perskie oczko)", () => {
+    const rules: Rules = { ...family, startCards: 2 };
+    const s = dealRound(rules, 2, stockFor(rules, ["A♥ A♦", "A♣ A♠"]), 0, null);
+    expect(s.turn).toBeNull();
+    expect(s.result!.points).toEqual([1, 1]);
+    expect(s.log[s.log.length - 1].t).toBe("result");
+  });
+
+  it("the bank skips when every player's fura comes in the deal", () => {
+    const rules: Rules = { ...bank, startCards: 2, persian: false };
+    const s = dealRound(rules, 3, stockFor(rules, ["5♥ 6♥", "A♥ A♦", "A♣ A♠"], "", 0, 0), 0, 0);
+    expect(s.status).toEqual(["stood", "bust", "bust"]);
+    expect(s.result!.points).toEqual([1, 0, 0]);
+  });
+
+  it("refuses a stock too short to deal", () => {
+    expect(() => dealRound(family, 3, cards("2♥ 3♥"), 0, null)).toThrow();
+  });
+});
