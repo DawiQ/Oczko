@@ -136,6 +136,12 @@ describe("TableScreen", () => {
     expect(props.onExit).toHaveBeenCalled();
   });
 
+  it("the match's end lists new badges", async () => {
+    const snap = family[family.length - 1];
+    const { r } = await render(snap, { newBadges: [{ name: "Równe 21", desc: "Runda zakończona z 21" }] });
+    expect(textOf(r)).toContain("Nowa odznaka: Równe 21");
+  });
+
   it("the menu: rules, leave, give up (confirmed)", async () => {
     const snap = family.find((s) => s.phase === "myTurn")!;
     const { r, game, props } = await render(snap);

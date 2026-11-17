@@ -83,6 +83,7 @@ export function TableScreen({
   allowed,
   coach,
   endPanel,
+  newBadges,
 }: {
   game: TableGame;
   kv: KV;
@@ -101,6 +102,8 @@ export function TableScreen({
   coach?: string | null;
   /** Replaces the match-end panel (tutorial). */
   endPanel?: ReactNode;
+  /** Badges earned in this match (shown at its end). */
+  newBadges?: { name: string; desc: string }[];
 }) {
   const snap = useSyncExternalStore(game.subscribe, game.getSnapshot);
   const insets = useSafeAreaInsets();
@@ -286,7 +289,7 @@ export function TableScreen({
       {snap.phase === "roundEnd" && <RoundEndPanel snap={snap} onNext={() => game.nextRound()} onReplay={() => game.replayRound()} />}
       {snap.phase === "matchEnd" && endPanel}
       {snap.phase === "matchEnd" && !endPanel && (
-        <MatchEndPanel snap={snap} onRematch={() => game.rematch()} onNewGame={onNewGame} onExit={onExit} onReplay={() => game.replayRound()} reduceMotion={reduceMotion} />
+        <MatchEndPanel snap={snap} newBadges={newBadges} onRematch={() => game.rematch()} onNewGame={onNewGame} onExit={onExit} onReplay={() => game.replayRound()} reduceMotion={reduceMotion} />
       )}
 
       {persian && (

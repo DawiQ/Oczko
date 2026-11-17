@@ -104,8 +104,11 @@ export function MatchEndPanel({
   onExit,
   onReplay,
   reduceMotion,
+  newBadges = [],
 }: {
   snap: GameSnapshot;
+  /** Badges earned in this match (names and descriptions). */
+  newBadges?: { name: string; desc: string }[];
   onRematch: () => void;
   onNewGame: () => void;
   onExit: () => void;
@@ -143,6 +146,15 @@ export function MatchEndPanel({
           );
         })}
       </View>
+      {newBadges.map((b) => (
+        <View key={b.name} style={s.newBadge} accessible accessibilityLabel={`Nowa odznaka: ${b.name}. ${b.desc}`}>
+          <Text style={s.newBadgeIcon}>★</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={s.newBadgeTitle}>{`Nowa odznaka: ${b.name}`}</Text>
+            <Text style={s.newBadgeDesc}>{b.desc}</Text>
+          </View>
+        </View>
+      ))}
       <View style={{ flex: 1 }} />
       <View style={{ gap: 10, width: "100%" }}>
         {snap.canReplay && onReplay && <Button3D label="Ta runda jeszcze raz" tone="dark" height={46} onPress={onReplay} />}
@@ -198,5 +210,9 @@ const s = StyleSheet.create({
   stepName: { color: P.text, fontSize: 13, fontWeight: "700" },
   block: { width: "100%", borderTopLeftRadius: 12, borderTopRightRadius: 12, backgroundColor: P.surface2, borderWidth: 1, borderColor: P.line, alignItems: "center", justifyContent: "center" },
   blockScore: { color: P.text, fontFamily: DISPLAY, fontSize: 28 },
+  newBadge: { flexDirection: "row", alignItems: "center", gap: 10, width: "100%", backgroundColor: P.surface, borderColor: P.line, borderWidth: 1, borderRadius: 14, padding: 10, marginTop: 12 },
+  newBadgeIcon: { color: P.accent, fontSize: 22 },
+  newBadgeTitle: { color: P.text, fontSize: 13, fontWeight: "700" },
+  newBadgeDesc: { color: P.muted, fontSize: 11.5 },
   blockPlace: { color: P.muted, fontSize: 11, fontWeight: "700" },
 });

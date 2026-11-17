@@ -38,6 +38,7 @@ import { clearSavedGame, isResumable, loadSavedGame } from "./src/storage/save";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "./src/storage/settings";
 import { emptyStats, loadStats, saveStats, type Stats } from "./src/storage/stats";
 import { ProfileScreen } from "./src/profile/ProfileScreen";
+import { BADGES, badgesShownBy, earnedBadges, type BadgeId } from "./src/profile/progress";
 import type { PersonaId } from "./src/ai/personas";
 import { resetHints } from "./src/table/hints";
 import { TableScreen } from "./src/table/TableScreen";
@@ -111,6 +112,7 @@ function GameScreen({
   source,
   opts,
   trainer,
+  earned,
   onExit,
   onNewGame,
   onRules,
@@ -119,11 +121,21 @@ function GameScreen({
   opts: UseGameOptions;
   /** The trainer's panel (the setting; always in training). */
   trainer: boolean;
+  /** Badges earned before this game. */
+  earned: BadgeId[];
   onExit: () => void;
   onNewGame: () => void;
   onRules: () => void;
 }) {
-  const { game, snapshot } = useGame(source, opts);
+  const [fresh, setFresh] = useState<BadgeId[]>([]);
+  const [gameOpts] = useState<UseGameOptions>(() => ({
+    ...opts,
+    onRoundEnd: (info) => {
+      const got = badgesShownBy(info.match, info.me).filter((b) => !earned.includes(b));
+      if (got.length) setFresh((old) => [...old, ...got.filter((b) => !old.includes(b))]);
+    },
+  }));
+  const { game, snapshot } = useGame(source, gameOpts);
   const on = trainer || snapshot.mode === "training";
   const ev = useTrainer(snapshot, on);
   return (
@@ -136,6 +148,7 @@ function GameScreen({
       onGiveUp={() => void clearSavedGame(opts.kv)}
       trainer={on ? () => <TrainerPanel evaluation={ev} /> : undefined}
       recommend={on && ev ? ev.best : null}
+      newBadges={BADGES.filter((b) => fresh.includes(b.id))}
     />
   );
 }
@@ -354,6 +367,7 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
           source={screen.source}
           opts={gameOpts}
           trainer={stored.settings.trainer}
+          earned={earnedBadges(stored.stats)}
           onExit={() => home()}
           onNewGame={() => setScreen({ name: "newGame", training: false })}
           onRules={() => setScreen({ name: "rules", backToGame: true })}

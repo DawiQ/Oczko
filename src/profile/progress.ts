@@ -45,6 +45,17 @@ export function roundBadges(m: MatchState, me: number): BadgeId[] {
   return out;
 }
 
+/** Badges a round shows, counters included (for "Nowa odznaka" at the table). */
+export function badgesShownBy(m: MatchState, me: number): BadgeId[] {
+  const r = m.round;
+  if (!r.result) return [];
+  const v = handValue(r.hands[me], m.rules);
+  const out = roundBadges(m, me);
+  if (v.persian) out.push("persian");
+  if (!v.persian && !v.bust && v.total === 21) out.push("exact21");
+  return out;
+}
+
 /** Every badge earned so far. */
 export function earnedBadges(s: Stats): BadgeId[] {
   const set = new Set<BadgeId>(s.badges);

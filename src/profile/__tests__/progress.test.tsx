@@ -7,7 +7,7 @@ import { DEFAULT_RULES, PRESETS, type Rules } from "../../engine/rules";
 import { stockFor } from "../../engine/testUtils";
 import { emptyStats, recordRound, type Stats } from "../../storage/stats";
 import { DialogProvider } from "../../ui/Dialog";
-import { BADGES, earnedBadges, RANKS, rankOf, ratios, roundBadges, STREAK_BADGE, VETERAN_BADGE, XP, xpOf } from "../progress";
+import { BADGES, badgesShownBy, earnedBadges, RANKS, rankOf, ratios, roundBadges, STREAK_BADGE, VETERAN_BADGE, XP, xpOf } from "../progress";
 import { ProfileScreen } from "../ProfileScreen";
 import { suggestNext } from "../suggest";
 
@@ -52,6 +52,11 @@ describe("badges from a round (seat 0 is me; dealer 1 → I move first)", () => 
     expect(m.round.result!.duels!.every((d) => d.winner === "bank")).toBe(true);
     expect(roundBadges(m, 0)).toContain("ironBank");
     expect(roundBadges(m, 1)).not.toContain("ironBank");
+  });
+
+  it("shown at the table include the counters' badges", () => {
+    const m = round(fam, ["10♥", "9♣"], "7♥ 4♥", ["hit", "hit", "stand", "stand"], 1);
+    expect(badgesShownBy(m, 0).sort()).toEqual(["edge", "exact21"]);
   });
 
   it("are stored once in the statistics", () => {
