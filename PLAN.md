@@ -12,6 +12,7 @@ Kopiując moduły, zmieniaj prefiksy (`pan.` → `oczko.`, `Pan Pro` → `Oczko 
 
 Makiety: `docs/mockups/oczko-makiety.html` (lobby, onboarding, nowa gra, stół
 rodzinny i z bankiem, perskie oczko, koniec rundy, koniec partii, profil, zasady).
+Makiety zaakceptowane przez właściciela (akcent Miedź) — obowiązują w Etapach 5 i 6.
 
 ---
 
