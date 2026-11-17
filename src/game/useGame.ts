@@ -2,6 +2,8 @@
 // after every move, records the statistics, stops the bots on unmount.
 import { useEffect, useState, useSyncExternalStore } from "react";
 
+import { buildRecord } from "../history/record";
+import { addRecord } from "../storage/history";
 import { clearSavedGame, saveGame } from "../storage/save";
 import { recordMatch, recordRound, updateStats } from "../storage/stats";
 import type { KV } from "../storage/kv";
@@ -35,6 +37,7 @@ export function createGame(source: GameSource, opts: UseGameOptions): GameContro
     onMatchEnd: (info) => {
       const personas = info.setup.seats.flatMap((s) => (s.kind === "bot" ? [s.persona] : []));
       void updateStats(kv, (st) => recordMatch(st, info.match, info.me, personas));
+      void addRecord(kv, buildRecord(info, Date.now()));
     },
     onEngineError: (e) => console.warn("oczko: engine error", e),
   };

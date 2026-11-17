@@ -140,6 +140,16 @@ describe("App", () => {
     await press(r, "Do lobby");
     expect(textOf(r)).toContain("Nowa gra");
     expect(textOf(r)).not.toContain("Wznów partię");
+    // The match is in the history, with its replay.
+    await press(r, "Historia. Rozegrane partie i powtórki");
+    const row = r.root.findAll((n) => typeof n.props.accessibilityLabel === "string" && /^(Partia dla Ciebie|Wygrywa)/.test(n.props.accessibilityLabel) && typeof n.props.onPress === "function")[0];
+    expect(row).toBeDefined();
+    await act(async () => row.props.onPress());
+    await settle();
+    expect(textOf(r)).toContain("Runda 1 — rozdanie");
+    await act(async () => void pressBack());
+    await act(async () => void pressBack());
+    await settle();
     // A new game, left in the middle and resumed.
     await press(r, "Nowa gra");
     await press(r, "Graj");

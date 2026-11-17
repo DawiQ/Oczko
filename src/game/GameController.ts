@@ -36,7 +36,10 @@ export interface RoundEndInfo {
   me: number;
   /** The match right after the round (points included). */
   match: MatchState;
+  /** This round's decisions. */
   decisions: Decision[];
+  /** Every decision of the match so far (history, replays). */
+  allDecisions: Decision[];
 }
 
 export type Decide = (spec: PolicySpec, view: SeatView, rng: Rng) => Promise<{ action: Action; rng: Rng } | null>;
@@ -352,6 +355,7 @@ export class GameController implements TableGame {
       me: this.me,
       match: this.match,
       decisions: this.decisions.filter((d) => d.round === this.match.roundNo),
+      allDecisions: this.decisions.slice(),
     };
     if (this.setup.mode !== "training") {
       try {

@@ -8,7 +8,13 @@ import { useCallback, useEffect, useState } from "react";
 import { BackHandler, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
+import { chunkedEvaluator } from "./src/ai/evaluate";
 import { personaById } from "./src/ai/personas";
+import { HistoryScreen } from "./src/history/HistoryScreen";
+import type { HistoryRecord } from "./src/history/record";
+import { ReplayScreen } from "./src/history/ReplayScreen";
+import { FREE_HISTORY, loadHistory, updateRecord } from "./src/storage/history";
+import { TrainerPanel, TRAINER_SAMPLES, useTrainer } from "./src/trainer/TrainerPanel";
 import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
 import type { SavedGame } from "./src/game/GameController";
 import { PACES, type Pace } from "./src/game/pace";
@@ -50,6 +56,8 @@ export type Screen =
   | { name: "houseRules"; from: Tab }
   /** The rules opened from the table's menu (back resumes the game). */
   | { name: "rules"; backToGame: boolean }
+  | { name: "history"; from: Tab }
+  | { name: "replay"; record: HistoryRecord; from: Tab }
   /** A part still being built, opened from a tab (back returns to it). */
   | { name: "soon"; title: string; from: Tab };
 
@@ -99,19 +107,40 @@ function resumeInfo(saved: SavedGame): ResumeInfo {
 function GameScreen({
   source,
   opts,
+  trainer,
   onExit,
   onNewGame,
   onRules,
 }: {
   source: GameSource;
   opts: UseGameOptions;
+  /** The trainer's panel (the setting; always in training). */
+  trainer: boolean;
   onExit: () => void;
   onNewGame: () => void;
   onRules: () => void;
 }) {
-  const { game } = useGame(source, opts);
-  return <TableScreen game={game} kv={opts.kv} onExit={onExit} onNewGame={onNewGame} onRules={onRules} onGiveUp={() => void clearSavedGame(opts.kv)} />;
+  const { game, snapshot } = useGame(source, opts);
+  const on = trainer || snapshot.mode === "training";
+  const ev = useTrainer(snapshot, on);
+  return (
+    <TableScreen
+      game={game}
+      kv={opts.kv}
+      onExit={onExit}
+      onNewGame={onNewGame}
+      onRules={onRules}
+      onGiveUp={() => void clearSavedGame(opts.kv)}
+      trainer={on ? () => <TrainerPanel evaluation={ev} /> : undefined}
+      recommend={on && ev ? ev.best : null}
+    />
+  );
 }
+
+/** The analysis' evaluator (one at a time). */
+const analysisEvaluator = chunkedEvaluator();
+const evaluateForAnalysis = (view: Parameters<typeof analysisEvaluator.evaluate>[0], seed: number) =>
+  analysisEvaluator.evaluate(view, { samples: TRAINER_SAMPLES, rng: { state: seed >>> 0 }, opponentModel: { standAt: 17 } });
 
 function applySettings(s: Settings): void {
   setSoundEnabled(s.sound);
@@ -137,6 +166,7 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
   const [screen, setScreen] = useState<Screen>({ name: "home", tab: "play" });
   const [stored, setStored] = useState<Stored | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  const [history, setHistory] = useState<HistoryRecord[]>([]);
   const [fontsLoaded, fontError] = useFonts(FONT_SOURCES);
   // A missing font must not block the app: it falls back to the system font.
   const ready = !!stored && (fontsLoaded || !!fontError);
@@ -185,7 +215,11 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
     switch (screen.name) {
       case "soon":
       case "houseRules":
+      case "history":
         home(screen.from);
+        return true;
+      case "replay":
+        setScreen({ name: "history", from: screen.from });
         return true;
       case "newGame":
       case "tutorial":
@@ -254,6 +288,26 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
   switch (screen.name) {
     case "soon":
       return <SoonScreen title={screen.title} onBack={back} />;
+    case "history":
+      return (
+        <HistoryScreen
+          records={history}
+          limit={FREE_HISTORY}
+          onBack={back}
+          onOpen={(record) => setScreen({ name: "replay", record, from: screen.from })}
+        />
+      );
+    case "replay":
+      return (
+        <ReplayScreen
+          record={screen.record}
+          onBack={back}
+          evaluate={evaluateForAnalysis}
+          onAnalysed={(rec) => {
+            void updateRecord(kv, rec).then(setHistory);
+          }}
+        />
+      );
     case "tutorial":
       return (
         <TutorialScreen
@@ -295,6 +349,7 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
           key={screen.key}
           source={screen.source}
           opts={gameOpts}
+          trainer={stored.settings.trainer}
           onExit={() => home()}
           onNewGame={() => setScreen({ name: "newGame", training: false })}
           onRules={() => setScreen({ name: "rules", backToGame: true })}
@@ -327,7 +382,10 @@ function Root({ kv, pace, decide, sleep }: AppProps & { kv: KV }) {
             onFriends={() => open("Ze znajomymi")}
             onTraining={() => setScreen({ name: "newGame", training: true })}
             onHouseRules={() => setScreen({ name: "houseRules", from: "play" })}
-            onHistory={() => open("Historia")}
+            onHistory={() => {
+              void loadHistory(kv).then(setHistory);
+              setScreen({ name: "history", from: tab });
+            }}
             onSettings={() => setSettingsOpen(true)}
           />
         )}

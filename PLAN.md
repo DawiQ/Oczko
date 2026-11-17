@@ -424,7 +424,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** `App.render.test.tsx`: onboarding → nowa gra → partia do
   końca (`skipToEnd`) → lobby → wznowienie.
 
-### Etap 7 — Trener, historia, analiza
+### Etap 7 — Trener, historia, analiza ✅
 - Trener wg §5.3 (włączany w ustawieniach lub w trybie „Trening”).
 - `HistoryRecord { v, engineVersion, seedBase, rules, seats, rounds: { decisions }[], result, summary, date }`
   — jeden rekord = jedna partia (pojedyncza runda = partia z jedną rundą);

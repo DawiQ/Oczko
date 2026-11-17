@@ -14,7 +14,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 4 | Kontroler gry, zapis i wznawianie, statystyki | gotowe |
 | 5 | Stół: układ, animacje, dźwięki, koniec rundy i partii, menu, wskazówki | gotowe |
 | 6 | Lobby, nowa gra, onboarding, samouczek, zasady, ustawienia | gotowe |
-| 7–11 | wg `PLAN.md` §7 | — |
+| 7 | Trener, historia partii, powtórka, analiza decyzji, eksport | gotowe |
+| 8–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -35,7 +36,7 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 6)
+## Architektura (stan na Etap 7)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -80,6 +81,12 @@ src/newgame/            NewGameScreen (rywale − n +, tryb, długość, reguły
 src/info/RulesScreen    zasady: rodzinne, z bankierem, warianty, przykłady rąk, wartości kart
 src/home/SettingsSheet  dźwięk, wibracje, trener, tempo rywali, reguły domowe, wskazówki od nowa
 src/storage/settings, houseRules, onboarding, newGame   oczko.settings / rules / onboarding / newgame .v1
+src/trainer/TrainerPanel  trener przy ręce: P(fura), Starczy / Dobieram (%), lepszy przycisk
+                        podświetlony; ewaluator w kawałkach; tylko z widoku gracza
+src/history/            record (partia = ziarno + reguły + decyzje, powtórka z silnika),
+                        analysis (najlepsza / dobra / ryzykowna / błąd: utrata szansy ≤ 3 / ≤ 10 pp),
+                        HistoryScreen (lista, eksport JSON), ReplayScreen (rundy, suwak, autoodtwarzanie)
+src/storage/history.ts  oczko.history.v1: 50 ostatnich partii (bez Pro widać 10)
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
@@ -175,6 +182,10 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
 - `src/__tests__/App.render.test.tsx` — test dymny: onboarding → nowa gra →
   cała partia („Pokaż wynik”) → lobby → wznowienie; samouczek; ustawienia
   i reguły domowe; zakładki i „wstecz” Androida.
+- `src/history/__tests__`, `src/trainer/__tests__` — zapis → odczyt →
+  powtórka identyczna (family i bank), inna wersja silnika / zła decyzja,
+  tabela klasyfikacji decyzji, limit 50 i zepsute rekordy, ekrany historii
+  i powtórki, trener tylko w moim ruchu i z mojego widoku.
 - `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
   — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 
