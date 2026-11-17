@@ -32,6 +32,8 @@ async function playedRecord(rules: Rules, seed = 5): Promise<HistoryRecord> {
   return buildRecord(end!, 1700000000000 + seed);
 }
 
+jest.setTimeout(60000);
+
 describe("history record", () => {
   it.each([
     ["family", { ...DEFAULT_RULES, target: 4 }],

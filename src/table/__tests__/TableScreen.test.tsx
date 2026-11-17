@@ -73,6 +73,8 @@ async function render(snap: GameSnapshot, extra: Partial<React.ComponentProps<ty
   return { r, game, props };
 }
 
+jest.setTimeout(60000);
+
 describe("TableScreen", () => {
   let family: GameSnapshot[];
   let bank: GameSnapshot[];

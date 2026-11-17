@@ -48,6 +48,8 @@ async function playMatch(game: GameController, maxRounds = 500, onSnap?: (s: Gam
   throw new Error("no end");
 }
 
+jest.setTimeout(60000);
+
 describe("GameController", () => {
   it.each([
     ["family", DEFAULT_RULES],

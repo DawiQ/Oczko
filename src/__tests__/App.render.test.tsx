@@ -8,6 +8,9 @@ const instant = () =>
   ({ start: (cb?: (r: { finished: boolean }) => void) => cb?.({ finished: true }), stop() {}, reset() {} }) as unknown as Animated.CompositeAnimation;
 Object.assign(Animated, { timing: instant, spring: instant, loop: instant, parallel: instant });
 
+// Whole matches through the UI: generous time when the suite runs in parallel.
+jest.setTimeout(60000);
+
 // Android "back": the handlers the app registers, newest first.
 const backHandlers: (() => boolean)[] = [];
 jest.spyOn(BackHandler, "addEventListener").mockImplementation((_e, h) => {

@@ -3,7 +3,7 @@
 // the round's end and the match's end. Works on any `TableGame` (local game,
 // Wi‑Fi host or guest) and sees only its snapshot.
 import { useCallback, useEffect, useRef, useState, useSyncExternalStore, type ReactNode } from "react";
-import { Image, ImageBackground, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
+import { Image, Pressable, StyleSheet, Text, View, type LayoutChangeEvent } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cardOf } from "../engine/cards";
@@ -182,7 +182,8 @@ export function TableScreen({
 
   return (
     <View style={s.screen}>
-      <ImageBackground source={ART.woodTop} style={[s.top, { paddingTop: insets.top + 6 }]} resizeMode="cover">
+      <View style={[s.top, { paddingTop: insets.top + 6 }]}>
+        <Image source={ART.woodTop} style={StyleSheet.absoluteFill} resizeMode="cover" />
         <Pressable style={s.bandBtn} onPress={() => setMenu(true)} accessibilityRole="button" accessibilityLabel="Menu" hitSlop={4}>
           <Image source={ART.iconMenu} style={s.bandIcon} />
         </Pressable>
@@ -197,7 +198,7 @@ export function TableScreen({
             <Text style={s.myScore}>{me.score}</Text>
           </ScorePop>
         </View>
-      </ImageBackground>
+      </View>
 
       <View style={s.felt} onLayout={onLayout}>
         <Image source={ART.felt} style={StyleSheet.absoluteFill} resizeMode="cover" />
@@ -245,7 +246,8 @@ export function TableScreen({
         </View>
       </View>
 
-      <ImageBackground source={ART.woodBottom} style={[s.bottom, { paddingBottom: insets.bottom + 10 }]} resizeMode="cover">
+      <View style={[s.bottom, { paddingBottom: insets.bottom + 10 }]}>
+        <Image source={ART.woodBottom} style={StyleSheet.absoluteFill} resizeMode="cover" />
         {myTurn ? (
           <>
             <Button3D
@@ -279,7 +281,7 @@ export function TableScreen({
             )}
           </>
         )}
-      </ImageBackground>
+      </View>
 
       {snap.phase === "roundEnd" && <RoundEndPanel snap={snap} onNext={() => game.nextRound()} onReplay={() => game.replayRound()} />}
       {snap.phase === "matchEnd" && endPanel}
@@ -324,7 +326,7 @@ function MenuItem({ label, hint, danger, onPress }: { label: string; hint?: stri
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: P.bg },
-  top: { flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10, paddingBottom: 8, borderBottomWidth: 3, borderBottomColor: "#2B190B" },
+  top: { overflow: "hidden", flexDirection: "row", alignItems: "center", justifyContent: "space-between", paddingHorizontal: 10, paddingBottom: 8, borderBottomWidth: 3, borderBottomColor: "#2B190B" },
   bandBtn: { width: 44, height: 44, borderRadius: 14, backgroundColor: "rgba(0,0,0,0.25)", alignItems: "center", justifyContent: "center" },
   bandIcon: { width: 20, height: 20, tintColor: "#F3E3CF" },
   titleBox: { alignItems: "center", flex: 1 },
@@ -359,7 +361,7 @@ const s = StyleSheet.create({
   tipBtn: { minWidth: 44, minHeight: 44, alignItems: "center", justifyContent: "center", borderRadius: 12, backgroundColor: P.accent },
   tipBtnText: { color: P.onAccent, fontWeight: "800" },
   handBox: { position: "absolute", left: 0, right: 0, bottom: 10 },
-  bottom: { flexDirection: "row", gap: 10, paddingHorizontal: 12, paddingTop: 14, borderTopWidth: 3, borderTopColor: "#2B190B" },
+  bottom: { overflow: "hidden", flexDirection: "row", gap: 10, paddingHorizontal: 12, paddingTop: 14, borderTopWidth: 3, borderTopColor: "#2B190B" },
   btn: { flex: 1 },
   glow: { shadowColor: P.accent, shadowOpacity: 0.9, shadowRadius: 14, shadowOffset: { width: 0, height: 0 }, elevation: 12 },
   menuTitle: { color: P.text, fontFamily: DISPLAY, fontSize: 22, marginBottom: 4 },
