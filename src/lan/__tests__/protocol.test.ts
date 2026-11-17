@@ -231,3 +231,11 @@ describe("protocol parsing", () => {
     expect(txtToAd({ ...adToTxt(ad), v: "99" })).toBeNull();
   });
 });
+
+describe("the host's looks", () => {
+  it("reach the guest only as known ids (anything else: classic)", () => {
+    const table = { name: "Stół", rules: DEFAULT_RULES, mode: "match", looks: { deck: "deck.four", felt: "felt.unknown", back: 42 } };
+    const msg = parseHostMsg(JSON.stringify({ t: "welcome", v: PROTOCOL_VERSION, token: "t", table }));
+    expect(msg && msg.t === "welcome" ? msg.table.looks : null).toEqual({ deck: "deck.four", felt: "felt.green", back: "back.classic" });
+  });
+});
