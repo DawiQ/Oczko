@@ -1,33 +1,119 @@
-# Wydanie — checklista
+# Wydanie w Google Play i App Store — checklista
 
-Uzupełniana w Etapie 11 (build, podpisywanie, sklepy). Sekcje monetyzacji —
-Etap 10.
+`[x]` — zrobione w repozytorium, `[ ]` — do zrobienia przez właściciela
+(konta, klucze, panele sklepów). Bez słów z listy zakazanych (`PLAN.md` §9).
 
-## Monetyzacja (konfiguracja właściciela)
+## 0. Decyzje i wersja
 
-1. **RevenueCat**: projekt „Oczko”, uprawnienie (entitlement) `pro`, oferta
-   `default` z pakietami: roczny (z okresem próbnym w sklepie) i dożywotni.
-   Klucze publiczne SDK wpisz w `app.json` → `expo.extra.monetization`
+- [x] Nazwa „Oczko — gra w karty”, bundle id / package `pl.dawiq.oczko`
+      (`app.json`).
+- [x] Expo SDK 58, React Native 0.88 (New Architecture), `expo-dev-client`.
+- [x] `version` 1.0.0, Android `versionCode` 1 (podbijaj przy każdym
+      wydaniu; EAS `autoIncrement` w profilu `production`).
+- [x] Uprawnienia: iOS `NSLocalNetworkUsageDescription`,
+      `NSBonjourServices` (`_oczko._tcp`), aparat (tylko skan QR stołu);
+      Android: zbędne zablokowane (`blockedPermissions`).
+- [x] Grafiki z `npm run art`: ikona, adaptive icon, splash,
+      `store/icon-512.png`, `store/feature-graphic.png`; dźwięki
+      `npm run sounds`.
+
+## 1. Konta
+
+- [ ] Google Play Console (opłata jednorazowa), App Store Connect (Apple
+      Developer Program).
+- [ ] Konto Expo (EAS) — `npx eas login`.
+
+## 2. Klucze i podpisywanie
+
+- [ ] Android, build lokalny: klucz uploadu
+      `keytool -genkeypair -v -keystore oczko-upload.jks -alias oczko-upload -keyalg RSA -keysize 2048 -validity 10000`,
+      a w `~/.gradle/gradle.properties`:
+      `OCZKO_UPLOAD_STORE_FILE`, `OCZKO_UPLOAD_STORE_PASSWORD`,
+      `OCZKO_UPLOAD_KEY_ALIAS`, `OCZKO_UPLOAD_KEY_PASSWORD`
+      (plugin `plugins/withReleaseSigning.js`; bez nich — klucz debug).
+      Nigdy nie commituj `.jks` (jest w `.gitignore`).
+- [ ] Włącz Play App Signing w Play Console.
+- [ ] iOS: certyfikaty i profile zarządza EAS (`eas credentials`) albo Xcode
+      (`node build.js --ios --team <TEAM_ID>`).
+
+## 3. Budowanie
+
+- [x] `node build.js` — menu: APK / AAB (`--aab`) / iOS (Xcode lub EAS).
+- [x] `eas.json`: `development` (dev client), `preview` (APK), `production`.
+- [ ] `node build.js --aab` → `dist/oczko-<wersja>.aab` (albo
+      `npx eas build -p android --profile production`).
+- [ ] `npx eas build -p ios --profile production` (albo `node build.js --ios --eas`).
+- [x] Przed buildem: `npm test`, `npm run typecheck`, `npm run lint` na zielono.
+
+## 4. Testy na urządzeniach
+
+- [ ] Partia rodzinna i z bankierem 2–6 graczy do końca; „Pokaż wynik”,
+      rewanż, wznowienie po zamknięciu aplikacji.
+- [ ] Onboarding i samouczek na świeżej instalacji.
+- [ ] Wi‑Fi: 2 telefony (Android + iOS) — lista stołów (mDNS), kod, QR,
+      wyjście z sieci i powrót, „Starczy” po 30 s.
+- [ ] Oczko Pro: zakup w sandboxie (roczny z okresem próbnym, dożywotni),
+      „Przywróć zakupy”, kod promocyjny.
+- [ ] Reklama z nagrodą (testowa jednostka w buildzie deweloperskim):
+      formularz zgód w EOG, nagroda po obejrzeniu, brak reklam w trakcie rundy.
+- [ ] TalkBack / VoiceOver: komunikaty rundy, etykiety kart, przyciski ≥ 44 px.
+- [ ] „Ogranicz ruch” — animacje bez ruchu.
+
+## 5. Zrzuty ekranu
+
+- [ ] Telefon (Play: min. 2, App Store 6,7" i 5,5"): lobby, stół w trakcie
+      rundy (z trenerem), perskie oczko, koniec rundy, profil, Wi‑Fi (kod
+      stołu). Bez kasynowych motywów; wygląd „Zielone” lub „Orzech”.
+
+## 6. Google Play Console
+
+- [ ] Opis: `store/listing-pl.md` (nazwa, krótki i pełny opis), grafiki
+      ze `store/`.
+- [ ] Kategoria: Gry → Karciane. Grupa docelowa: 13+ (ze względu na
+      reklamy) — albo „wszyscy” po zablokowaniu reklam dla dzieci.
+- [ ] Ocena treści (IARC): odpowiedzi z `store/rating-answers.md`
+      — **Simulated gambling: No**.
+- [ ] Bezpieczeństwo danych: identyfikatory urządzenia (AdMob, RevenueCat)
+      i historia zakupów — tak, do reklam i zakupów; dane gry — tylko na
+      urządzeniu; szyfrowanie w tranzycie — tak; usuwanie danych — przez
+      odinstalowanie.
+- [ ] Reklamy: „Aplikacja zawiera reklamy” — tak.
+- [ ] Polityka prywatności: opublikuj `store/privacy.md` pod adresem i wpisz
+      go w Play Console oraz w `app.json` → `extra.monetization.privacyUrl`.
+- [ ] Produkty: subskrypcja roczna z okresem próbnym i produkt jednorazowy
+      (te same w RevenueCat).
+
+## 7. App Store Connect
+
+- [ ] Opis i słowa kluczowe: `store/listing-pl.md`.
+- [ ] Age Rating: `store/rating-answers.md` — **Simulated Gambling: None**.
+- [ ] App Privacy: identyfikatory (reklamy — bez śledzenia między
+      aplikacjami, bez ATT), zakupy.
+- [ ] Zakupy w aplikacji: subskrypcja (grupa „Oczko Pro”) i zakup
+      jednorazowy; regulamin (EULA) i polityka prywatności w opisie.
+
+## 8. Monetyzacja (konfiguracja właściciela)
+
+1. [ ] **RevenueCat**: projekt „Oczko”, uprawnienie (entitlement) `pro`,
+   oferta `default` z pakietami: roczny (z okresem próbnym) i dożywotni.
+   Klucze publiczne SDK w `app.json` → `expo.extra.monetization`
    (`revenueCatAndroidKey`, `revenueCatIosKey`). Bez kluczy zakupy są
    niedostępne, aplikacja działa.
-2. **AdMob**: aplikacja Android i iOS, jednostka „Rewarded”. ID aplikacji
-   w pluginie `react-native-google-mobile-ads` (`app.json`), ID jednostek
-   w `expo.extra.monetization.rewardedAndroid / rewardedIos`. W wersji
-   deweloperskiej używane są testowe jednostki Google.
-3. **AdMob — zablokowane kategorie (obowiązkowo)**: w panelu AdMob →
-   Blocking controls → Sensitive categories zablokuj **„Gambling & Betting”**
-   i **„Social Casino”** dla obu aplikacji. Oczko to gra na punkty, bez
-   pieniędzy i nagród — reklamy hazardu nie mogą się w niej pojawiać.
-4. **Formularz zgód (UMP)**: w AdMob → Privacy & messaging utwórz komunikat
-   GDPR dla EOG/UK/CH. Bez zgody reklamy są niespersonalizowane; zmiana zgody
+2. [ ] **AdMob**: aplikacja Android i iOS, jednostka „Rewarded”. ID aplikacji
+   w pluginie `react-native-google-mobile-ads` (`app.json`, teraz testowe),
+   ID jednostek w `expo.extra.monetization.rewardedAndroid / rewardedIos`.
+3. [ ] **AdMob — zablokowane kategorie (obowiązkowo)**: Blocking controls →
+   Sensitive categories: zablokuj **„Gambling & Betting”** i **„Social
+   Casino”** dla obu aplikacji. Oczko to gra na punkty, bez pieniędzy
+   i nagród — reklamy hazardu nie mogą się w niej pojawiać.
+4. [ ] **Formularz zgód (UMP)**: AdMob → Privacy & messaging, komunikat GDPR
+   dla EOG/UK/CH. Bez zgody reklamy są niespersonalizowane; zmiana zgody
    w Ustawieniach → „Prywatność reklam”.
-5. **Regulamin i polityka prywatności**: adresy w `termsUrl` / `privacyUrl`
-   (wyświetlane pod przyciskiem zakupu).
+5. [ ] **Regulamin i polityka prywatności**: `termsUrl` / `privacyUrl`.
 
 ## Zasady reklam w aplikacji
 
-- Reklama z nagrodą tylko na żądanie (arkusz limitu, ustawienia), nigdy
-  w trakcie rundy i nigdy dla Oczko Pro.
-- Nagroda: +1 do wybranego limitu dziennego (podpowiedź trenera, analiza
-  partii, stół 7–8 osób) albo wygląd na 24 h. Nic, co wpływa na wynik gry
-  z innymi ludźmi.
+- [x] Reklama z nagrodą tylko na żądanie (arkusz limitu, ustawienia), nigdy
+      w trakcie rundy i nigdy dla Oczko Pro.
+- [x] Nagroda: +1 do wybranego limitu dziennego (podpowiedź trenera,
+      analiza partii, stół 7–8 osób) albo wygląd na 24 h.

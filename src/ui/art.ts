@@ -15,6 +15,15 @@ export const ART = {
   iconChevron: require("../../assets/game/icon-chevron.png"),
 };
 
-/** Character portraits by (lower-case) name. Drawn in Etap 11; until then
- *  every seat shows its coloured initial. */
-export const PORTRAITS: Record<string, number> = {};
+/** Character portraits by (lower-case) name; "ty" is you. */
+export const PORTRAITS: Record<string, number> = {
+  zosia: require("../../assets/game/portrait-zosia.png"),
+  kuba: require("../../assets/game/portrait-kuba.png"),
+  witek: require("../../assets/game/portrait-witek.png"),
+  hela: require("../../assets/game/portrait-hela.png"),
+  ola: require("../../assets/game/portrait-ola.png"),
+  marek: require("../../assets/game/portrait-marek.png"),
+  profesor: require("../../assets/game/portrait-profesor.png"),
+  hrabia: require("../../assets/game/portrait-hrabia.png"),
+  ty: require("../../assets/game/portrait-you.png"),
+};

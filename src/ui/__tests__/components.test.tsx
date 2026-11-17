@@ -157,10 +157,16 @@ describe("Portrait", () => {
     expect(splitCopy("Pan Kowalski")).toEqual({ base: "Pan Kowalski", copy: "" });
   });
 
-  it("draws the initial and the copy badge", () => {
-    const r = render(<Portrait name="Hela III" size={48} color="#B9D86A" />);
+  it("draws the initial and the copy badge without a portrait", () => {
+    const r = render(<Portrait name="Gość III" size={48} color="#B9D86A" />);
     const t = textOf(r);
-    expect(t).toContain("H");
+    expect(t).toContain("G");
     expect(t).toContain("III");
+  });
+
+  it("draws a character's portrait", () => {
+    const r = render(<Portrait name="Hela II" size={48} color="#B9D86A" />);
+    expect(r.root.findAll((n) => n.props.source !== undefined).length).toBeGreaterThan(0);
+    expect(textOf(r)).toContain("II");
   });
 });

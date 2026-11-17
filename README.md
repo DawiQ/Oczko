@@ -18,7 +18,7 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 8 | Profil: rangi, odznaki, statystyki, następny rywal | gotowe |
 | 9 | Gra przez Wi‑Fi: stół u gospodarza, goście, kod, QR, mDNS, rozłączenia | gotowe |
 | 10 | Oczko Pro, portfel dzienny, reklamy z nagrodą, wygląd | gotowe |
-| 11 | wg `PLAN.md` §7 | — |
+| 11 | Grafiki (portrety, sklep), dźwięki, `build.js`, EAS, podpisywanie, teksty sklepu | gotowe |
 
 ## Uruchomienie
 
@@ -37,10 +37,12 @@ npm start               # serwer Metro dla dev clienta
 | `npm run lint` | ESLint (konfiguracja Expo) |
 | `npm run tournament` | kalibracja poziomów botów → `docs/BOTS.md`, `src/ai/calibration.ts` |
 | `npm run stats` | statystyki reguł z symulacji → `docs/STATS.md` |
-| `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
+| `npm run art` | ikona, adaptive icon, splash, grafiki sklepu, ikony, sukno, bandy, portrety (`tools/render-*.js`, Chromium przez Playwright) |
+| `node build.js` | build: menu (APK / AAB / iOS przez Xcode lub EAS); `--aab`, `--install`, `--clean`, `--ios --team …`, `--ios --eas` |
+| `npx tsx tools/find-tutorial-seed.ts` | szuka ziarna samouczka (sprawdzane testem) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 10)
+## Architektura
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -253,12 +255,36 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
 - `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
   — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 
+## Konfiguracja właściciela (krok po kroku)
+
+Pełna checklista: `store/RELEASE.md`. W skrócie:
+
+1. **Konta**: Google Play Console, Apple Developer, Expo (EAS).
+2. **Podpisywanie Androida**: klucz uploadu (`keytool …`, alias
+   `oczko-upload`) i wpisy `OCZKO_UPLOAD_*` w `~/.gradle/gradle.properties`
+   (plugin `plugins/withReleaseSigning.js`); Play App Signing włączone.
+3. **Build**: `node build.js --aab` (lokalnie, wymaga Android SDK i NDK)
+   albo `npx eas build -p android|ios --profile production`.
+4. **RevenueCat**: projekt, uprawnienie `pro`, oferta z pakietem rocznym
+   (okres próbny) i dożywotnim; klucze w `app.json` → `extra.monetization`.
+5. **AdMob**: aplikacje i jednostki „Rewarded” (ID w `app.json`);
+   **zablokuj kategorie „Gambling & Betting” i „Social Casino”**; komunikat
+   zgód UMP dla EOG/UK/CH.
+6. **Kwestionariusze ocen**: `store/rating-answers.md` (Simulated Gambling:
+   None / No).
+7. **Opis i grafiki**: `store/listing-pl.md`, `store/icon-512.png`,
+   `store/feature-graphic.png`; polityka prywatności `store/privacy.md`
+   pod publicznym adresem (`privacyUrl`).
+
 ## Dokumenty
 
 - `PLAN.md` — plan implementacji, decyzje (§0), specyfikacja silnika, etapy.
 - `CLAUDE.md` — zasady pracy i architektury.
 - `docs/BLUEPRINT.md` — opis aplikacji Pan (wzorzec architektury).
-- `docs/mockups/oczko-makiety.html` — makiety ekranów (zaakceptowane).
+- `docs/mockups/oczko-makiety.html` — makiety ekranów (zaakceptowane),
+  `docs/mockups/oczko-pro.html` — paywall, limit dzienny, wygląd.
+- `docs/STATS.md`, `docs/BOTS.md` — pomiary (`npm run stats`, `npm run tournament`).
+- `store/` — opis w sklepach, polityka prywatności, odpowiedzi do ocen, checklista wydania.
 
 ## Wzorzec
 

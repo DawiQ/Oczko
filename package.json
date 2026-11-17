@@ -14,7 +14,8 @@
     "stats": "tsx tools/stats.ts",
     "tournament": "tsx tools/tournament.ts",
     "sounds": "python3 tools/render-sounds.py",
-    "prebuild": "expo prebuild"
+    "prebuild": "expo prebuild",
+    "build:apk": "node build.js"
   },
   "dependencies": {
     "@expo-google-fonts/fraunces": "^0.4.1",

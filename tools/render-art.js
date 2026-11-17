@@ -1,4 +1,5 @@
-// Renders the app icon, Android adaptive icon and splash icon with headless
+// Renders the app icon, Android adaptive icon, splash icon and the store
+// graphics (icon 512, feature graphic) with headless
 // Chromium (Playwright):
 //   node tools/render-art.js
 const path = require("path");
@@ -53,6 +54,13 @@ const iconBody = `<rect width="1024" height="1024" fill="${FELT}"/>${logo(500, 4
 const shots = [
   // App icon: opaque square (iOS applies its own mask).
   ["assets/icon.png", 1024, 1024, false, iconBody],
+  // Google Play listing icon (512x512, same artwork).
+  ["store/icon-512.png", 512, 512, false, iconBody, 1024, 1024],
+  // Google Play feature graphic (1024x500): no lettering beyond the name.
+  ["store/feature-graphic.png", 1024, 500, false,
+    `<rect width="1024" height="500" fill="${FELT}"/>${logo(250, 230, 0.62)}
+     <text x="540" y="250" font-family="Fraunces" font-size="150" fill="#EEF2F6">Oczko</text>
+     <text x="546" y="312" font-family="DejaVu Sans, sans-serif" font-size="30" fill="#CFE6DC">polska gra w karty do 21</text>`],
   // Android adaptive icon foreground: transparent, artwork inside the central safe zone (~66%).
   ["assets/adaptive-icon.png", 1024, 1024, true, logo(500, 460, 0.66)],
   // Splash icon (shown 200 dp wide on the background colour): logo + wordmark
@@ -65,6 +73,7 @@ const shots = [
 
 (async () => {
   fs.mkdirSync(path.join(OUT, "assets"), { recursive: true });
+  fs.mkdirSync(path.join(OUT, "store"), { recursive: true });
   const browser = await chromium.launch();
   for (const [name, w, h, transparent, body, vw, vh] of shots) {
     const p = await browser.newPage({ viewport: { width: w, height: h }, deviceScaleFactor: 1 });
