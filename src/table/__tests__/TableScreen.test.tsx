@@ -166,3 +166,26 @@ describe("TableScreen", () => {
     expect(JSON.parse((await kv.get("oczko.hints.v1"))!)).toEqual({ v: 1, seen: ["firstTurn"] });
   });
 });
+
+describe("score animation", () => {
+  it("shows +N when a score grows", async () => {
+    const { ScorePop } = jest.requireActual("../OpponentSeat") as typeof import("../OpponentSeat");
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(
+        <ScorePop value={2} reduceMotion={false}>
+          <Text>2</Text>
+        </ScorePop>
+      );
+    });
+    expect(textOf(r)).not.toContain("+");
+    await act(async () => {
+      r.update(
+        <ScorePop value={3} reduceMotion={false}>
+          <Text>3</Text>
+        </ScorePop>
+      );
+    });
+    expect(textOf(r)).toContain("+1");
+  });
+});

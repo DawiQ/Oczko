@@ -24,7 +24,7 @@ import { FuraStamp, PersianOverlay } from "./Effects";
 import { Hand } from "./Hand";
 import { HINT_TEXT, hintFor, loadHints, saveHints, type HintId } from "./hints";
 import { opponentsOf, PORTRAIT_SIZE, seatSize, seatSpots } from "./layout";
-import { OpponentSeat } from "./OpponentSeat";
+import { OpponentSeat, ScorePop } from "./OpponentSeat";
 import { MatchEndPanel, RoundEndPanel, ScoreBars } from "./RoundEnd";
 import { caption } from "./texts";
 
@@ -184,7 +184,9 @@ export function TableScreen({
           <Text style={s.subtitle}>{modeLine(snap)}</Text>
         </View>
         <View style={s.bandBtn} accessible accessibilityLabel={`Twoje punkty: ${me.score} z ${snap.target}`}>
-          <Text style={s.myScore}>{me.score}</Text>
+          <ScorePop value={me.score} reduceMotion={reduceMotion}>
+            <Text style={s.myScore}>{me.score}</Text>
+          </ScorePop>
         </View>
       </ImageBackground>
 

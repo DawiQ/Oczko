@@ -1,6 +1,6 @@
 // A rival at the table: portrait (in the seat's colour, with the score),
 // name, the cards (backs, or faces once shown), status, bank / dealer marks.
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
 import type { SeatInfo } from "../game/TableGame";
@@ -22,21 +22,47 @@ export function FlipIn({ children, delay = 0, reduceMotion }: { children: React.
   return <Animated.View style={{ transform: [{ scaleX: v }], opacity: v }}>{children}</Animated.View>;
 }
 
-/** A small "pop" when the value changes (the score). */
-function Pop({ value, children, reduceMotion }: { value: number; children: React.ReactNode; reduceMotion: boolean }) {
+/** The score: a "pop" and a "+N" flying up when it grows. */
+export function ScorePop({ value, children, reduceMotion }: { value: number; children: React.ReactNode; reduceMotion: boolean }) {
   const s = useState(() => new Animated.Value(1))[0];
-  const first = useRef(true);
+  const fly = useState(() => new Animated.Value(1))[0];
+  const [prev, setPrev] = useState(value);
+  const [gain, setGain] = useState(0);
+  if (value !== prev) {
+    // Derived during render: remember the gain for the "+N" label.
+    setGain(value > prev ? value - prev : 0);
+    setPrev(value);
+  }
   useEffect(() => {
-    if (first.current) {
-      first.current = false;
-      return;
-    }
-    if (reduceMotion) return;
+    if (gain <= 0 || reduceMotion) return;
     s.setValue(1.6);
-    Animated.spring(s, { toValue: 1, friction: 4, useNativeDriver: true }).start();
-  }, [value, s, reduceMotion]);
-  return <Animated.View style={{ transform: [{ scale: s }] }}>{children}</Animated.View>;
+    fly.setValue(0);
+    Animated.parallel([
+      Animated.spring(s, { toValue: 1, friction: 4, useNativeDriver: true }),
+      Animated.timing(fly, { toValue: 1, duration: 900, useNativeDriver: true }),
+    ]).start();
+  }, [gain, value, s, fly, reduceMotion]);
+  return (
+    <View>
+      <Animated.View style={{ transform: [{ scale: s }] }}>{children}</Animated.View>
+      {gain > 0 && !reduceMotion && (
+        <Animated.Text
+          style={[
+            ps.plus,
+            { opacity: fly.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] }), transform: [{ translateY: fly.interpolate({ inputRange: [0, 1], outputRange: [0, -30] }) }] },
+          ]}
+          accessibilityElementsHidden
+        >
+          {`+${gain}`}
+        </Animated.Text>
+      )}
+    </View>
+  );
 }
+
+const ps = StyleSheet.create({
+  plus: { position: "absolute", top: -6, left: -4, right: -4, textAlign: "center", color: P.accent, fontFamily: DISPLAY, fontSize: 16 },
+});
 
 export function seatA11y(seat: SeatInfo): string {
   const parts = [seat.name, `${seat.cards} ${plural(seat.cards, "karta", "karty", "kart")}`];
@@ -58,9 +84,9 @@ export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; siz
       <View>
         <Portrait name={seat.name} size={p} color={seat.color} ring={seat.color} />
         <View style={[s.score, { borderColor: seat.color }]}>
-          <Pop value={seat.score} reduceMotion={reduceMotion}>
+          <ScorePop value={seat.score} reduceMotion={reduceMotion}>
             <Text style={s.scoreText}>{seat.score}</Text>
-          </Pop>
+          </ScorePop>
         </View>
         {seat.isBank && (
           <View style={s.bank}>
