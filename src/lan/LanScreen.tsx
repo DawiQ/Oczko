@@ -13,6 +13,8 @@ import type { Rules } from "../engine/rules";
 import type { Pace } from "../game/pace";
 import type { GameSnapshot, TableGame } from "../game/TableGame";
 import { summaryLine } from "../newgame/rulesText";
+import type { LookChoice } from "../premium/looks";
+import { LookOverride } from "../premium/LooksProvider";
 import type { KV } from "../storage/kv";
 import { addLanRound, loadLanStats, saveLanStats, type LanStats } from "../storage/lan";
 import { TableScreen } from "../table/TableScreen";
@@ -45,7 +47,24 @@ export interface LanDeps {
 
 const defaultIp = () => Network.getIpAddressAsync().catch(() => null);
 
-export function LanScreen({ kv, rules, pace, pro, onExit, deps = {} }: { kv: KV; rules: Rules; pace: Pace; pro: boolean; onExit: () => void; deps?: LanDeps }) {
+export function LanScreen({
+  kv,
+  rules,
+  pace,
+  pro,
+  looks,
+  onExit,
+  deps = {},
+}: {
+  kv: KV;
+  rules: Rules;
+  pace: Pace;
+  pro: boolean;
+  /** An Oczko Pro host's looks, shown to the whole table. */
+  looks?: LookChoice;
+  onExit: () => void;
+  deps?: LanDeps;
+}) {
   const [step, setStep] = useState<Step>({ name: "menu" });
   const [stats, setStats] = useState<LanStats | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -110,7 +129,7 @@ export function LanScreen({ kv, rules, pace, pro, onExit, deps = {} }: { kv: KV;
   const startHost = async () => {
     saveName();
     setError(null);
-    const table: TableInfo = { name: `Stół: ${name || "Gospodarz"}`, rules, mode: "match" };
+    const table: TableInfo = { name: `Stół: ${name || "Gospodarz"}`, rules, mode: "match", ...(pro && looks ? { looks } : {}) };
     const host = new LanHost({
       name: name || "Gospodarz",
       table,
@@ -412,7 +431,11 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
 function GuestFlow({ guest, kv, onLeave }: { guest: LanGuest; kv: KV; onLeave: () => void }) {
   const view = useSyncExternalStore(guest.subscribe, () => guest.state);
   if (view.phase === "playing" && guest.snapshot)
-    return <LanTable game={guest.game} kv={kv} lan={() => guest.state.lan} subscribeLan={guest.subscribe} onExit={onLeave} onReact={(t) => guest.react(t)} guest offline={view.offline} />;
+    return (
+      <LookOverride choice={view.table?.looks ?? null}>
+        <LanTable game={guest.game} kv={kv} lan={() => guest.state.lan} subscribeLan={guest.subscribe} onExit={onLeave} onReact={(t) => guest.react(t)} guest offline={view.offline} />
+      </LookOverride>
+    );
   const title = view.table?.name ?? "Stół";
   let line = "Łączę…";
   if (view.phase === "lobby") line = "Czekamy, aż gospodarz rozda karty.";

@@ -32,8 +32,13 @@ export function HistoryScreen({
   onOpen,
   onBack,
   onMore,
+  canExport = true,
+  onExportLocked,
 }: {
   records: HistoryRecord[];
+  /** Export (Oczko Pro). */
+  canExport?: boolean;
+  onExportLocked?: () => void;
   /** How many can be opened (without Oczko Pro: 10). */
   limit: number;
   onOpen: (r: HistoryRecord) => void;
@@ -43,7 +48,10 @@ export function HistoryScreen({
 }) {
   const shown = records.slice(0, limit);
   const locked = records.length - shown.length;
-  const doExport = () => void Share.share({ title: "Oczko — historia", message: exportHistory(shown) }).catch(() => {});
+  const doExport = () => {
+    if (!canExport) return onExportLocked?.();
+    void Share.share({ title: "Oczko — historia", message: exportHistory(shown) }).catch(() => {});
+  };
   return (
     <View style={s.screen}>
       <Header

@@ -52,3 +52,37 @@ jest.mock("expo-camera", () => ({
   CameraView: () => null,
   useCameraPermissions: () => [{ granted: false, canAskAgain: true }, () => Promise.resolve({ granted: false }), () => Promise.resolve({ granted: false })],
 }));
+
+// Oczko Pro natives: no store and no ads under Jest (tests inject fakes).
+jest.mock("react-native-purchases", () => ({
+  __esModule: true,
+  default: {
+    configure() {},
+    getCustomerInfo: async () => ({ entitlements: { active: {} } }),
+    getOfferings: async () => ({ current: null }),
+    purchasePackage: async () => ({ customerInfo: { entitlements: { active: {} } } }),
+    restorePurchases: async () => ({ entitlements: { active: {} } }),
+    showManageSubscriptions: async () => {},
+    syncPurchasesForResult: async () => ({ customerInfo: { entitlements: { active: {} } } }),
+    presentCodeRedemptionSheet: async () => {},
+    invalidateCustomerInfoCache: async () => {},
+    addCustomerInfoUpdateListener() {},
+    removeCustomerInfoUpdateListener() {},
+  },
+  PACKAGE_TYPE: { ANNUAL: "ANNUAL", LIFETIME: "LIFETIME" },
+}));
+jest.mock("react-native-google-mobile-ads", () => ({
+  __esModule: true,
+  default: () => ({ initialize: async () => [] }),
+  AdsConsent: {
+    gatherConsent: async () => ({ canRequestAds: false }),
+    getUserChoices: async () => ({ selectPersonalisedAds: false }),
+    showPrivacyOptionsForm: async () => ({}),
+    getConsentInfo: async () => ({ canRequestAds: false, privacyOptionsRequirementStatus: "NOT_REQUIRED" }),
+  },
+  AdsConsentPrivacyOptionsRequirementStatus: { REQUIRED: "REQUIRED", NOT_REQUIRED: "NOT_REQUIRED", UNKNOWN: "UNKNOWN" },
+  RewardedAd: { createForAdRequest: () => ({ addAdEventListener: () => () => {}, load() {}, show: async () => {} }) },
+  RewardedAdEventType: { LOADED: "rewarded_loaded", EARNED_REWARD: "rewarded_earned_reward" },
+  AdEventType: { CLOSED: "closed", ERROR: "error" },
+  TestIds: { REWARDED: "test-rewarded" },
+}));

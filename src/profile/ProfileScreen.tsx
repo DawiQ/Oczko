@@ -31,8 +31,13 @@ export function ProfileScreen({
   onPlay,
   onHistory,
   onReset,
+  pro = true,
+  onPro,
 }: {
   stats: Stats;
+  /** Extended statistics (modes, rivals, the next rival) are Oczko Pro. */
+  pro?: boolean;
+  onPro?: () => void;
   /** Play against a suggested character. */
   onPlay: (persona: string) => void;
   onHistory: () => void;
@@ -93,7 +98,17 @@ export function ProfileScreen({
         })}
       </View>
 
-      {next && (
+      {!pro && (
+        <Pressable style={[s.panel, { justifyContent: "space-between" }]} onPress={onPro} accessibilityRole="button" accessibilityLabel="Rozszerzone statystyki w Oczko Pro">
+          <View style={{ flex: 1 }}>
+            <Text style={s.name}>Rozszerzone statystyki</Text>
+            <Text style={s.small}>Tryby, wyniki z każdym rywalem, następny rywal — w Oczko Pro.</Text>
+          </View>
+          <Text style={s.linkText}>Pro ›</Text>
+        </Pressable>
+      )}
+
+      {pro && next && (
         <View style={s.panel}>
           <Portrait name={next.persona.name} size={42} color={next.persona.color} />
           <View style={{ flex: 1 }}>
@@ -105,8 +120,8 @@ export function ProfileScreen({
         </View>
       )}
 
-      <Label>Tryby</Label>
-      <View style={s.panel2}>
+      {pro && <Label>Tryby</Label>}
+      {pro && <View style={s.panel2}>
         {(["family", "bank"] as const).map((m) => {
           const x = stats.byMode[m];
           return (
@@ -116,9 +131,9 @@ export function ProfileScreen({
             </View>
           );
         })}
-      </View>
+      </View>}
 
-      {played.length > 0 && (
+      {pro && played.length > 0 && (
         <>
           <Label>Rywale</Label>
           <View style={s.panel2}>

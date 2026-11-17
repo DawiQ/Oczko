@@ -5,7 +5,7 @@ import { useFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
-import { BackHandler, View } from "react-native";
+import { BackHandler, Pressable, Text, View } from "react-native";
 import { SafeAreaProvider } from "react-native-safe-area-context";
 
 import { chunkedEvaluator } from "./src/ai/evaluate";
@@ -13,7 +13,7 @@ import { personaById } from "./src/ai/personas";
 import { HistoryScreen } from "./src/history/HistoryScreen";
 import type { HistoryRecord } from "./src/history/record";
 import { ReplayScreen } from "./src/history/ReplayScreen";
-import { FREE_HISTORY, loadHistory, updateRecord } from "./src/storage/history";
+import { FREE_HISTORY, loadHistory, MAX_HISTORY, updateRecord } from "./src/storage/history";
 import { TrainerPanel, TRAINER_SAMPLES, useTrainer } from "./src/trainer/TrainerPanel";
 import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
 import type { SavedGame } from "./src/game/GameController";
@@ -26,7 +26,7 @@ import { SettingsSheet } from "./src/home/SettingsSheet";
 import { TabBar, type Tab } from "./src/home/TabBar";
 import { RulesScreen } from "./src/info/RulesScreen";
 import { HouseRulesScreen } from "./src/newgame/HouseRulesScreen";
-import { NewGameScreen } from "./src/newgame/NewGameScreen";
+import { FREE_SEATS, NewGameScreen } from "./src/newgame/NewGameScreen";
 import { summaryLines } from "./src/newgame/rulesText";
 import { TutorialScreen } from "./src/onboarding/TutorialScreen";
 import { Welcome } from "./src/onboarding/Welcome";
@@ -43,6 +43,13 @@ import type { PersonaId } from "./src/ai/personas";
 import { resetHints } from "./src/table/hints";
 import { TableScreen } from "./src/table/TableScreen";
 import { DialogProvider, useConfirm } from "./src/ui/Dialog";
+import type { AdsApi } from "./src/premium/ads";
+import { LimitSheet } from "./src/premium/LimitSheet";
+import { LooksProvider, useLooks } from "./src/premium/LooksProvider";
+import { LooksScreen } from "./src/premium/LooksScreen";
+import { PremiumProvider, usePremium } from "./src/premium/PremiumProvider";
+import type { StoreApi } from "./src/premium/store";
+import type { Reward } from "./src/premium/wallet";
 import { FONT_SOURCES } from "./src/ui/fonts";
 import { setHapticsEnabled } from "./src/ui/haptics";
 import { P } from "./src/ui/palette";
@@ -63,10 +70,13 @@ export type Screen =
   /** Playing with friends over Wi‑Fi (its own steps and back handling). */
   | { name: "lan"; key: number }
   | { name: "replay"; record: HistoryRecord; from: Tab }
-  ;
+  | { name: "looks"; from: Tab };
 
 export interface AppProps {
   kv?: KV;
+  /** Oczko Pro purchases and rewarded ads (tests pass fakes). */
+  store?: StoreApi;
+  ads?: AdsApi;
   /** Tests: the Wi‑Fi network in memory. */
   lanDeps?: LanDeps;
   /** Tests: the table's pace (otherwise from the settings). */
@@ -90,7 +100,11 @@ export default function App(props: AppProps) {
     <SafeAreaProvider style={{ backgroundColor: P.bg }}>
       <StatusBar style="light" />
       <DialogProvider>
-        <Root {...props} kv={props.kv ?? deviceKV} />
+        <PremiumProvider kv={props.kv ?? deviceKV} store={props.store} ads={props.ads}>
+          <LooksProvider kv={props.kv ?? deviceKV}>
+            <Root {...props} kv={props.kv ?? deviceKV} />
+          </LooksProvider>
+        </PremiumProvider>
       </DialogProvider>
     </SafeAreaProvider>
   );
@@ -139,8 +153,9 @@ function GameScreen({
     },
   }));
   const { game, snapshot } = useGame(source, gameOpts);
+  const premium = usePremium();
   const on = trainer || snapshot.mode === "training";
-  const ev = useTrainer(snapshot, on);
+  const ev = useTrainer(snapshot, on, undefined, premium.pro ? undefined : () => premium.spend("hint"));
   return (
     <TableScreen
       game={game}
@@ -149,8 +164,8 @@ function GameScreen({
       onNewGame={onNewGame}
       onRules={onRules}
       onGiveUp={() => void clearSavedGame(opts.kv)}
-      trainer={on ? () => <TrainerPanel evaluation={ev} /> : undefined}
-      recommend={on && ev ? ev.best : null}
+      trainer={on ? () => <TrainerPanel evaluation={ev} onMore={() => premium.showPaywall("hints")} /> : undefined}
+      recommend={on && ev && ev !== "locked" ? ev.best : null}
       newBadges={BADGES.filter((b) => fresh.includes(b.id))}
     />
   );
@@ -186,6 +201,9 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
   const [stored, setStored] = useState<Stored | null>(null);
   const [settingsOpen, setSettingsOpen] = useState(false);
   const [history, setHistory] = useState<HistoryRecord[]>([]);
+  const premium = usePremium();
+  const looks = useLooks();
+  const [limit, setLimit] = useState<null | "analysis" | "bigTable" | "hints">(null);
   const [fontsLoaded, fontError] = useFonts(FONT_SOURCES);
   // A missing font must not block the app: it falls back to the system font.
   const ready = !!stored && (fontsLoaded || !!fontError);
@@ -234,6 +252,7 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
     switch (screen.name) {
       case "houseRules":
       case "history":
+      case "looks":
         home(screen.from);
         return true;
       case "replay":
@@ -272,6 +291,11 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
   const gameOpts: UseGameOptions = { kv, pace: tablePace, decide, sleep };
 
   const start = (choices: NewGameChoices, rules: Rules, training: boolean) => {
+    // A table of 7–8: Oczko Pro, or today's free one (a rewarded ad adds one).
+    if (choices.bots.length + 1 > FREE_SEATS && !premium.pro && !premium.spend("bigTable")) {
+      setLimit("bigTable");
+      return;
+    }
     const go = () => {
       void saveChoices(kv, choices);
       void clearSavedGame(kv);
@@ -305,31 +329,48 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
       />
     );
 
+  // A daily limit's sheet shows over whatever screen is open.
+  const withLimit = (el: React.ReactElement) => (
+    <>
+      {el}
+      {limit && <Limit kind={limit} onClose={() => setLimit(null)} />}
+    </>
+  );
+
   switch (screen.name) {
     case "lan":
-      return <LanScreen key={screen.key} kv={kv} rules={stored.rules} pace={tablePace} pro={false} onExit={() => home()} deps={lanDeps} />;
+      return withLimit(
+        <LanScreen key={screen.key} kv={kv} rules={stored.rules} pace={tablePace} pro={premium.pro} looks={looks.effective} onExit={() => home()} deps={lanDeps} />
+      );
+    case "looks":
+      return withLimit(<LooksScreen onBack={back} />);
     case "history":
-      return (
+      return withLimit(
         <HistoryScreen
           records={history}
-          limit={FREE_HISTORY}
+          limit={premium.pro ? MAX_HISTORY : FREE_HISTORY}
+          canExport={premium.pro}
+          onExportLocked={() => premium.showPaywall("export")}
+          onMore={() => premium.showPaywall("history")}
           onBack={back}
           onOpen={(record) => setScreen({ name: "replay", record, from: screen.from })}
         />
       );
     case "replay":
-      return (
+      return withLimit(
         <ReplayScreen
           record={screen.record}
           onBack={back}
           evaluate={evaluateForAnalysis}
+          spendAnalysis={() => premium.spend("analysis")}
+          onAnalyseLocked={() => setLimit("analysis")}
           onAnalysed={(rec) => {
             void updateRecord(kv, rec).then(setHistory);
           }}
         />
       );
     case "tutorial":
-      return (
+      return withLimit(
         <TutorialScreen
           key={screen.key}
           kv={kv}
@@ -340,7 +381,7 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
         />
       );
     case "houseRules":
-      return (
+      return withLimit(
         <HouseRulesScreen
           initial={stored.rules}
           onBack={back}
@@ -352,10 +393,11 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
         />
       );
     case "rules":
-      return <RulesScreen rules={stored.rules} onBack={back} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />;
+      return withLimit(<RulesScreen rules={stored.rules} onBack={back} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />);
     case "newGame":
-      return (
+      return withLimit(
         <NewGameScreen
+          maxTable={8 /* 7–8 need Oczko Pro or today's free big table: checked at the start */}
           key={screen.bots?.join(",") ?? "last"}
           initial={screen.bots ? { ...(stored.choices ?? DEFAULT_CHOICES), bots: screen.bots } : stored.choices ?? DEFAULT_CHOICES}
           rules={stored.rules}
@@ -365,7 +407,7 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
         />
       );
     case "game":
-      return (
+      return withLimit(
         <GameScreen
           key={screen.key}
           source={screen.source}
@@ -392,6 +434,8 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
       <View style={{ flex: 1 }}>
         {tab === "profile" ? (
           <ProfileScreen
+            pro={premium.pro}
+            onPro={() => premium.showPaywall("stats")}
             stats={stored.stats}
             onPlay={(persona) => setScreen({ name: "newGame", training: false, bots: [persona as PersonaId] })}
             onHistory={() => {
@@ -438,8 +482,81 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
             setSettingsOpen(false);
           }}
           onClose={() => setSettingsOpen(false)}
+          extra={
+            <SettingsExtra
+              hintsLeft={premium.hintsLeft}
+              onLooks={() => {
+                setSettingsOpen(false);
+                setScreen({ name: "looks", from: tab });
+              }}
+              onMoreHints={() => {
+                setSettingsOpen(false);
+                setLimit("hints");
+              }}
+            />
+          }
         />
       )}
+      {limit && <Limit kind={limit} onClose={() => setLimit(null)} />}
     </View>
+  );
+}
+
+const LIMITS: Record<"analysis" | "bigTable" | "hints", { title: string; text: string; reason: "analysis" | "bigTable" | "hints"; proLabel: string; ad: { label: string; reward: Reward } }> = {
+  analysis: {
+    title: "Dzisiejsza analiza wykorzystana",
+    text: "Bez Oczko Pro jedna analiza partii dziennie. Jutro kolejna — albo jeszcze jedna teraz, za reklamę.",
+    reason: "analysis",
+    proLabel: "Analiza bez limitu",
+    ad: { label: "+1 analiza dziś", reward: { kind: "analysis" } },
+  },
+  bigTable: {
+    title: "Stół dla 7–8 osób",
+    text: "Bez Oczko Pro jeden duży stół dziennie. Dziś już był — kolejny za reklamę albo w Oczko Pro.",
+    reason: "bigTable",
+    proLabel: "Duże stoły bez limitu",
+    ad: { label: "+1 duży stół dziś", reward: { kind: "bigTable" } },
+  },
+  hints: {
+    title: "Podpowiedzi trenera",
+    text: "Bez Oczko Pro trzy podpowiedzi dziennie. Kolejną dostaniesz za reklamę — oglądasz ją tylko, gdy chcesz.",
+    reason: "hints",
+    proLabel: "Trener bez limitu",
+    ad: { label: "+1 podpowiedź dziś", reward: { kind: "hints" } },
+  },
+};
+
+/** A daily limit reached: a rewarded ad (only on request) or Oczko Pro. */
+function Limit({ kind, onClose }: { kind: keyof typeof LIMITS; onClose: () => void }) {
+  const l = LIMITS[kind];
+  return <LimitSheet title={l.title} text={l.text} reason={l.reason} proLabel={l.proLabel} ad={l.ad} onClose={onClose} />;
+}
+
+/** Settings rows of Oczko Pro, looks, ads' privacy and codes. */
+function SettingsExtra({ hintsLeft, onLooks, onMoreHints }: { hintsLeft: number; onLooks: () => void; onMoreHints: () => void }) {
+  const premium = usePremium();
+  const row = (label: string, sub: string, onPress: () => void) => (
+    <Pressable
+      key={label}
+      onPress={onPress}
+      accessibilityRole="button"
+      accessibilityLabel={label}
+      accessibilityHint={sub}
+      style={{ minHeight: 56, justifyContent: "center", borderBottomWidth: 1, borderBottomColor: P.line }}
+    >
+      <Text style={{ color: P.text, fontSize: 15, fontWeight: "600" }}>{label}</Text>
+      <Text style={{ color: P.muted, fontSize: 12, marginTop: 2 }}>{sub}</Text>
+    </Pressable>
+  );
+  return (
+    <>
+      {row("Wygląd", "Talie, sukna i rewersy", onLooks)}
+      {!premium.pro && Number.isFinite(hintsLeft) && row("Podpowiedzi trenera", `Dziś zostało: ${hintsLeft}. Więcej za reklamę albo w Oczko Pro`, onMoreHints)}
+      {premium.pro
+        ? row("Oczko Pro", "Aktywne — zarządzaj subskrypcją", () => void premium.manage())
+        : row("Oczko Pro", "Trener i analiza bez limitu, duże stoły, wygląd", () => premium.showPaywall("profile"))}
+      {premium.codeFlow !== "none" && row("Mam kod", "Kod promocyjny Oczko Pro", () => premium.showRedeem())}
+      {premium.adsAvailable && row("Prywatność reklam", "Zgody na reklamy (UE)", () => void premium.privacyOptions())}
+    </>
   );
 }

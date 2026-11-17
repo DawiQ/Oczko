@@ -53,7 +53,7 @@ describe("trainer", () => {
         return { bustIfHit: 0, winIfStand: 0.2, winIfHit: 0.6, best: "hit", confidence: 1, samples: 1500 };
       },
     };
-    let result: Evaluation | null = null;
+    let result: Evaluation | "locked" | null = null;
     function Probe({ s, on }: { s: GameSnapshot; on: boolean }) {
       result = useTrainer(s, on, () => fake);
       return null;

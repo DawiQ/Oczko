@@ -1,7 +1,7 @@
 // The trainer at the table: P(fura) and the chances of "Starczy" vs
 // "Dobieram" for the current hand, computed in chunks from my view only.
 import { useEffect, useRef, useState } from "react";
-import { StyleSheet, Text, View } from "react-native";
+import { Pressable, StyleSheet, Text, View } from "react-native";
 
 import { chunkedEvaluator, type ChunkedEvaluator, type Evaluation } from "../ai/evaluate";
 import { splitmix32 } from "../engine/rng";
@@ -12,14 +12,25 @@ export const TRAINER_SAMPLES = 1500;
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 
-/** The evaluation for my current decision (null while computing / not my turn). */
-export function useTrainer(snap: GameSnapshot, enabled: boolean, evaluatorFactory: () => ChunkedEvaluator = chunkedEvaluator): Evaluation | null {
+/** The evaluation for my current decision (null while computing / not my turn).
+ *  `allow` is asked once per decision (a free player's daily hints): false →
+ *  "locked". */
+export function useTrainer(
+  snap: GameSnapshot,
+  enabled: boolean,
+  evaluatorFactory: () => ChunkedEvaluator = chunkedEvaluator,
+  allow?: () => boolean
+): Evaluation | "locked" | null {
   const key = enabled && snap.phase === "myTurn" ? `${snap.roundNo}:${snap.view.myHand.join(",")}` : null;
   const view = snap.view;
-  const [ev, setEv] = useState<{ key: string; e: Evaluation } | null>(null);
+  const [ev, setEv] = useState<{ key: string; e: Evaluation | "locked" } | null>(null);
   const evaluator = useRef<ChunkedEvaluator | null>(null);
   useEffect(() => {
     if (!key) return;
+    if (allow && !allow()) {
+      void Promise.resolve().then(() => setEv({ key, e: "locked" }));
+      return;
+    }
     const e = (evaluator.current ??= evaluatorFactory());
     e.cancel();
     let seed = 0;
@@ -46,7 +57,14 @@ function Bar({ label, value, best }: { label: string; value: number; best: boole
   );
 }
 
-export function TrainerPanel({ evaluation }: { evaluation: Evaluation | null }) {
+export function TrainerPanel({ evaluation, onMore }: { evaluation: Evaluation | "locked" | null; /** Locked: more hints (Oczko Pro). */ onMore?: () => void }) {
+  if (evaluation === "locked")
+    return (
+      <Pressable style={s.panel} onPress={onMore} accessibilityRole="button" accessibilityLabel="Dzisiejsze podpowiedzi wykorzystane. Więcej w Oczko Pro">
+        <Text style={s.title}>Trener · dzisiejsze podpowiedzi wykorzystane</Text>
+        <Text style={s.bust}>Więcej: Oczko Pro albo reklama w ustawieniach (poza rundą).</Text>
+      </Pressable>
+    );
   if (!evaluation)
     return (
       <View style={s.panel} accessible accessibilityLabel="Trener liczy szanse">

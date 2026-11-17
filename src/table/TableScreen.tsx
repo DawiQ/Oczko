@@ -15,6 +15,7 @@ import { BottomSheet } from "../ui/BottomSheet";
 import { Button3D } from "../ui/Button3D";
 import { CardBack } from "../ui/cards";
 import { useConfirm } from "../ui/Dialog";
+import { Felt } from "../ui/lookStyle";
 import { DISPLAY } from "../ui/fonts";
 import { haptic } from "../ui/haptics";
 import { useReduceMotion } from "../ui/motion";
@@ -213,7 +214,7 @@ export function TableScreen({
       </View>
 
       <View style={s.felt} onLayout={onLayout}>
-        <Image source={ART.felt} style={StyleSheet.absoluteFill} resizeMode="cover" />
+        <Felt resizeMode="cover" />
         {banner ? <View style={s.banner}>{banner}</View> : null}
         {opp.map((seat, i) => (
           <View

@@ -85,6 +85,74 @@ async function playToEnd(r: ReactTestRenderer) {
   throw new Error(`the match did not end: ${textOf(r).slice(0, 300)}`);
 }
 
+const freeStore = {
+  available: true,
+  codeFlow: "none" as const,
+  isPro: async () => false,
+  sync: async () => ({ active: false, expires: null, renews: false }),
+  redeem: async () => false,
+  plans: async () => [],
+  purchase: async () => "error" as const,
+  restore: async () => false,
+  manage: async () => {},
+  onChange: () => () => {},
+};
+const noAdsHere = { available: false, showRewarded: async () => false, privacyOptions: async () => false };
+
+describe("Oczko Pro limits (a free player)", () => {
+  it("one table of 7–8 a day, then the limit sheet", async () => {
+    const kv = onboarded();
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} store={freeStore} ads={noAdsHere} pace={INSTANT} sleep={() => Promise.resolve()} decide={async (_s, v, rng) => threshold(17)(v, rng)} />);
+    });
+    await settle();
+    const seat7 = async (add: boolean) => {
+      await press(r, "Nowa gra");
+      if (add) for (let i = 0; i < 3; i++) await press(r, "Zosia przy stole: więcej");
+      expect(textOf(r)).toContain("Ty + 6 · max 7");
+      await press(r, "Graj");
+    };
+    await seat7(true);
+    expect(textOf(r)).toContain("Runda 1");
+    await press(r, "Menu");
+    await press(r, "Wyjdź do lobby");
+    await settle();
+    await seat7(false); // the choices are remembered
+    // Today's free big table is used: the limit sheet, no game started.
+    expect(textOf(r)).toContain("Stół dla 7–8 osób");
+    expect(textOf(r)).toContain("Rywale");
+    act(() => r.unmount());
+  });
+
+  it("the trainer's daily hints run out", async () => {
+    const kv = memoryKV({
+      [ONBOARDING_KEY]: JSON.stringify({ v: 1, done: true }),
+      "oczko.settings.v1": JSON.stringify({ v: 1, sound: true, haptics: true, pace: "normal", trainer: true }),
+      "oczko.premium.v1": JSON.stringify({ v: 1, day: "2000-01-01", hintsUsed: 0, analysesUsed: 0, bigTablesUsed: 0, bonusHints: 0, bonusAnalyses: 0, bonusBigTables: 0, trials: {} }),
+    });
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} store={freeStore} ads={noAdsHere} pace={INSTANT} sleep={() => Promise.resolve()} decide={async (_s, v, rng) => threshold(17)(v, rng)} />);
+    });
+    await settle();
+    await press(r, "Nowa gra");
+    await press(r, "Graj");
+    let locked = false;
+    for (let i = 0; i < 300 && !locked; i++) {
+      if (button(r, "Rozumiem")) await press(r, "Rozumiem");
+      if (textOf(r).includes("dzisiejsze podpowiedzi wykorzystane")) locked = true;
+      else if (button(r, "Następna runda")) await press(r, "Następna runda");
+      else if (button(r, "Dobieram")) await press(r, "Dobieram");
+      else if (button(r, "Starczy")) await press(r, "Starczy");
+      else await settle();
+    }
+    expect(locked).toBe(true);
+    expect(JSON.parse((await kv.get("oczko.premium.v1"))!).hintsUsed).toBe(3);
+    act(() => r.unmount());
+  });
+});
+
 describe("App", () => {
   it("starts in the lobby with the tab bar", async () => {
     const r = await renderApp();

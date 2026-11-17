@@ -23,6 +23,7 @@
     "expo-asset": "~58.0.21",
     "expo-audio": "~58.0.12",
     "expo-camera": "~58.0.14",
+    "expo-constants": "~58.0.16",
     "expo-dev-client": "~58.0.21",
     "expo-font": "~58.0.11",
     "expo-haptics": "~58.0.7",
@@ -33,6 +34,8 @@
     "qrcode-generator": "^2.0.4",
     "react": "19.3.0",
     "react-native": "0.88.1",
+    "react-native-google-mobile-ads": "^17.4.0",
+    "react-native-purchases": "^11.0.3",
     "react-native-safe-area-context": "~5.11.1",
     "react-native-tcp-socket": "^6.4.3",
     "react-native-zeroconf": "^0.17.7"

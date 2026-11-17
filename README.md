@@ -17,7 +17,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 7 | Trener, historia partii, powtórka, analiza decyzji, eksport | gotowe |
 | 8 | Profil: rangi, odznaki, statystyki, następny rywal | gotowe |
 | 9 | Gra przez Wi‑Fi: stół u gospodarza, goście, kod, QR, mDNS, rozłączenia | gotowe |
-| 10–11 | wg `PLAN.md` §7 | — |
+| 10 | Oczko Pro, portfel dzienny, reklamy z nagrodą, wygląd | gotowe |
+| 11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -39,7 +40,7 @@ npm start               # serwer Metro dla dev clienta
 | `npm run art` | generuje ikonę, splash, ikony, sukno i bandy (`tools/render-*.js`, Chromium przez Playwright) |
 | `npm run sounds` | syntetyzuje dźwięki (`tools/render-sounds.py`, numpy) |
 
-## Architektura (stan na Etap 9)
+## Architektura (stan na Etap 10)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -100,6 +101,10 @@ src/lan/                gra ze znajomymi przez Wi‑Fi (z Pana, dopasowana)
   guest.ts              gość: wysyła tylko Dobieram / Starczy, dostaje swój widok, ponawia połączenie
   discovery.ts, code.ts mDNS `_oczko._tcp`, 4-znakowy kod stołu, QR (`oczko://stol?…`), port 47676
   LanScreen.tsx         menu, lobby gospodarza (kod, QR, miejsca, boty), dołączanie, lobby gościa, stół
+src/premium/            z Pana, dopasowane: RevenueCat (`store.ts`, `noStore`), AdMob rewarded + UMP
+                        (`ads.ts`, `noAds`), portfel dzienny (`wallet.ts`), PremiumProvider (bez
+                        providera: wszystko odblokowane), Paywall, LimitSheet, kody, wygląd
+                        (talie, sukna, rewersy; host Pro narzuca wygląd gościom Wi‑Fi)
 src/storage/lan.ts      oczko.lanStats.v1: imię przy stole, wyniki przez Wi‑Fi
 src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
 src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
@@ -144,6 +149,21 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   dostaje wyłącznie swój widok. Trener przy stole Wi‑Fi jest wyłączony.
 - Uprawnienia: iOS `NSLocalNetworkUsageDescription`, `NSBonjourServices`
   (`_oczko._tcp`), aparat do QR.
+
+## Oczko Pro
+
+- Darmowe: pełna gra 2–6 graczy, oba tryby, wszystkie reguły, profil,
+  historia 10 partii, Wi‑Fi do 4 osób.
+- Pro: trener i analiza bez limitu, stoły 7–8 osób (lokalnie i Wi‑Fi —
+  wystarczy gospodarz z Pro), 50 partii w historii, eksport, rozszerzone
+  statystyki, talie, sukna i rewersy.
+- Portfel dzienny bez Pro (`oczko.premium.v1`, reset o północy):
+  3 podpowiedzi trenera, 1 analiza, 1 stół 7–8 osób. Reklama z nagrodą:
+  +1 do wybranego limitu albo wygląd na 24 h — tylko na żądanie, nigdy
+  w trakcie rundy.
+- Konfiguracja właściciela: `store/RELEASE.md` (RevenueCat, AdMob,
+  **blokada kategorii „Gambling & Betting” i „Social Casino”**, UMP).
+  Bez kluczy aplikacja działa: zakupy niedostępne, reklam brak.
 
 ## Zgodność: zero hazardu
 
@@ -226,6 +246,10 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   → bot → powrót, wynik = lokalna powtórka tych samych decyzji; odmowy
   (pełny stół, gra trwa, inna wersja), „Starczy” po czasie, parsowanie;
   ekrany: gospodarz z botem, gość po kodzie, obaj przy stole.
+- `src/premium/__tests__` — portfel (limity, reklama +1, północ, scalanie,
+  walidacja), provider z fałszywym sklepem i reklamami (zakup, kody,
+  synchronizacja, bez providera — bez ograniczeń); w `App.render.test.tsx`
+  limity: duży stół raz dziennie, podpowiedzi trenera.
 - `src/onboarding/__tests__`, `src/newgame/__tests__`, `src/storage/__tests__/prefs.test.ts`
   — ziarno samouczka, nowa gra (limity, wybory), opisy reguł, walidatory.
 

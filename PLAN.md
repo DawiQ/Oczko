@@ -463,7 +463,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
   żaden gość nie dostaje cudzych kart przed odsłonięciem, rozłączenie
   i powrót, wynik zgodny z partią lokalną z tymi samymi decyzjami.
 
-### Etap 10 — Monetyzacja i wygląd
+### Etap 10 — Monetyzacja i wygląd ✅
 - Skopiuj `src/premium/` (RevenueCat, portfel, `LimitSheet`, paywall, kody,
   AdMob rewarded + UMP, warianty „brak”). Uprawnienie `pro`. Z portfela
   usuń kredyt „rewanż”.

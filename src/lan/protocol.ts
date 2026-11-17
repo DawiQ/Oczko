@@ -6,6 +6,7 @@
 // player's face-down cards, the stock or the seed. Everything a peer sends is
 // untrusted: every message is parsed and checked here before anyone acts on it.
 import { personaById, type PersonaId } from "../ai/personas";
+import { cleanChoice, type LookChoice } from "../premium/looks";
 import { isCard } from "../engine/cards";
 import { validateRules, type Rules } from "../engine/rules";
 import type { GameSnapshot } from "../game/TableGame";
@@ -36,6 +37,8 @@ export interface TableInfo {
   name: string;
   rules: Rules;
   mode: GameMode;
+  /** An Oczko Pro host's deck, felt and back: the whole table sees them. */
+  looks?: LookChoice;
 }
 
 export type RefuseReason = "full" | "version" | "started" | "closed";
@@ -172,18 +175,21 @@ function looksLikeLan(x: unknown): x is LanInfo {
   return r === null || (isObj(r) && isInt(r.seq) && isInt(r.seat) && REACTION_TEXTS.includes(r.text as ReactionText));
 }
 
+/** Only known look ids reach the table (anything else: the classic one). */
+const withCleanLooks = (t: TableInfo): TableInfo => (t.looks === undefined ? t : { ...t, looks: cleanChoice(t.looks) });
+
 /** The host's message, checked; null = malformed (ignored). */
 export function parseHostMsg(line: string): HostMsg | null {
   const m = parseLine(line);
   if (!m) return null;
   switch (m.t) {
     case "welcome":
-      return isInt(m.v) && typeof m.token === "string" && looksLikeTable(m.table) ? { t: "welcome", v: m.v, token: m.token, table: m.table } : null;
+      return isInt(m.v) && typeof m.token === "string" && looksLikeTable(m.table) ? { t: "welcome", v: m.v, token: m.token, table: withCleanLooks(m.table) } : null;
     case "refuse":
       return m.reason === "full" || m.reason === "version" || m.reason === "started" || m.reason === "closed" ? { t: "refuse", reason: m.reason } : null;
     case "lobby":
       return Array.isArray(m.slots) && m.slots.length <= MAX_LAN_SEATS && m.slots.every(looksLikeSlot) && isInt(m.you) && looksLikeTable(m.table)
-        ? { t: "lobby", slots: m.slots as LobbySlot[], you: m.you, table: m.table }
+        ? { t: "lobby", slots: m.slots as LobbySlot[], you: m.you, table: withCleanLooks(m.table) }
         : null;
     case "state":
       return looksLikeSnapshot(m.snap) && looksLikeLan(m.lan) ? { t: "state", snap: m.snap, lan: m.lan } : null;

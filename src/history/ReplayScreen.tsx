@@ -34,7 +34,7 @@ export function ReplayScreen({
   onBack,
   onAnalysed,
   evaluate,
-  canAnalyse = true,
+  spendAnalysis = () => true,
   onAnalyseLocked,
 }: {
   record: HistoryRecord;
@@ -42,8 +42,8 @@ export function ReplayScreen({
   /** The record with its analysis (to be saved). */
   onAnalysed: (r: HistoryRecord) => void;
   evaluate: (view: SeatView, seed: number) => Promise<Evaluation | null>;
-  /** Daily limit without Oczko Pro (Etap 10). */
-  canAnalyse?: boolean;
+  /** Uses up one analysis (a free player's daily limit); false: none left. */
+  spendAnalysis?: () => boolean;
   onAnalyseLocked?: () => void;
 }) {
   const frames = useMemo(() => replay(record), [record]);
@@ -77,7 +77,7 @@ export function ReplayScreen({
   const seek = (e: GestureResponderEvent, width: number) => setI(Math.max(0, Math.min(n - 1, Math.round((e.nativeEvent.locationX / width) * (n - 1)))));
 
   const runAnalysis = async () => {
-    if (!canAnalyse) return onAnalyseLocked?.();
+    if (!spendAnalysis()) return onAnalyseLocked?.();
     setBusy(true);
     const a = await analyze(record, frames, evaluate);
     setBusy(false);
