@@ -1,0 +1,46 @@
+{
+  "expo": {
+    "name": "Oczko",
+    "slug": "oczko",
+    "description": "Oczko — polska gra w 21. Gra na punkty: rodzinnie albo z bankierem, z postaciami komputerowymi o różnym stylu gry.",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#0F1720",
+    "ios": {
+      "bundleIdentifier": "pl.dawiq.oczko",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
+    },
+    "android": {
+      "package": "pl.dawiq.oczko",
+      "versionCode": 1,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#123D30"
+      },
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO"
+      ]
+    },
+    "plugins": [
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0F1720"
+        }
+      ],
+      "expo-font",
+      "expo-asset"
+    ]
+  }
+}

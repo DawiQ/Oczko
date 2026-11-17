@@ -27,6 +27,7 @@ to stary „Pan Advisor”, nie wzorzec). Makiety: `docs/mockups/`.
 - `npm run lint`
 - `npm run stats` — symulacje → `docs/STATS.md`
 - `npm run tournament` — kalibracja botów → `docs/BOTS.md`
+- `npm run art` — grafiki z `tools/render-*.js`
 - `node build.js` — build (menu interaktywne)
 
 Przed commitem: `npm test` i `npm run typecheck` muszą przejść.
