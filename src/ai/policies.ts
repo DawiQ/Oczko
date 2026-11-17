@@ -3,7 +3,7 @@
 import { rngNext, type Rng } from "../engine/rng";
 import type { Action } from "../engine/round";
 import type { SeatView } from "../engine/view";
-import { evaluate, finishEvaluation, startEvaluation, type OpponentModel } from "./evaluate";
+import { evaluate, finishEvaluation, startEvaluation, type ChunkedEvaluator, type OpponentModel } from "./evaluate";
 
 export type Policy = (view: SeatView, rng: Rng) => { action: Action; rng: Rng };
 
@@ -61,12 +61,40 @@ export function evaluatorPolicy(samples: number, model: OpponentModel, continueA
   return (v, rng) => {
     const f = forced(v);
     if (f) return { action: f, rng };
-    const [, next] = rngNext(rng);
-    const opts = { samples, rng: next, opponentModel: model, continueAt };
-    // No card can bust: drawing never hurts.
-    if (finishEvaluation(startEvaluation(v, opts)).bustIfHit === 0) return { action: "hit", rng: next };
-    return { action: evaluate(v, opts).best, rng: { state: (next.state + 0x9e3779b9) >>> 0 } };
+    const p = evaluatorPlan(v, rng, samples, model, continueAt);
+    if (p.decided) return p.decided;
+    return { action: evaluate(v, p.opts).best, rng: p.after };
   };
+}
+
+/** The shared steps of the evaluator policy (sync here, chunked in `decideAsync`). */
+export function evaluatorPlan(v: SeatView, rng: Rng, samples: number, model: OpponentModel, continueAt?: number) {
+  const [, next] = rngNext(rng);
+  const opts = { samples, rng: next, opponentModel: model, continueAt };
+  const after: Rng = { state: (next.state + 0x9e3779b9) >>> 0 };
+  // No card can bust: drawing never hurts.
+  const decided = finishEvaluation(startEvaluation(v, opts)).bustIfHit === 0 ? { action: "hit" as Action, rng: next } : null;
+  return { opts, after, decided };
+}
+
+/**
+ * A bot's decision without blocking the UI: the evaluator runs in chunks
+ * (`evaluator`), every other policy at once. Same result as `policyOf(spec)`;
+ * null when the evaluation was cancelled.
+ */
+export async function decideAsync(
+  spec: PolicySpec,
+  v: SeatView,
+  rng: Rng,
+  evaluator: ChunkedEvaluator
+): Promise<{ action: Action; rng: Rng } | null> {
+  if (spec.kind !== "evaluator") return policyOf(spec)(v, rng);
+  const f = forced(v);
+  if (f) return { action: f, rng };
+  const p = evaluatorPlan(v, rng, spec.samples, { standAt: spec.standAt }, spec.continueAt);
+  if (p.decided) return p.decided;
+  const e = await evaluator.evaluate(v, p.opts);
+  return e ? { action: e.best, rng: p.after } : null;
 }
 
 export function policyOf(spec: PolicySpec): Policy {

@@ -11,7 +11,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 1 | Szkielet: Expo, TS strict, Jest, ESLint, lobby z zakładkami, komponenty bazowe, `kv.ts` | gotowe |
 | 2 | Silnik: reguły, punktacja, runda, partia, widok miejsca | gotowe |
 | 3 | Boty, ewaluator, turniej, statystyki | gotowe |
-| 4–11 | wg `PLAN.md` §7 | — |
+| 4 | Kontroler gry, zapis i wznawianie, statystyki | gotowe |
+| 5–11 | wg `PLAN.md` §7 | — |
 
 ## Uruchomienie
 
@@ -31,7 +32,7 @@ npx expo start          # Expo Go (do Etapu 8)
 | `npm run stats` | statystyki reguł z symulacji → `docs/STATS.md` |
 | `npm run art` | generuje ikonę, splash i ikony interfejsu (`tools/render-*.js`, Chromium przez Playwright) |
 
-## Architektura (stan na Etap 3)
+## Architektura (stan na Etap 4)
 
 ```
 App.tsx                 korzeń: SafeAreaProvider, DialogProvider, czcionka, splash,
@@ -53,6 +54,15 @@ src/ai/                 boty: czyste funkcje, decyzje tylko z SeatView
   personas.ts           8 postaci = poziomy (od najsłabszej, kolejność z turnieju)
   simulate.ts           boty grające rundy i partie (turniej, statystyki, testy)
   calibration.ts        zmierzona siła postaci (generowane przez turniej)
+src/game/               logika gry bez Reacta
+  setup.ts              GameSetup: reguły, miejsca (człowiek / bot / zdalny), ziarno, tryb
+  GameController.ts     kolejka ruchów, tempo botów, odsłanianie rąk po kolei, zapis po ruchu,
+                        „Pokaż wynik”, rewanż (nowe karty), „ta runda jeszcze raz” (Trening)
+  TableGame.ts          interfejs stołu + GameSnapshot (tylko widok człowieka)
+  pace.ts               tempo: wolne / normalne / szybkie
+  useGame.ts            jedyne spoiwo z Reactem (autozapis, statystyki, sprzątanie)
+src/storage/save.ts     trwająca partia (oczko.save.v1), walidacja całego stanu
+src/storage/stats.ts    statystyki (oczko.stats.v1), czyste reduktory, aktualizacje po kolei
 src/storage/kv.ts       KV (AsyncStorage / pamięć), readJSON z walidatorem (zły JSON → null), kolejka zapisów
 src/ui/                 paleta (akcent Miedź), Button3D, BottomSheet, Dialog (useConfirm), Header,
                         Portrait, CardFace/CardBack, plural, haptyka, czcionka Fraunces, ikony
@@ -122,6 +132,13 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   zbieżność MC z dokładnym wyliczeniem wszystkich kolejności kart,
   wnioskowanie z „Starczy” i perskiego oczka, kawałki = całość, anulowanie),
   polityki, postacie (kolejność = zmierzona siła), boty widzą tylko swój widok.
+- `src/game/__tests__/` — kontroler bez UI (natychmiastowy `sleep`, stałe
+  ziarno, mock decyzji botów): pełne partie family i bank, brak cudzych kart
+  w snapshotach, odsłanianie po kolei, zapis → odczyt → kontynuacja = ten sam
+  wynik, rewanż, „ta runda jeszcze raz”, „Pokaż wynik” w trakcie ruchu banku,
+  błędy; `useGame` (autozapis, statystyki, sprzątanie).
+- `src/storage/__tests__/save-stats.test.ts` — walidacja zapisu (zepsute
+  dane → `null`), reduktory statystyk, brak utraconych aktualizacji.
 - `src/__tests__/App.render.test.tsx` — test dymny: lobby, zakładki,
   ekran i powrót, „wstecz” Androida.
 

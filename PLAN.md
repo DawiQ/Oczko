@@ -333,8 +333,9 @@ new GameController(setup: GameSetup, deps: ControllerDeps)
   (`name`, `persona`, `cards`, `status`, `isBank`, `isDealer`, `thinking`,
   `score`, `hand?` po odsłonięciu), `lastEvents` (wyłącznie z `eventsFor`,
   z id), `result`, `scores`, `target`, `canSkip`, `canRematch`.
-- Zapis `SavedGame { v: 1, setup, match, decisionsLog }` po każdym ruchu,
-  wznawianie po zamknięciu aplikacji.
+- Zapis `SavedGame { v: 1, setup, match, roundStart, decisions, botRng }`
+  po każdym ruchu, wznawianie po zamknięciu aplikacji. Decyzje botów:
+  `decideAsync` (ewaluator w kawałkach, wstrzykiwalne `decide`).
 - `TableGame` — interfejs dla stołu (lokalny kontroler, host Wi‑Fi, gość).
 - `useGame` — jedyne spoiwo z Reactem.
 - Testy: natychmiastowy `sleep`, stałe ziarno, zamockowany ewaluator;
@@ -383,7 +384,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
   przypadkach z wynikiem policzonym analitycznie), domyślne reguły trybu bank
   zbalansowane (udział wygranych partii per miejsce ≈ 1/n ± 3 pp.).
 
-### Etap 4 — Kontroler
+### Etap 4 — Kontroler ✅
 - §6: `GameController`, `pace`, `series`, `TableGame`, `useGame`,
   `storage/save.ts`, `storage/stats.ts`.
 - **Gotowe, gdy:** testy z §6 przechodzą.
