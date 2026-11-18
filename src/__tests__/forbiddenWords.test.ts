@@ -5,7 +5,7 @@ import fs from "fs";
 import path from "path";
 
 const ROOT = path.join(__dirname, "../..");
-const SCANNED = ["src", "store", "app.json", "App.tsx"];
+const SCANNED = ["src", "store", "locales", "app.json", "App.tsx"];
 const EXTENSIONS = /\.(ts|tsx|js|json|md|txt)$/;
 /** This file lists the words, so it is not scanned. */
 const SELF = path.relative(ROOT, __filename);
@@ -62,7 +62,7 @@ const ALLOWED = [
 ];
 
 /** Texts for people: the dictionaries, store listings and policy, app.json. */
-const TEXTS = /^(src\/i18n\/|store\/(listing|privacy)|app\.json)/;
+const TEXTS = /^(src\/i18n\/|store\/(listing|privacy)|locales\/|app\.json)/;
 
 export function findForbidden(text: string, texts = true): string[] {
   let t = text;

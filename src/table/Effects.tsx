@@ -19,7 +19,7 @@ export function FuraStamp({ reduceMotion }: { reduceMotion: boolean }) {
   const scale = v.interpolate({ inputRange: [0, 1], outputRange: [2.2, 1] });
   return (
     <Animated.View style={[s.stamp, { opacity: v, transform: [{ rotate: "-10deg" }, { scale }] }]} pointerEvents="none" accessibilityElementsHidden>
-      <Text style={s.stampText}>{str.table.effects.fura}</Text>
+      <Text style={s.stampText} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{str.table.effects.fura}</Text>
     </Animated.View>
   );
 }

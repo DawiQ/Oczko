@@ -19,6 +19,11 @@
         ]
       }
     },
+    "locales": {
+      "pl": "./locales/pl.json",
+      "en": "./locales/en.json",
+      "de": "./locales/de.json"
+    },
     "android": {
       "package": "pl.dawiq.oczko",
       "versionCode": 1,

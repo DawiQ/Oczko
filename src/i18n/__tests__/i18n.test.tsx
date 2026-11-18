@@ -121,7 +121,7 @@ describe("settings: language row", () => {
   };
 
   it("is hidden while the app speaks one language", () => {
-    const { r, byLabel } = render();
+    const { r, byLabel } = render(["pl"]);
     expect(byLabel("Język")).toBeUndefined();
     act(() => r.unmount());
   });

@@ -33,7 +33,7 @@ export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void
             accessibilityLabel={label}
           >
             <Image source={t.icon} style={[s.icon, { tintColor: color }]} />
-            <Text style={[s.label, { color }]}>{label}</Text>
+            <Text style={[s.label, { color }]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{label}</Text>
           </Pressable>
         );
       })}

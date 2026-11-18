@@ -519,7 +519,7 @@ ale żaden tekst UI nie jest już wpisany w komponent.
   (test lub lint to sprawdza), aplikacja po polsku wygląda i działa jak
   przed etapem, wszystkie testy zielone.
 
-### Etap 13 — Angielski i niemiecki
+### Etap 13 — Angielski i niemiecki ✅ (przegląd tłumaczeń przez rodzimych użytkowników — u właściciela)
 - Słownik pojęć (glosariusz) dla EN i DE: „Dobieram”, „Starczy”, „Fura!”,
   „Perskie oczko!”, „Bank”, nazwy trybów i reguł — bez słownictwa kasyna
   (§12). Nazwa w sklepie: EN „Oczko — 21 card game”, DE „Oczko — 17 und 4”.
@@ -668,5 +668,5 @@ dla Polski (`store/rating-answers.md`).
 - Moduły bez Reacta mają domyślny parametr `s = pl`: w Etapie 13 test dymny
   aplikacji po angielsku sprawdza, że na ekranie nie ma polskich liter
   (wykrywa wywołanie bez słownika).
-- Do sprawdzenia w Etapie 13: `locales` w `app.json` dla Androida w SDK 58
-  (nazwa aplikacji per język).
+- `locales` w `app.json` działa dla iOS i Androida (SDK 58); nazwa „Oczko”
+  jest wspólna, per język tylko komunikaty uprawnień iOS (`locales/*.json`).

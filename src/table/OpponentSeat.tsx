@@ -125,7 +125,7 @@ export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; siz
       {seat.value && !seat.value.bust && !seat.value.persian && <Text style={s.total}>{seat.value.total}</Text>}
       {status && (
         <View style={[s.pill, pillStyle(seat)]}>
-          <Text style={[s.pillText, pillText(seat)]}>{status}</Text>
+          <Text style={[s.pillText, pillText(seat)]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{status}</Text>
         </View>
       )}
     </View>

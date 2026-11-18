@@ -62,6 +62,13 @@ const page = (w, h, body, vw = w, vh = h) => `<!doctype html><html><head><style>
   html, body { margin: 0; background: transparent; }
 </style></head><body><svg xmlns="http://www.w3.org/2000/svg" width="${w}" height="${h}" viewBox="0 0 ${vw} ${vh}">${body}</svg></body></html>`;
 
+/** The feature graphic's subtitle per store language (store/listing-*.md). */
+const FEATURE_SUBTITLES = {
+  pl: "polska gra w karty do 21",
+  en: "the Polish game of 21",
+  de: "das polnische 17 und 4",
+};
+
 const iconBody = `${copper(1024, 1024)}${logo(512, 425, 1.17, true)}`;
 
 const shots = [
@@ -69,11 +76,13 @@ const shots = [
   ["assets/icon.png", 1024, 1024, false, iconBody],
   // Google Play listing icon (512x512, same artwork; Play rounds the corners).
   ["store/icon-512.png", 512, 512, false, iconBody, 1024, 1024],
-  // Google Play feature graphic (1024x500): no lettering beyond the name.
-  ["store/feature-graphic.png", 1024, 500, false,
+  // Google Play feature graphics (1024x500), one per store language: no
+  // lettering beyond the name and a subtitle.
+  ...Object.entries(FEATURE_SUBTITLES).map(([lang, sub]) => [
+    lang === "pl" ? "store/feature-graphic.png" : `store/feature-graphic-${lang}.png`, 1024, 500, false,
     `${copper(1024, 500)}${logo(255, 205, 0.62, true)}
      <text x="520" y="250" font-family="Fraunces" font-size="150" fill="#1E0F06">Oczko</text>
-     <text x="526" y="312" font-family="DejaVu Sans, sans-serif" font-size="30" fill="#4A2410">polska gra w karty do 21</text>`],
+     <text x="526" y="312" font-family="DejaVu Sans, sans-serif" font-size="30" fill="#4A2410">${sub}</text>`]),
   // Android adaptive icon: the foreground inside the central safe zone (~66%),
   // the background the same copper.
   ["assets/adaptive-icon.png", 1024, 1024, true, logo(512, 470, 0.62, true)],

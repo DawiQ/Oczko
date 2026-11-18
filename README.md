@@ -20,7 +20,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 10 | Oczko Pro, portfel dzienny, reklamy z nagrodą, wygląd | gotowe |
 | 11 | Grafiki (portrety, sklep), dźwięki, `build.js`, EAS, podpisywanie, teksty sklepu | gotowe |
 | 12 | Wiele języków — infrastruktura: słowniki, wybór języka, protokół Wi‑Fi v2 | gotowe |
-| 13–15 | Angielski i niemiecki; czeski, słowacki, węgierski; ukraiński, rosyjski, BCMS | plan (`PLAN.md`) |
+| 13 | Angielski i niemiecki: cała aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
+| 14–15 | Czeski, słowacki, węgierski; ukraiński, rosyjski, BCMS | plan (`PLAN.md`) |
 
 ## Uruchomienie
 
@@ -197,6 +198,13 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - Wi‑Fi: protokół v2 — reakcje jako identyfikatory; każdy telefon pokazuje
   je w swoim języku.
 - `noLiterals.test.ts` — żadnych tekstów poza słownikami.
+- Języki: polski, angielski, niemiecki. Słownik pojęć: `docs/i18n/GLOSSARY.md`
+  (Draw / Stay, Bust!, Two aces!; Noch eine / Genug, Überkauft!, Feuer!).
+- `App.languages.test.tsx` — cała aplikacja w każdym języku (lobby, partia do
+  końca, zakładki, ustawienia): na ekranie i w etykietach dostępności żadnych
+  polskich liter.
+- Komunikaty uprawnień iOS per język: `locales/*.json` (`app.json` → `locales`).
+- Sklep: `store/listing-{pl,en,de}.md`, `store/feature-graphic{,-en,-de}.png`.
 
 ## Zgodność: zero hazardu
 

@@ -41,7 +41,7 @@ export function Segmented<T extends string | number>({
             accessibilityState={{ checked: on }}
             accessibilityLabel={o.sub ? `${o.label}, ${o.sub}` : o.label}
           >
-            <Text style={[s.segText, on && s.segTextOn]}>{o.label}</Text>
+            <Text style={[s.segText, on && s.segTextOn]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{o.label}</Text>
             {o.sub ? <Text style={s.segSub}>{o.sub}</Text> : null}
           </Pressable>
         );
