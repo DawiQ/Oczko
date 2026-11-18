@@ -531,6 +531,12 @@ ale żaden tekst UI nie jest już wpisany w komponent.
   Play z napisem per język (`tools/render-art.js`), zrzuty ekranu.
 - Przegląd układu: najdłuższe teksty (niemiecki ~30% dłuższy) na małym
   ekranie — zrzuty kluczowych ekranów w obu językach.
+- Test dymny aplikacji po angielsku: na ekranach żadnych polskich liter
+  (łapie wywołanie modułu bez słownika — domyślne `s = pl`).
+- Imiona zapisane w partii („Ty”, postacie) zostają w języku z chwili
+  rozpoczęcia — wznowiona partia po zmianie języka pokazuje stare imiona;
+  rozważyć wyświetlanie miejsca człowieka i postaci wg id, nie zapisanego
+  imienia (lokalnie; Wi‑Fi bez zmian).
 - **Gotowe, gdy:** cała aplikacja i opisy sklepu w EN i DE, przegląd
   tłumaczeń przez rodzimego użytkownika (właściciel organizuje), testy
   zielone.
