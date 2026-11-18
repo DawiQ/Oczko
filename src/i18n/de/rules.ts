@@ -14,7 +14,7 @@ export const rules: typeof pl.rules = {
   editor: {
     mode: "Modus",
     modeA11y: "Spielmodus",
-    modeSubs: { family: "jeder gegen jeden", bank: "alle gegen die Bank" } as Record<Rules["mode"], string>,
+    modeSubs: { family: "alle gegen alle", bank: "alle gegen die Bank" } as Record<Rules["mode"], string>,
     faces: "Bilder",
     facesA11y: "Werte der Bildkarten",
     /** Under the face presets: which cards they are. */
@@ -38,7 +38,7 @@ export const rules: typeof pl.rules = {
     startCards: "Startkarten",
     startCardsOptions: { 1: common.cards(1), 2: common.cards(2) } as Record<Rules["startCards"], string>,
     maxCards: "Karten pro Hand",
-    noLimit: "Offen",
+    noLimit: "Kein Limit",
     familyTie: "Unentschieden",
     familyTieA11y: "Unentschieden im Familienspiel",
     familyTieOptions: { allScore: "Punkt für alle", noneScore: "Kein Punkt" } as Record<Rules["familyTie"], string>,
@@ -52,9 +52,9 @@ export const rules: typeof pl.rules = {
     bankRotation: "Bank wechselt",
     bankRotationA11y: "Wann die Bank wechselt",
     bankRotationOptions: { everyRound: "Jede Runde", onPersian: "Nach Feuer", fixed: "Nie" } as Record<Rules["bankRotation"], string>,
-    playerBustLoses: "Überkauft verliert immer",
-    playerBustLosesSub: "Auch wenn die Bank sich überkauft",
-    bustRevealed: "Überkauft sofort sichtbar",
+    playerBustLoses: "Wer sich überkauft, verliert immer",
+    playerBustLosesSub: "Auch wenn sich die Bank ebenfalls überkauft",
+    bustRevealed: "Überkaufen sofort sichtbar",
     bustRevealedSub: "Überkaufte Hände werden gleich aufgedeckt",
   },
 
@@ -85,13 +85,13 @@ export const rules: typeof pl.rules = {
     goalText: "Komm so nah wie möglich an 21, aber nicht darüber. Reihum sagt jede Person „Noch eine“ (Karte ziehen) oder „Genug“ (aufhören).",
     flow: "Ablauf",
     flowTexts: [
-      "Alle bekommen eine Startkarte. Gespielt wird reihum, links von der Person, die austeilt. Am Ende der Runde decken alle ihre Karten auf.",
+      "Alle bekommen eine Startkarte. Gespielt wird reihum, beginnend links von der Person, die austeilt. Am Ende der Runde decken alle ihre Karten auf.",
       "Den Punkt bekommt, wer am nächsten an 21 liegt, ohne sich zu überkaufen; zwei Asse („Feuer“) schlagen alles. Bei Unentschieden gilt die Einstellung: Punkt für alle oder für niemanden.",
     ],
     banker: "Bankhalter",
     bankerTexts: [
       "Eine Person hält die Bank. Alle anderen spielen je ein Duell nur gegen die Bank; die Bank ist zuletzt dran und sieht, wer sich überkauft hat.",
-      "Der höhere Wert gewinnt das Duell (+1). Wer sich überkauft, verliert immer; überkauft sich die Bank, verliert sie gegen alle, die noch im Spiel sind. Ein Unentschieden geht meist an die Bank.",
+      "Der höhere Wert gewinnt das Duell (+1). Wer sich überkauft, verliert immer; überkauft sich die Bank, verliert sie gegen alle, die sich nicht überkauft haben. Ein Unentschieden geht meist an die Bank.",
       "Die Bank bekommt einen Punkt, wenn sie mehr Duelle gewinnt als verliert (oder — je nach Einstellung — einen Punkt pro gewonnenem Duell). Jede Runde wandert die Bank zur nächsten Person.",
     ],
     houseVariants: "Hausvarianten",

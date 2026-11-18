@@ -5,7 +5,7 @@ import type { pl } from "../pl";
 export const newgame: typeof pl.newgame = {
   title: "New game",
   training: "Practice",
-  trainingSub: "With tips from the coach",
+  trainingSub: "With coach hints",
   modeA11y: "Game mode",
   rivals: "Opponents",
   /** "You + 3 · max 5" */

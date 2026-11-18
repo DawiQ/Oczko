@@ -11,6 +11,9 @@ const date = (ms: number) => {
   return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
 };
 
+/** "the App Store", "Google Play". */
+const theStore = (store: string) => (store === "App Store" ? `the ${store}` : store);
+
 export const premium: typeof pl.premium = {
   /** The product's name. */
   pro: "Oczko Pro",
@@ -51,14 +54,14 @@ export const premium: typeof pl.premium = {
       yearly: "every year",
     },
     days,
-    lifetimeNote: (price: string) => `${price} once`,
+    lifetimeNote: (price: string) => `One-off ${price}`,
     note: (price: string, per: string) => `${price} / ${per}`,
     trialNote: (trialDays: number, price: string, per: string) => `${days(trialDays)} free, then ${price} / ${per}`,
     buy: "Get Oczko Pro",
     tryFree: (trialDays: number) => `Try ${days(trialDays)} free`,
     buyLifetime: (price: string) => `Buy lifetime · ${price}`,
     buyFor: (price: string) => `Buy · ${price}`,
-    fineLifetime: "One-time payment, no renewals.",
+    fineLifetime: "One-off payment, no renewals.",
     fineOther: "The store shows the payment terms before you buy.",
     fine: (trialDays: number | null, price: string, every: string) =>
       `${trialDays ? `Free for ${days(trialDays)}, then ` : ""}${price} ${every}. Renews automatically until you cancel in the store settings — you can do that at any time.`,
@@ -69,7 +72,7 @@ export const premium: typeof pl.premium = {
   paywall: {
     /** What the player was after. */
     headline: {
-      hints: "Unlimited Coach",
+      hints: "Unlimited coach",
       history: "Your last 50 matches",
       analysis: "Analysis of every match",
       export: "History export",
@@ -81,13 +84,13 @@ export const premium: typeof pl.premium = {
     },
     /** What Oczko Pro gives (PLAN.md §10). Nothing changes the game itself. */
     perks: [
-      { title: "Unlimited Coach", note: "chance to bust and chances to win on every move" },
+      { title: "Unlimited coach", note: "chance to bust and chances to win on every move" },
       { title: "Analysis of every match", note: "last 50 matches, replays, export" },
       { title: "Tables for 7–8 people", note: "on one phone and over Wi‑Fi (only the host needs Pro)" },
       { title: "Extended statistics", note: "modes, opponents, next opponent" },
       { title: "Decks, felts and backs", note: "at a Wi‑Fi table everyone sees the host's look" },
     ],
-    lead: "Play just as before — plus the Coach, analysis and big tables without limits.",
+    lead: "Play just as before — plus the coach, analysis and big tables without limits.",
     buyFailed: "The purchase didn't go through. Try again in a moment.",
     pending: "The store is still confirming the payment — Oczko Pro will turn on by itself once it does.",
     nothingToRestore: "No earlier Oczko Pro purchases were found on this store account.",
@@ -116,13 +119,13 @@ export const premium: typeof pl.premium = {
     placeholder: "E.G. OCZKO2026XYZ",
     code: "Code",
     goAndroid: "Redeem in Google Play",
-    goIos: "Enter code in App Store",
-    fine: "A code works once and on one store account only. On another device, get Oczko Pro from a code back with “Restore purchases”.",
+    goIos: "Enter code in the App Store",
+    fine: "A code works once and on one store account only. To get Oczko Pro from a code on another device, use “Restore purchases”.",
     openFailed: "Couldn't open the store. Try again.",
-    finishIn: (store: string) => `Finish in ${store}`,
-    stepOpened: (store: string) => `We opened ${store}`,
+    finishIn: (store: string) => `Finish in ${theStore(store)}`,
+    stepOpened: (store: string) => `We opened ${theStore(store)}`,
     stepConfirm: "Confirm the code in the store",
-    stepBack: "Come back here — we'll check by ourselves",
+    stepBack: "Come back here — we'll check for you",
     checkNow: "Check now",
     otherCode: "Enter another code",
     checking: "Checking your store account…",
@@ -135,7 +138,7 @@ export const premium: typeof pl.premium = {
     offlineLead: "Couldn't connect to the store. Check your internet and try again.",
     notYetLead: "The store hasn't confirmed the code on this account yet. Perhaps:",
     reasons: (store: string) => [
-      `• the redemption wasn't finished in ${store},`,
+      `• the redemption wasn't finished in ${theStore(store)},`,
       "• the code has already been used or has expired,",
       "• a different account is signed in to the store,",
       "• the store needs a little more time.",

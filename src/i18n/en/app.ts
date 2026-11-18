@@ -29,7 +29,7 @@ export const app: typeof pl.app = {
     },
     bigTable: {
       title: "Table for 7–8 people",
-      text: "Without Oczko Pro, you get one big table a day. Today's is used — another one for an ad or with Oczko Pro.",
+      text: "Without Oczko Pro, you get one big table a day. You've had today's — another one for an ad or with Oczko Pro.",
       proLabel: "Unlimited big tables",
       adLabel: "+1 big table today",
     },

@@ -63,7 +63,7 @@ od nowa w danym języku.
 | profesor | Profesor | Professor | Professor | Expert / Experte |
 | hrabia | Hrabia | The Count | Der Graf | Master / Meister |
 
-`withName` (narzędnik w PL): w EN i DE to samo co imię.
+`withName` (narzędnik w PL; po „z”/„with”/„gegen”): w EN i DE to samo co imię, z wyjątkiem form z przedimkiem — EN „the Count”, DE „den Grafen” (biernik po „gegen”).
 
 ## Neutralność płciowa
 

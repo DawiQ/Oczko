@@ -18,14 +18,14 @@ export const profile: typeof pl.profile = {
 
   rank: "Rank",
   rankLabel: (name: string, xp: number, next: { name: string; left: number } | null) =>
-    `Rank: ${name}, ${xp} experience points${next ? `, ${next.left} more to the rank ${next.name}` : ""}`,
+    `Rank: ${name}, ${xp} experience points${next ? `, ${next.left} more to reach ${next.name}` : ""}`,
   rankProgress: (xp: number, next: { name: string; at: number } | null) => (next ? `${xp} / ${next.at} to “${next.name}”` : `${xp} — top rank`),
 
   /** Tiles: a number above, these below. */
   tiles: {
     matches: "matches",
     won: "won",
-    busts: "rounds bust",
+    busts: "rounds gone bust",
     rounds: "rounds",
     roundsWon: "rounds with a point",
     standAvg: "average at “Stay”",

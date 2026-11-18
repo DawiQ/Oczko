@@ -27,7 +27,7 @@ export const lan: typeof pl.lan = {
   },
   menu: {
     title: "Mit Freunden",
-    subtitle: "Alle am eigenen Handy, im selben WLAN",
+    subtitle: "Alle mit eigenem Handy, im selben WLAN",
     nameLabel: "Dein Name am Tisch",
     namePlaceholder: "z. B. Ella",
     host: "Tisch eröffnen",
@@ -90,7 +90,7 @@ export const lan: typeof pl.lan = {
   guest: {
     table: "Tisch",
     connecting: "Verbinde…",
-    lobby: "Warten, bis der Gastgeber austeilt.",
+    lobby: "Wir warten, bis der Gastgeber austeilt.",
     full: "Am Tisch ist kein Platz mehr frei.",
     version: "Andere App-Version — bitte Oczko aktualisieren.",
     started: "An diesem Tisch läuft schon ein Spiel.",

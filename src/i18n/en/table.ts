@@ -122,7 +122,7 @@ export const table: typeof pl.table = {
     label: "Table menu",
     title: "Menu",
     rules: "Rules",
-    exit: "Back to lobby",
+    exit: "Back to the lobby",
     exitHint: "The match will be saved",
     giveUp: "Give up the match",
     leave: "Leave the table",
@@ -168,7 +168,7 @@ export const table: typeof pl.table = {
     rematch: "Rematch",
     rematchHint: "Same opponents, new cards",
     newGame: "New game",
-    lobby: "To lobby",
+    lobby: "To the lobby",
   },
   effects: {
     fura: "Bust!",

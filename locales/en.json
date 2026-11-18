@@ -1,6 +1,6 @@
 {
   "ios": {
     "NSLocalNetworkUsageDescription": "Oczko connects phones on the same Wi‑Fi network so you can play at one table.",
-    "NSCameraUsageDescription": "The camera scans a table's QR code to join a game with friends."
+    "NSCameraUsageDescription": "The camera scans a table's QR code so you can join a game with friends."
   }
 }

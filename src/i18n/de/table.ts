@@ -88,9 +88,9 @@ export const table: typeof pl.table = {
   },
   /** One-time tips. */
   hints: {
-    firstTurn: "„Noch eine“ nimmt eine Karte, „Genug“ beendet deinen Zug. Den Punkt bekommt, wer am nächsten an 21 ist.",
+    firstTurn: "„Noch eine“ nimmt eine Karte, „Genug“ beendet deinen Zug. Den Punkt bekommt, wer am nächsten an 21 liegt.",
     first21: "Du hast 21 — mehr geht nicht. Sag „Genug“.",
-    firstBust: "Überkauft: Über 21 verliert. Ab 17 ist jede Karte ein großes Risiko.",
+    firstBust: "Überkauft: Wer über 21 kommt, verliert. Ab 17 ist jede Karte ein großes Risiko.",
     bank: "Mit Bankhalter: Alle spielen nur gegen die Bank. Die Bank ist zuletzt dran und gewinnt bei Unentschieden.",
     persian: "Feuer: Zwei Asse schlagen alles.",
   } as Record<HintId, string>,

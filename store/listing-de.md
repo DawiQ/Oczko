@@ -9,12 +9,12 @@ Oczko — 17 und 4
 
 ## Kurzbeschreibung — Google Play (80)
 
-Das polnische 17 und 4 um Punkte: als Familie, mit Bankhalter, im WLAN.
+Das polnische 17 und 4 um Punkte: Familienspiel, mit Bankhalter, im WLAN.
 
 ## Werbetext — App Store (170)
 
-Noch eine oder genug? Das klassische Oczko mit euren Hausregeln, acht
-Figuren am Tisch, einem Trainer für die Chancen und Spielen im selben WLAN.
+Noch eine oder genug? Das klassische Oczko mit deinen Hausregeln, acht
+Figuren am Tisch, einem Trainer für die Chancen und Partien im selben WLAN.
 
 ## Schlüsselwörter — App Store (100, kommagetrennt, ohne Leerzeichen)
 
@@ -24,17 +24,18 @@ Figuren am Tisch, einem Trainer für die Chancen und Spielen im selben WLAN.
 
 Oczko ist das polnische 17 und 4 — so, wie man es zu Hause in der Familie
 spielt. Reihum sagt jede Person „Noch eine“ oder „Genug“. Wer am nächsten an
-21 ist, gewinnt die Runde — wer darüber liegt, ist überkauft. Zwei Asse?
+21 liegt, gewinnt die Runde — wer darüber liegt, ist überkauft. Zwei Asse?
 Feuer — die beste Hand überhaupt!
 
 Gespielt wird um Punkte: jede gewonnene Runde ist ein Punkt, eine Partie
 geht bis 5, 10 oder 15. Kein Geld, keine Preise — nur Karten und Spaß.
 
-EURE HAUSREGELN
+DEINE HAUSREGELN
 • Familienspiel (alle gegen alle) oder mit Bankhalter.
-• Kartenwerte (B 2, D 3, K 4 oder eigene), 52, 32 oder 24 Karten.
-• Zwei Asse, Ass als 11 oder als 1 oder 11, eine oder zwei Startkarten,
-  Kartenlimit, Regeln für Unentschieden und die Bank.
+• Werte der Bilder (B 2, D 3, K 4 oder eigene), ein Stapel mit 52, 32 oder
+  24 Karten.
+• Feuer ja oder nein, das Ass als 11 oder als 1 oder 11, eine oder zwei
+  Startkarten, ein Kartenlimit, Regeln für Unentschieden und die Bank.
 Einmal einstellen — beim ersten Start — und jederzeit ändern.
 
 ACHT FIGUREN AM TISCH
@@ -48,8 +49,8 @@ Der Trainer zeigt das Risiko, sich zu überkaufen, und die Gewinnchancen bei
 Zug und eine Bewertung deiner Entscheidungen.
 
 MIT FREUNDEN IM WLAN
-Jede Person am eigenen Handy, im selben Netz — ohne Internet und ohne
-Konto. Wer Gastgeber ist, öffnet den Tisch; die anderen treten über die
+Jede Person mit dem eigenen Handy, im selben Netz — ohne Internet und ohne
+Konto. Wer Gastgeber ist, eröffnet den Tisch; die anderen treten über die
 Liste, einen Code oder einen QR‑Code bei.
 
 PROFIL

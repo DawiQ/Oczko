@@ -38,7 +38,7 @@ export const rules: typeof pl.rules = {
     startCards: "Starting cards",
     startCardsOptions: { 1: common.cards(1), 2: common.cards(2) } as Record<Rules["startCards"], string>,
     maxCards: "Cards per hand",
-    noLimit: "Any",
+    noLimit: "No limit",
     familyTie: "Tie",
     familyTieA11y: "Tie in the family game",
     familyTieOptions: { allScore: "A point each", noneScore: "Nobody scores" } as Record<Rules["familyTie"], string>,
