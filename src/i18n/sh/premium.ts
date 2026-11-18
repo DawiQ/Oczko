@@ -64,7 +64,7 @@ export const premium: typeof pl.premium = {
     fineLifetime: "Jednokratno plaćanje, bez obnavljanja.",
     fineOther: "Trgovina prikazuje sve o plaćanju prije nego što platiš.",
     fine: (trialDays: number | null, price: string, every: string) =>
-      `${trialDays ? `Besplatno ${days(trialDays)}, zatim ` : ""}${price} ${every}, dok ne otkažeš pretplatu u trgovini — otkazati možeš bilo kad.`,
+      `${trialDays ? `Besplatno ${days(trialDays)}, zatim ` : ""}${price} ${every}, dok pretplatu ne otkažeš u opcijama trgovine — to možeš bilo kad.`,
     /** The badge on a plan with a free trial. */
     trialBadge: (trialDays: number) => `${days(trialDays).toUpperCase()} BESPLATNO`,
   },
@@ -144,9 +144,9 @@ export const premium: typeof pl.premium = {
       "• trgovini treba još malo vremena.",
     ],
     retry: "Provjeri opet",
-    again: "Upiši kod ponovo",
+    again: "Upiši kod još jednom",
     noExpiry: "Bez roka važenja.",
-    renews: (expires: number) => `Pretplata se obnavlja u trgovini, gdje je možeš i otkazati. Sljedeće obnavljanje: ${date(expires)}`,
+    renews: (expires: number) => `Pretplata se obnavlja u trgovini, a otkazati je možeš u opcijama trgovine. Sljedeće obnavljanje: ${date(expires)}`,
     validUntil: (expires: number) => `Vrijedi do ${date(expires)}`,
   },
 
@@ -166,7 +166,7 @@ export const premium: typeof pl.premium = {
       "felt.walnut": { name: "Orah", note: "drvena ploča" },
       "felt.graphite": { name: "Grafit", note: "moderna" },
       "back.classic": { name: "Klasična", note: "plava, na kockice" },
-      "back.copper": { name: "Bakar", note: "" },
+      "back.copper": { name: "Bakrena", note: "" },
       "back.green": { name: "Zelena", note: "" },
       "back.black": { name: "Crna", note: "" },
       "back.gold": { name: "Zlatna", note: "" },

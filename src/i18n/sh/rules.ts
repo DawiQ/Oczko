@@ -85,7 +85,7 @@ export const rules: typeof pl.rules = {
     goalText: "Skupi što bliže 21, ali ne više — kao u ajncu. Svi redom kažu „Još“ (uzimaju kartu) ili „Dosta“ (završavaju).",
     flow: "Tok igre",
     flowTexts: [
-      "Svi dobiju kartu za početak. Igra se redom, počevši lijevo od onoga ko dijeli. Na kraju runde svi otkrivaju karte.",
+      "Svi dobiju kartu za početak. Igra se redom, počevši od osobe lijevo od one koja dijeli. Na kraju runde svi otkrivaju karte.",
       "Bod ide rezultatu najbližem 21 bez trope; dva asa (suvi ajnc) pobjeđuju sve. Kod neriješenog vrijedi ono što je izabrano: bod za svakoga ili ni za koga.",
     ],
     banker: "Bankar",

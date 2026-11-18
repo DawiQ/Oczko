@@ -29,7 +29,7 @@ export const app: typeof pl.app = {
     },
     bigTable: {
       title: "Igra za 7–8 osoba",
-      text: "Bez Oczko Pro za velikim stolom igra se jednom dnevno. Danas je to već bilo — ponovo uz reklamu ili s Oczko Pro.",
+      text: "Bez Oczko Pro za velikim stolom igra se jednom dnevno. Danas je to već bilo — opet uz reklamu ili s Oczko Pro.",
       proLabel: "Veliki stolovi bez ograničenja",
       adLabel: "+1 igra za 7–8 danas",
     },

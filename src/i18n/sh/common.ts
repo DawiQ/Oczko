@@ -56,7 +56,7 @@ export const cards: typeof pl.cards = {
 
 export const ui: typeof pl.ui = {
   sheetHandle: "Promijeni visinu panela",
-  sheetHint: "Povuci gore ili dolje ili dodirni za promjenu visine",
+  sheetHint: "Povuci gore ili dolje, ili dodirni za promjenu visine",
   sheetUp: "Više",
   sheetDown: "Niže",
   more: "Više",

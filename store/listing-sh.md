@@ -40,9 +40,9 @@ TVOJA KUĆNA PRAVILA
 Postaviš ih jednom — pri prvom pokretanju — i mijenjaš kad god hoćeš.
 
 OSAM LIKOVA ZA STOLOM
-Od Zoje, koja tek počinje, preko oprezne Jele i rizikaša Vite, sve do
-Profesora i Grofa, koji prije svakog poteza procjenjuju šanse. Jačina likova
-je odmjerena na mnoštvu odigranih rundi.
+Zoja tek počinje, Jela je oprezna, Vito voli rizik, a Profesor i Grof prije
+svakog poteza procjenjuju šanse. Jačina likova je odmjerena na mnoštvu
+odigranih rundi.
 
 TRENER I ANALIZA
 Trener pokazuje rizik trope i šanse za pobjedu ako kažeš „Dosta“ ili „Još“.
@@ -50,7 +50,8 @@ Nakon partije pogledaj snimak potez po potez, s ocjenom svojih odluka.
 
 S PRIJATELJIMA PREKO WI‑FI MREŽE
 Svi na svojim telefonima, u istoj mreži — bez interneta i bez računa.
-Domaćin otvara igru; ostali se pridružuju s liste, kodom ili QR kodom.
+Domaćin otvara igru; ostali je nalaze u mreži ili se pridružuju kodom ili
+QR kodom.
 
 PROFIL
 Rangovi od Devetke do Dva asa, značke, statistika.
@@ -68,6 +69,6 @@ Cijela igra je besplatna — Pro ne mijenja ništa u samoj igri.
 
 ## Cijena i dostupnost
 
-Besplatno, uz plaćanje u aplikaciji (Oczko Pro: godišnja pretplata s
-besplatnim probnim periodom ili jednokratno plaćanje). Reklame samo s
+Besplatno, uz plaćanje u aplikaciji (Oczko Pro: godišnja pretplata uz
+besplatnu probu ili jednokratno plaćanje). Reklame samo s
 nagradom i samo kad igrač to zatraži.

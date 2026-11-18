@@ -79,7 +79,7 @@ export const lan: typeof pl.lan = {
   join: {
     scanTitle: "Skeniraj QR kod",
     cameraNote: "Kamera je potrebna samo za skeniranje koda stola.",
-    allowCamera: "Dozvoli kameru",
+    allowCamera: "Dozvoli pristup kameri",
     title: "Pridruži se stolu",
     found: "Stolovi u ovoj mreži",
     searching: "Tražim… Ako stola nema ovdje, upiši kod ili skeniraj QR kod s telefona domaćina.",
@@ -101,11 +101,11 @@ export const lan: typeof pl.lan = {
     started: "Igra za ovim stolom već traje.",
     removed: "Domaćin: više nisi za ovim stolom.",
     hostLeft: "Domaćin: igra za stolom je završena.",
-    offline: "Nema veze — ponovo se povezujem…",
+    offline: "Nema veze — opet se povezujem…",
     freeSeat: "Slobodno mjesto",
   },
   table: {
-    offline: "Nema veze sa stolom — ponovo se povezujem…",
+    offline: "Nema veze sa stolom — opet se povezujem…",
     away: (name: string) => `${name} — veza je prekinuta. Uskoro igra bot.`,
     moveTime: (name: string, sec: number) => `${name}: ${sec} s za potez`,
     myMoveTime: (sec: number) => `Tvoj potez: ${sec} s, zatim „Dosta“`,
