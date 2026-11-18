@@ -4,7 +4,8 @@ import { makeRng } from "../../engine/rng";
 import { DEFAULT_RULES, PRESETS, type Rules } from "../../engine/rules";
 import { GameController, type ControllerDeps, type Decide, type RoundEndInfo, type SavedGame } from "../GameController";
 import { INSTANT } from "../pace";
-import { makeSetup, type GameMode } from "../setup";
+import { localizeSetup, makeSetup, type GameMode } from "../setup";
+import { DICTIONARIES } from "../../i18n";
 import type { GameSnapshot } from "../TableGame";
 
 /** Bots decide at once by a plain threshold (the evaluator is mocked away). */
@@ -255,5 +256,16 @@ describe("with the real bots", () => {
     const end = await playMatch(game, 3);
     expect(["roundEnd", "matchEnd"]).toContain(end.phase);
     expect(end.result).not.toBeNull();
+  });
+});
+
+describe("names in the language in use", () => {
+  it("a local table's person and characters follow the dictionary; a Wi‑Fi table keeps its names", () => {
+    const setup = makeSetup(DEFAULT_RULES, ["ola", "ola", "hrabia"], "match", 1);
+    expect(setup.seats.map((x) => x.name)).toEqual(["Ty", "Ola", "Ola II", "Hrabia"]);
+    expect(localizeSetup(setup, DICTIONARIES.en).seats.map((x) => x.name)).toEqual(["You", "Ollie", "Ollie II", "The Count"]);
+    expect(localizeSetup(setup, DICTIONARIES.pl)).toBe(setup);
+    const lan = { ...setup, seats: setup.seats.map((x, i) => (i === 1 ? { kind: "remote" as const, name: "Kasia" } : x)) };
+    expect(localizeSetup(lan, DICTIONARIES.en)).toBe(lan);
   });
 });

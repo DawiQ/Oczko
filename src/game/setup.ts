@@ -33,6 +33,23 @@ export function makeSetup(rules: Rules, bots: readonly PersonaId[], mode: GameMo
   return { v: 1, rules: r, seats, seed: seed >>> 0, mode, first: splitmix32(seed) % seats.length };
 }
 
+/**
+ * A local table's names in the language of `s`: the person ("Ty" → "You")
+ * and the characters by id. Names are saved with a game and its history, so
+ * a game started in another language reads right after a change. A Wi‑Fi
+ * table (with remote seats) keeps the names people chose.
+ */
+export function localizeSetup(setup: GameSetup, s: Strings = pl): GameSetup {
+  if (setup.seats.some((x) => x.kind === "remote")) return setup;
+  const names = seatNames(
+    setup.seats.flatMap((x) => (x.kind === "bot" ? [x.persona] : [])),
+    (id) => s.personas[id].name
+  );
+  let b = 0;
+  const seats = setup.seats.map((x): SeatSetup => (x.kind === "human" ? { ...x, name: s.common.you } : x.kind === "bot" ? { ...x, name: names[b++] } : x));
+  return seats.every((x, i) => x.name === setup.seats[i].name) ? setup : { ...setup, seats };
+}
+
 /** A fresh seed for a new game (not from the engine: outside its determinism). */
 export const freshSeed = (): number => (Math.floor(Math.random() * 0x100000000) ^ Date.now()) >>> 0;
 

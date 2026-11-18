@@ -23,6 +23,9 @@ import { DEFAULT_SETTINGS, SETTINGS_KEY } from "../storage/settings";
 
 const POLISH = /[ąćęłńśźżĄĆĘŁŃŚŹŻ]/;
 
+/** Every fixed text of a dictionary. */
+const fixedTexts = (x: unknown): string[] => (typeof x === "string" ? [x] : typeof x === "object" && x !== null ? Object.values(x).flatMap(fixedTexts) : []);
+
 /** Everything a person sees or hears: texts and accessibility labels / hints. */
 function shown(r: ReactTestRenderer): string[] {
   const texts = r.root
@@ -45,6 +48,9 @@ const button = (r: ReactTestRenderer, label: string) =>
 describe.each(LANGS.filter((l) => l !== "pl").map((l) => [l]))("the app in %s", (lang) => {
   const str = DICTIONARIES[lang as Lang];
   const seen: string[] = [];
+  // Polish words without Polish letters ("Graj", "Rodzinne") that this language does not share.
+  const own = new Set(fixedTexts(str));
+  const polishOnly = new Set(fixedTexts(DICTIONARIES.pl).filter((t) => t.length >= 4 && !own.has(t)));
   let r: ReactTestRenderer;
 
   const look = () => seen.push(...shown(r));
@@ -93,15 +99,74 @@ describe.each(LANGS.filter((l) => l !== "pl").map((l) => [l]))("the app in %s", 
     await press(str.table.matchEnd.lobby);
   });
 
+  /** Presses the first button whose label passes `test`. */
+  async function pressWhere(test: (label: string) => boolean, what: string) {
+    const b = r.root.findAll((n) => typeof n.props.accessibilityLabel === "string" && test(n.props.accessibilityLabel) && typeof n.props.onPress === "function")[0];
+    if (!b) throw new Error(`no button for ${what} in: ${shown(r).slice(0, 40).join(" | ")}`);
+    await act(async () => {
+      b.props.onPress();
+    });
+    await settle();
+    look();
+  }
+  const back = () => press(str.common.back);
+
   it("shows the tabs and the settings", async () => {
     await press(str.home.tabs.profile);
     await press(str.home.tabs.rules);
     await press(str.home.tabs.play);
     await press(str.home.settings);
+    await pressWhere((l) => l === str.common.close, "close");
+  });
+
+  it("shows the history and a replay", async () => {
+    await pressWhere((l) => l.startsWith(str.home.history), "history");
+    await pressWhere((l) => l.includes(str.history.list.family) || l.includes(str.history.list.bank), "a record");
+    await back();
+    await back();
+  });
+
+  it("shows the house rules", async () => {
+    await pressWhere((l) => l.startsWith(str.home.houseRules), "house rules");
+    await back();
+  });
+
+  it("shows the Wi‑Fi screens", async () => {
+    await press(str.home.friendsA11y);
+    await press(str.lan.menu.join);
+    await back();
+    await back();
+  });
+
+  it("shows the looks and Oczko Pro from the settings", async () => {
+    // (No store in tests: the promo-code row is not offered.)
+    for (const row of [str.app.extra.looks, str.app.extra.pro]) {
+      await press(str.home.settings);
+      await pressWhere((l) => l.startsWith(row), row);
+      const out = r.root.findAll((n) => (n.props.accessibilityLabel === str.common.back || n.props.accessibilityLabel === str.common.close) && typeof n.props.onPress === "function");
+      await act(async () => out[out.length - 1]?.props.onPress());
+      await settle();
+    }
+  });
+
+  it("shows the welcome and the tutorial on a fresh install", async () => {
+    let fresh!: ReactTestRenderer;
+    await act(async () => {
+      fresh = create(<App kv={memoryKV({ [SETTINGS_KEY]: JSON.stringify({ ...DEFAULT_SETTINGS, lang }) })} pace={INSTANT} sleep={() => Promise.resolve()} decide={async (_s, v, rng) => threshold(17)(v, rng)} />);
+    });
+    await settle();
+    seen.push(...shown(fresh));
+    expect(shown(fresh)).toContain(str.onboarding.welcome.title);
+    const tutorial = button(fresh, str.onboarding.welcome.tutorial);
+    expect(tutorial).toBeDefined();
+    await act(async () => tutorial.props.onPress());
+    await settle();
+    seen.push(...shown(fresh));
+    act(() => fresh.unmount());
   });
 
   it("nothing seen is Polish", () => {
-    expect([...new Set(seen.filter((t) => POLISH.test(t)))]).toEqual([]);
+    expect([...new Set(seen.filter((t) => POLISH.test(t) || polishOnly.has(t)))]).toEqual([]);
   });
 });
 

@@ -18,7 +18,7 @@ import { TrainerPanel, TRAINER_SAMPLES, useTrainer } from "./src/trainer/Trainer
 import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
 import type { SavedGame } from "./src/game/GameController";
 import { PACES, type Pace } from "./src/game/pace";
-import { freshSeed, makeSetup } from "./src/game/setup";
+import { freshSeed, localizeSetup, makeSetup } from "./src/game/setup";
 import { deviceLang, deviceLocales, I18nProvider, resolveLang, useStrings, type Lang, type Strings } from "./src/i18n";
 import { useGame, type GameSource, type UseGameOptions } from "./src/game/useGame";
 import { HomeScreen, type ResumeInfo } from "./src/home/HomeScreen";
@@ -115,7 +115,11 @@ export default function App(props: AppProps) {
   );
 }
 
-function resumeInfo(saved: SavedGame, str: Strings): ResumeInfo {
+/** A saved game with its names in the language in use. */
+const localizeSaved = (saved: SavedGame, str: Strings): SavedGame => ({ ...saved, setup: localizeSetup(saved.setup, str) });
+
+function resumeInfo(savedIn: SavedGame, str: Strings): ResumeInfo {
+  const saved = localizeSaved(savedIn, str);
   const m = saved.match;
   const t = str.app.resume;
   const mode = saved.setup.rules.mode === "bank" ? t.bank : t.family;
@@ -278,7 +282,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
       case "rules":
         if (screen.backToGame)
           // The table saved the game on leaving; storage reads wait for queued writes.
-          void loadSavedGame(kv).then((s) => (isResumable(s) ? setScreen({ name: "game", source: { saved: s }, key: Date.now() }) : home()));
+          void loadSavedGame(kv).then((s) => (isResumable(s) ? setScreen({ name: "game", source: { saved: localizeSaved(s, str) }, key: Date.now() }) : home()));
         else home();
         return true;
       default:
@@ -286,7 +290,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
         setScreen({ name: "home", tab: "play" });
         return true;
     }
-  }, [screen, home, stored, kv]);
+  }, [screen, home, stored, kv, str]);
 
   // Android back: screens go back to where they came from, other tabs go to
   // "Graj", the lobby leaves the app. Open bottom sheets handle back first.
@@ -363,7 +367,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
     case "history":
       return withLimit(
         <HistoryScreen
-          records={history}
+          records={history.map((r) => ({ ...r, setup: localizeSetup(r.setup, str) }))}
           limit={premium.pro ? MAX_HISTORY : FREE_HISTORY}
           canExport={premium.pro}
           onExportLocked={() => premium.showPaywall("export")}
@@ -471,7 +475,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
           <HomeScreen
             rulesSummary={summaryLines(stored.rules, str)}
             resume={stored.saved ? resumeInfo(stored.saved, str) : null}
-            onResume={() => stored.saved && setScreen({ name: "game", source: { saved: stored.saved }, key: Date.now() })}
+            onResume={() => stored.saved && setScreen({ name: "game", source: { saved: localizeSaved(stored.saved, str) }, key: Date.now() })}
             onNewGame={() => setScreen({ name: "newGame", training: false })}
             onFriends={() => setScreen({ name: "lan", key: Date.now() })}
             onTraining={() => setScreen({ name: "newGame", training: true })}
