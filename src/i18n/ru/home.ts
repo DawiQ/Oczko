@@ -41,7 +41,7 @@ export const home: typeof pl.home = {
     fast: "Быстрый",
     houseRules: "Твои домашние правила",
     resetTips: "Показать советы заново",
-    resetTipsSub: "Подсказки в первых ситуациях",
+    resetTipsSub: "Подсказки, когда что-то случается впервые",
     language: "Язык",
     /** "Автоматически (Русский)": the phone's language. */
     languageAuto: (current: string) => `Автоматически (${current})`,

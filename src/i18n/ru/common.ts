@@ -52,7 +52,7 @@ export const cards: typeof pl.cards = {
 
 export const ui: typeof pl.ui = {
   sheetHandle: "Изменить высоту панели",
-  sheetHint: "Потяни вверх или вниз или нажми, чтобы переключить высоту",
+  sheetHint: "Потяни вверх или вниз либо нажми, чтобы переключить высоту",
   sheetUp: "Выше",
   sheetDown: "Ниже",
   more: "Больше",

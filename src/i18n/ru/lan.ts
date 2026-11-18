@@ -85,7 +85,7 @@ export const lan: typeof pl.lan = {
     otherVersion: "Другая версия приложения",
     code: "Код стола",
     codePlaceholder: "например, K7 4Q",
-    join: "Войти",
+    join: "Присоединиться",
     scan: "Сканировать QR-код",
   },
   guest: {
