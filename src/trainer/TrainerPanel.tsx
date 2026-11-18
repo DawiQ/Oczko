@@ -25,12 +25,15 @@ export function useTrainer(
   const view = snap.view;
   const [ev, setEv] = useState<{ key: string; e: Evaluation | "locked" } | null>(null);
   const evaluator = useRef<ChunkedEvaluator | null>(null);
+  // Decisions already paid for (an effect run again must not spend twice).
+  const paid = useRef(new Set<string>());
   useEffect(() => {
     if (!key) return;
-    if (allow && !allow()) {
+    if (allow && !paid.current.has(key) && !allow()) {
       void Promise.resolve().then(() => setEv({ key, e: "locked" }));
       return;
     }
+    paid.current.add(key);
     const e = (evaluator.current ??= evaluatorFactory());
     e.cancel();
     let seed = 0;

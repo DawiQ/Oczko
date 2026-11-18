@@ -125,6 +125,40 @@ describe("Oczko Pro limits (a free player)", () => {
     act(() => r.unmount());
   });
 
+  it("cancelling the confirm over a saved game keeps today's big table", async () => {
+    const kv = onboarded();
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} store={freeStore} ads={noAdsHere} pace={INSTANT} sleep={() => Promise.resolve()} decide={async (_s, v, rng) => threshold(17)(v, rng)} />);
+    });
+    await settle();
+    // A saved game of 4.
+    await press(r, "Nowa gra");
+    await press(r, "Graj");
+    await press(r, "Menu");
+    await press(r, "Wyjdź do lobby");
+    await settle();
+    expect(await loadSavedGame(kv)).not.toBeNull();
+    // A table of 7 over it: cancel the confirm (its backdrop).
+    await press(r, "Nowa gra");
+    for (let i = 0; i < 3; i++) await press(r, "Zosia przy stole: więcej");
+    await press(r, "Graj");
+    expect(textOf(r)).toContain("Masz niedokończoną partię");
+    const closes = r.root.findAll((n) => n.props.accessibilityLabel === "Zamknij" && typeof n.props.onPress === "function");
+    await act(async () => closes[closes.length - 1].props.onPress());
+    await settle();
+    const used = async () => JSON.parse((await kv.get("oczko.premium.v1")) ?? "{}").bigTablesUsed ?? 0;
+    expect(await used()).toBe(0);
+    // Confirmed: now it is spent.
+    await press(r, "Graj");
+    const ok = r.root.findAll((n) => typeof n.props.onPress === "function" && textOf({ root: n } as ReactTestRenderer) === "Zacznij nową");
+    await act(async () => ok[ok.length - 1].props.onPress());
+    await settle();
+    expect(textOf(r)).toContain("Runda 1");
+    expect(await used()).toBe(1);
+    act(() => r.unmount());
+  });
+
   it("the trainer's daily hints run out", async () => {
     const kv = memoryKV({
       [ONBOARDING_KEY]: JSON.stringify({ v: 1, done: true }),

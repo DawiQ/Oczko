@@ -79,11 +79,14 @@ export function ReplayScreen({
   const runAnalysis = async () => {
     if (!spendAnalysis()) return onAnalyseLocked?.();
     setBusy(true);
-    const a = await analyze(record, frames, evaluate);
-    setBusy(false);
-    if (a) {
-      setAnalysis(a);
-      onAnalysed({ ...record, analysis: a });
+    try {
+      const a = await analyze(record, frames, evaluate);
+      if (a) {
+        setAnalysis(a);
+        onAnalysed({ ...record, analysis: a });
+      }
+    } finally {
+      setBusy(false);
     }
   };
   const sum = analysis ? summarize(analysis) : null;

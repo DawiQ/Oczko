@@ -292,11 +292,17 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
 
   const start = (choices: NewGameChoices, rules: Rules, training: boolean) => {
     // A table of 7–8: Oczko Pro, or today's free one (a rewarded ad adds one).
-    if (choices.bots.length + 1 > FREE_SEATS && !premium.pro && !premium.spend("bigTable")) {
+    // Spent only when the game really starts (not when the confirm is cancelled).
+    const big = choices.bots.length + 1 > FREE_SEATS && !premium.pro;
+    if (big && premium.bigTablesLeft <= 0) {
       setLimit("bigTable");
       return;
     }
     const go = () => {
+      if (big && !premium.spend("bigTable")) {
+        setLimit("bigTable");
+        return;
+      }
       void saveChoices(kv, choices);
       void clearSavedGame(kv);
       const mode = training ? "training" : choices.length === "single" ? "single" : "match";

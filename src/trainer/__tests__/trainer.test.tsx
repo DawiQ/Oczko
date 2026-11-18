@@ -68,4 +68,44 @@ describe("trainer", () => {
     await act(async () => r.update(<Probe s={snap} on={false} />));
     expect(result).toBeNull();
   });
+
+  it("spends one hint per decision, also when the effect runs again", async () => {
+    const snap = await myTurn();
+    const fake: ChunkedEvaluator = {
+      cancel: () => {},
+      evaluate: async () => ({ bustIfHit: 0, winIfStand: 0.2, winIfHit: 0.6, best: "hit", confidence: 1, samples: 1500 }),
+    };
+    let left = 1;
+    const allow = jest.fn(() => left-- > 0);
+    let result: Evaluation | "locked" | null = null;
+    function Probe({ s, on }: { s: GameSnapshot; on: boolean }) {
+      result = useTrainer(s, on, () => fake, allow);
+      return null;
+    }
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<Probe s={snap} on />);
+    });
+    expect(result).toMatchObject({ best: "hit" });
+    // Off and on again: the same decision is not paid for twice.
+    await act(async () => r.update(<Probe s={snap} on={false} />));
+    await act(async () => r.update(<Probe s={snap} on />));
+    expect(allow).toHaveBeenCalledTimes(1);
+    expect(result).toMatchObject({ best: "hit" });
+  });
+
+  it("is locked when no hint is left", async () => {
+    const snap = await myTurn();
+    const fake: ChunkedEvaluator = { cancel: () => {}, evaluate: jest.fn() };
+    let result: Evaluation | "locked" | null = null;
+    function Probe() {
+      result = useTrainer(snap, true, () => fake, () => false);
+      return null;
+    }
+    await act(async () => {
+      create(<Probe />);
+    });
+    expect(result).toBe("locked");
+    expect(fake.evaluate).not.toHaveBeenCalled();
+  });
 });
