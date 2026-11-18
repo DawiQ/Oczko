@@ -206,6 +206,9 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   polskich liter.
 - Komunikaty uprawnień iOS per język: `locales/*.json` (`app.json` → `locales`).
 - Sklep: `store/listing-{pl,en,de,cs,sk,hu}.md`, `store/feature-graphic{,-en,-de,-cs,-sk,-hu}.png`.
+- `storeTexts.test.ts` — dla każdego języka: limity znaków w opisie sklepu
+  (nazwa 30, krótki opis 80, tekst promocyjny 170, słowa kluczowe 100,
+  pełny opis 4000), komunikaty uprawnień iOS, grafika do Google Play.
 
 ## Zgodność: zero hazardu
 
