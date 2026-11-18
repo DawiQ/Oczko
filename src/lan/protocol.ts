@@ -83,8 +83,12 @@ export function encode(msg: GuestMsg | HostMsg): string {
 export class LineReader {
   private buf = "";
   push(chunk: string): string[] | null {
-    this.buf += chunk;
-    const lines = this.buf.split("\n");
+    // Only the new chunk is searched (a line sent byte by byte stays linear).
+    if (!chunk.includes("\n")) {
+      this.buf += chunk;
+      return this.buf.length > MAX_LINE ? null : [];
+    }
+    const lines = (this.buf + chunk).split("\n");
     this.buf = lines.pop() ?? "";
     if (this.buf.length > MAX_LINE || lines.some((l) => l.length > MAX_LINE)) return null;
     return lines.filter((l) => l.trim().length > 0);

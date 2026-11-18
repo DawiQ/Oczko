@@ -52,7 +52,12 @@ interface Guest {
   /** When a bot takes over, while the guest is away (ms since epoch). */
   deadline: number | null;
   timer: ReturnType<typeof setTimeout> | null;
+  /** The last reaction (one a second at most). */
+  reactedAt: number;
 }
+
+/** The shortest gap between one guest's reactions. */
+export const REACT_GAP_MS = 1_000;
 
 export interface AwaySeat {
   seat: number;
@@ -99,6 +104,8 @@ export class LanHost {
   private reactionSeq = 0;
   private listeners = new Set<() => void>();
   private peers = new Set<Conn>();
+  /** Links without a hello yet, and since when (dropped when silent too long). */
+  private strangers = new Map<Conn, number>();
   private check: ReturnType<typeof setInterval> | null = null;
   private moveTimer: ReturnType<typeof setTimeout> | null = null;
   /** Re-sends the table every second while a guest's time runs (the countdown). */
@@ -280,6 +287,7 @@ export class LanHost {
       c.close();
     }
     this.peers.clear();
+    this.strangers.clear();
     for (const g of this.guests()) if (g.timer) clearTimeout(g.timer);
     if (this.check) clearInterval(this.check);
     if (this.moveTimer) clearTimeout(this.moveTimer);
@@ -294,6 +302,7 @@ export class LanHost {
   private accept(conn: Conn): void {
     if (this.phase === "closed") return conn.close();
     this.peers.add(conn);
+    this.strangers.set(conn, this.opts.now());
     const reader = new LineReader();
     let guest: Guest | null = null;
     conn.onData((chunk) => {
@@ -303,12 +312,16 @@ export class LanHost {
         const msg = parseGuestMsg(line);
         if (!msg) continue;
         // One seat per link: a second hello on it is ignored.
-        if (msg.t === "hello") guest = guest ?? this.hello(conn, msg);
+        if (msg.t === "hello") {
+          this.strangers.delete(conn);
+          guest = guest ?? this.hello(conn, msg);
+        }
         else if (guest && guest.conn === conn) this.fromGuest(guest, msg);
       }
     });
     conn.onClose(() => {
       this.peers.delete(conn);
+      this.strangers.delete(conn);
       if (guest && guest.conn === conn) this.dropped(guest);
     });
   }
@@ -350,7 +363,7 @@ export class LanHost {
       conn.close();
       return null;
     }
-    const guest: Guest = { name: msg.name, token: this.opts.token(), conn, lastSeen: this.opts.now(), seat: -1, botted: false, deadline: null, timer: null };
+    const guest: Guest = { name: msg.name, token: this.opts.token(), conn, lastSeen: this.opts.now(), seat: -1, botted: false, deadline: null, timer: null, reactedAt: -Infinity };
     this.slots[free] = { kind: "guest", guest };
     this.sendTo(conn, { t: "welcome", v: PROTOCOL_VERSION, token: guest.token, table: this.opts.table });
     this.lobbyChanged();
@@ -372,9 +385,13 @@ export class LanHost {
           this.lobbyChanged();
         } else this.takeOver(g);
         return;
-      case "react":
-        if (this.phase === "playing" && !g.botted) this.reactFrom(g.seat, msg.text);
+      case "react": {
+        const now = this.opts.now();
+        if (this.phase !== "playing" || g.botted || now - g.reactedAt < REACT_GAP_MS) return;
+        g.reactedAt = now;
+        this.reactFrom(g.seat, msg.text);
         return;
+      }
       case "move": {
         if (!this.game || g.botted) return;
         const err = this.game.act(g.seat, msg.action);
@@ -400,6 +417,7 @@ export class LanHost {
   }
 
   private startAway(g: Guest): void {
+    if (this.phase !== "playing") return;
     if (g.timer) clearTimeout(g.timer);
     g.deadline = this.opts.now() + this.opts.awayMs;
     g.timer = setTimeout(() => this.takeOver(g), this.opts.awayMs);
@@ -410,7 +428,7 @@ export class LanHost {
     if (g.timer) clearTimeout(g.timer);
     g.timer = null;
     g.deadline = null;
-    if (g.botted || !this.game) return;
+    if (g.botted || !this.game || this.phase !== "playing") return;
     g.botted = true;
     this.game.replaceWithBot(g.seat, AWAY_BOT);
     this.gameChanged();
@@ -419,6 +437,8 @@ export class LanHost {
   private checkSilent(): void {
     const now = this.opts.now();
     for (const g of this.guests()) if (g.conn && now - g.lastSeen > this.opts.silentMs) g.conn.close();
+    // A link that never said hello.
+    for (const [c, since] of [...this.strangers]) if (now - since > this.opts.silentMs) c.close();
   }
 
   private reactFrom(seat: number, text: ReactionText): void {

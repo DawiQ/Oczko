@@ -107,8 +107,12 @@ export function LanScreen({
   useEffect(() => {
     current.current = step;
   }, [step]);
+  // One table being opened / joined at a time; the screen may be gone after it.
+  const busy = useRef(false);
+  const alive = useRef(true);
   useEffect(
     () => () => {
+      alive.current = false;
       const st = current.current;
       if (st.name === "host") st.host.close();
       if (st.name === "guest") st.guest.leave();
@@ -127,6 +131,8 @@ export function LanScreen({
   });
 
   const startHost = async () => {
+    if (busy.current) return;
+    busy.current = true;
     saveName();
     setError(null);
     const table: TableInfo = { name: `Stół: ${name || "Gospodarz"}`, rules, mode: "match", ...(pro && looks ? { looks } : {}) };
@@ -139,21 +145,35 @@ export function LanScreen({
     });
     try {
       await host.open();
-      setStep({ name: "host", host });
+      if (!alive.current || current.current.name !== "menu") host.close();
+      else setStep({ name: "host", host });
     } catch {
-      setError("Nie udało się otworzyć stołu. Sprawdź połączenie z Wi‑Fi.");
+      try {
+        host.close();
+      } catch {
+        // never listened
+      }
+      if (alive.current) setError("Nie udało się otworzyć stołu. Sprawdź połączenie z Wi‑Fi.");
+    } finally {
+      busy.current = false;
     }
   };
 
   const join = async (target: { host: string; port: number }) => {
+    if (busy.current) return; // a double tap, the scanner's next frames
+    busy.current = true;
     saveName();
     setError(null);
     const guest = new LanGuest({ dial: deps.dial ?? tcpDial, host: target.host, port: target.port, name: name || "Gość", onRoundEnd: recordRound });
     try {
       await guest.connect();
-      setStep({ name: "guest", guest });
+      if (!alive.current || current.current.name !== "join") guest.leave();
+      else setStep({ name: "guest", guest });
     } catch {
-      setError("Nie udało się połączyć ze stołem.");
+      guest.leave();
+      if (alive.current) setError("Nie udało się połączyć ze stołem.");
+    } finally {
+      busy.current = false;
     }
   };
 

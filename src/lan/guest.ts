@@ -55,7 +55,6 @@ export class LanGuest {
   private token: string | null = null;
   private view: GuestView = { phase: "connecting", table: null, slots: [], you: -1, offline: false, refused: null, closed: null, rejected: null, lan: null };
   private snap: GameSnapshot | null = null;
-  private recordedRound = -1;
   private lastHeard = 0;
   private ping: ReturnType<typeof setInterval> | null = null;
   private retry: ReturnType<typeof setTimeout> | null = null;
@@ -154,11 +153,12 @@ export class LanGuest {
       case "lobby":
         return this.update({ phase: "lobby", slots: msg.slots, you: msg.you, table: msg.table, offline: false });
       case "state": {
+        const isEnd = (s: GameSnapshot | null) => s?.phase === "roundEnd" || s?.phase === "matchEnd";
+        const before = this.snap;
         this.snap = msg.snap;
-        if ((msg.snap.phase === "roundEnd" || msg.snap.phase === "matchEnd") && this.recordedRound !== msg.snap.roundNo) {
-          this.recordedRound = msg.snap.roundNo;
-          this.opts.onRoundEnd?.(msg.snap);
-        }
+        // Once per round: on reaching its end (a rematch starts the numbers over;
+        // the same end sent again after a reconnect does not count twice).
+        if (isEnd(msg.snap) && (!isEnd(before) || before!.roundNo !== msg.snap.roundNo)) this.opts.onRoundEnd?.(msg.snap);
         return this.update({ phase: "playing", offline: false, rejected: null, lan: msg.lan });
       }
       case "reject":

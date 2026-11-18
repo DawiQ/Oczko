@@ -13,6 +13,7 @@ import { adToTxt, txtToAd } from "../discovery";
 import { LanGuest } from "../guest";
 import { LanHost } from "../host";
 import { cleanName, encode, LineReader, parseGuestMsg, parseHostMsg, PROTOCOL_VERSION } from "../protocol";
+import { Utf8Stream } from "../utf8";
 import { MemoryNet } from "../transport";
 
 jest.setTimeout(60000);
@@ -200,6 +201,65 @@ describe("Wi‑Fi table", () => {
   });
 });
 
+describe("Wi‑Fi table — edges", () => {
+  /** The host stands at once, the guest too; plays until the match ends. */
+  async function playOut(host: LanHost, g: LanGuest): Promise<GameSnapshot> {
+    const ctrl = host.controller!;
+    for (let i = 0; i < 2000; i++) {
+      await ctrl.idle();
+      await flush(3);
+      const s = ctrl.getSnapshot();
+      if (s.phase === "matchEnd") return s;
+      if (s.phase === "roundEnd") ctrl.nextRound();
+      else if (s.phase === "myTurn") ctrl.stand();
+      else if (g.snapshot?.phase === "myTurn") g.game.stand();
+      else await flush(5);
+    }
+    throw new Error("no end");
+  }
+
+  it("the guest records every round, also after the host's rematch, and sees the host's hand", async () => {
+    const net = new MemoryNet();
+    const host = makeHost(net, { ...DEFAULT_RULES, target: 1 }, { seed: () => 11 });
+    const port = await host.open();
+    const rounds: number[] = [];
+    const g = new LanGuest({ dial: net.dialer(), host: "h", port, name: "Kuba", retryMs: 5, pingEveryMs: 1_000_000, onRoundEnd: (s) => rounds.push(s.roundNo) });
+    await g.connect();
+    await flush();
+    host.start();
+    const first = await playOut(host, g);
+    await flush();
+    const hostSeat = host.controller!.me;
+    expect(g.snapshot!.seats[hostSeat].hand).toEqual(first.view.myHand);
+    expect(host.controller!.rematch()).toBeNull();
+    const second = await playOut(host, g);
+    await flush();
+    expect(rounds).toHaveLength(first.roundNo + second.roundNo);
+    host.close();
+  });
+
+  it("drops a link that never says hello, and lets a guest react once a second", async () => {
+    const net = new MemoryNet();
+    const host = makeHost(net, DEFAULT_RULES, { checkEveryMs: 10, silentMs: 30 });
+    const port = await host.open();
+    const stranger = await net.dialer()("x", port);
+    let closed = false;
+    stranger.onClose(() => (closed = true));
+    const g = makeGuest(net, port, "Kuba");
+    await g.connect();
+    await flush();
+    host.start();
+    await flush();
+    g.react("Brawo");
+    g.react("Ups");
+    await flush();
+    expect(host.lan!.reaction).toMatchObject({ text: "Brawo" });
+    await wait(80);
+    expect(closed).toBe(true);
+    host.close();
+  });
+});
+
 describe("protocol parsing", () => {
   it("cleans names and drops malformed messages", () => {
     expect(cleanName("  Ola​\u0007 ")).toBe("Ola");
@@ -218,6 +278,26 @@ describe("protocol parsing", () => {
     expect(r.push('{"t":"pi')).toEqual([]);
     expect(r.push('ng"}\n{"t":"ping"}\n')).toEqual(['{"t":"ping"}', '{"t":"ping"}']);
     expect(new LineReader().push("x".repeat(200_000))).toBeNull();
+  });
+
+  it("keeps a character cut between two TCP chunks whole", () => {
+    const text = '{"t":"state","name":"Łucja ółż 🂡"}\n';
+    const bytes = new TextEncoder().encode(text);
+    for (let cut = 0; cut <= bytes.length; cut++) {
+      const u = new Utf8Stream();
+      expect(u.push(bytes.slice(0, cut)) + u.push(bytes.slice(cut))).toBe(text);
+    }
+    const one = new Utf8Stream();
+    expect(Array.from(bytes, (x) => one.push(Uint8Array.of(x))).join("")).toBe(text);
+    expect(new Utf8Stream().push(Uint8Array.of(0x41, 0xff, 0x42))).toBe("A\uFFFDB");
+  });
+
+  it("reads a line sent byte by byte", () => {
+    const r = new LineReader();
+    const line = '{"t":"ping"}';
+    const got = [...line].flatMap((ch) => r.push(ch)!);
+    expect(got).toEqual([]);
+    expect(r.push("\n")).toEqual([line]);
   });
 
   it("table code, QR link and the mDNS record round-trip", () => {

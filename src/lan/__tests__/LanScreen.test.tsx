@@ -74,9 +74,15 @@ describe("Wi‑Fi screens", () => {
     await press(guest, "Dołącz do stołu");
     const input = guest.root.findAll((n) => n.type === TextInput && n.props.accessibilityLabel === "Kod stołu")[0];
     await act(async () => input.props.onChangeText(code));
-    await press(guest, "Dołącz");
+    // A double tap joins once.
+    const join = button(guest, "Dołącz");
+    await act(async () => {
+      join.props.onPress();
+      join.props.onPress();
+    });
+    await settle();
     expect(textOf(guest)).toContain("Czekamy, aż gospodarz rozda karty.");
-    expect(textOf(host)).toContain("Kuba");
+    expect(textOf(host).match(/Kuba/g)).toHaveLength(1);
 
     await press(host, "Rozdaj karty");
     await settle();
