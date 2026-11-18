@@ -5,6 +5,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { cardOf } from "../engine/cards";
 import type { Rules } from "../engine/rules";
+import { handValue } from "../engine/score";
 import { useStrings } from "../i18n";
 import { BottomSheet } from "../ui/BottomSheet";
 import { Button3D } from "../ui/Button3D";
@@ -18,11 +19,20 @@ import { FONT_LICENSES } from "./licenses";
 type Topic = "family" | "bank" | "variants";
 
 const c = cardOf;
-const EXAMPLES: { id: "persian" | "oczko" | "fura"; cards: number[]; value: string; color: string }[] = [
-  { id: "persian", cards: [c(14, 0), c(14, 3)], value: "AA", color: P.accent },
-  { id: "oczko", cards: [c(10, 2), c(14, 1)], value: "21", color: P.ok },
-  { id: "fura", cards: [c(13, 3), c(9, 0), c(10, 1)], value: "23", color: P.danger },
-];
+type ExampleId = "persian" | "aces21" | "oczko" | "fura";
+
+/** Example hands under the rules in use: two aces as the rules say (none
+ *  without the rule), 21, and a fura that is one under any values. */
+function examples(rules: Rules): { id: ExampleId; cards: number[]; value: string; color: string }[] {
+  const aces = [c(14, 0), c(14, 3)];
+  const fura = [c(10, 3), c(9, 0), c(5, 1)];
+  return [
+    ...(rules.persian === "wins" ? [{ id: "persian" as const, cards: aces, value: "AA", color: P.accent }] : []),
+    ...(rules.persian === "is21" ? [{ id: "aces21" as const, cards: aces, value: "21", color: P.ok }] : []),
+    { id: "oczko", cards: [c(10, 2), c(14, 1)], value: "21", color: P.ok },
+    { id: "fura", cards: fura, value: String(handValue(fura, rules).total), color: P.danger },
+  ];
+}
 
 function Section({ title, children }: { title: string; children: React.ReactNode }) {
   return (
@@ -93,7 +103,7 @@ export function RulesScreen({ rules, onTutorial, onBack }: { rules: Rules; onTut
           </Section>
         )}
         <View style={s.panel}>
-          {EXAMPLES.map((e, i) => (
+          {examples(rules).map((e, i) => (
             <View key={e.id} style={[s.example, i > 0 && s.sep]} accessible accessibilityLabel={t.exampleA11y(t.examples[e.id].title, t.examples[e.id].text)}>
               <View style={s.cards}>
                 {e.cards.map((card) => (

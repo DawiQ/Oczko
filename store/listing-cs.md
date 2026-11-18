@@ -31,6 +31,7 @@ Hraje se na body: každé vyhrané kolo je bod, partie jde do 5, 10 nebo 15 bod�
 Žádné peníze, žádné výhry — jen karty a dobrá zábava.
 
 TVOJE DOMÁCÍ PRAVIDLA
+• Hotová sada „Oko bere“: 32 karet, J a Q za 1, K za 2, dvě esa = 21.
 • Rodinná hra (všichni proti všem) nebo s bankéřem.
 • Hodnoty figur (J 2, Q 3, K 4 nebo vlastní), balíček 52, 32 nebo 24 karet.
 • Dvě esa ano nebo ne, eso za 11 nebo za 1 či 11, jedna nebo dvě karty na

@@ -117,7 +117,8 @@ export const rules: typeof pl.rules = {
       persian: { title: "Dvě esa", text: "Eso a eso — vyhrávají nad vším." },
       oczko: { title: "Oczko", text: "Přesně 21." },
       fura: { title: "Přes", text: "Víc než 21 — ruka prohrává." },
-    } as Record<"persian" | "oczko" | "fura", { title: string; text: string }>,
+      aces21: { title: "Dvě esa", text: "Počítají se jako 21." },
+    } as Record<"persian" | "oczko" | "fura" | "aces21", { title: string; text: string }>,
     /** An example hand for screen readers. */
     exampleA11y: (title: string, text: string) => `${title}: ${text}`,
     cardValues: "Hodnoty karet",

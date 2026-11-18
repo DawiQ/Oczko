@@ -32,6 +32,7 @@ Igra se na bodove: svaka osvojena runda je bod, partija ide do 5, 10 ili 15
 bodova. Bez novca, bez nagrada — samo karte i dobra zabava.
 
 TVOJA KUĆNA PRAVILA
+• Gotov skup pravila „Ajnc“: 32 karte, J 2, Q 3, K 4, suvi ajnc pobjeđuje.
 • Svi protiv svih ili s bankarom.
 • Vrijednosti figura (J 2, Q 3, K 4 ili po želji), špil od 52, 32 ili 24
   karte.

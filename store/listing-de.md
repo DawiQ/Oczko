@@ -31,6 +31,7 @@ Gespielt wird um Punkte: jede gewonnene Runde ist ein Punkt, eine Partie
 geht bis 5, 10 oder 15. Kein Geld, keine Preise — nur Karten und Spaß.
 
 DEINE HAUSREGELN
+• Fertiger Regelsatz „17 und 4“: 32 Karten, B 2, D 3, K 4, Feuer schlägt alles.
 • Familienspiel (alle gegen alle) oder mit Bankhalter.
 • Werte der Bilder (B 2, D 3, K 4 oder eigene), ein Stapel mit 52, 32 oder
   24 Karten.

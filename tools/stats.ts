@@ -15,6 +15,7 @@ import { matchApply, newMatch } from "../src/engine/match";
 import { makeDeck, type Card } from "../src/engine/cards";
 import { shuffle, splitmix32 } from "../src/engine/rng";
 import { handValue } from "../src/engine/score";
+import { withPreset } from "../src/engine/presets";
 import { DEFAULT_RULES, MAX_SEATS, PRESETS, type Rules } from "../src/engine/rules";
 import { viewFor } from "../src/engine/view";
 
@@ -67,6 +68,9 @@ for (const [name, rules, seats] of [
   ["Z bankierem (52)", PRESETS.bank, 2],
   ["Rodzinne (24 karty)", PRESETS.small24, 4],
   ["Rodzinne, 2 karty na start", { ...PRESETS.family, startCards: 2 } as Rules, 4],
+  // Regional rule sets (PLAN.md §13); Ajnc has the cards of 17 und 4.
+  ["17 und 4 / Ajnc (32, z bankierem)", withPreset(DEFAULT_RULES, "siebzehnUndVier"), 4],
+  ["Oko bere (32, 1 · 1 · 2, dwa asy = 21)", withPreset(DEFAULT_RULES, "okoBere"), 4],
 ] as const) {
   const s = roundStats(rules, seats, mixed(seats), 20000);
   presetRows.push(

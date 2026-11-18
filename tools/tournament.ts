@@ -11,7 +11,8 @@ import { PERSONAS, type PersonaId } from "../src/ai/personas";
 import { policyOf, threshold, type Policy } from "../src/ai/policies";
 import { playRound } from "../src/ai/simulate";
 import { splitmix32 } from "../src/engine/rng";
-import { DEFAULT_RULES, PRESETS } from "../src/engine/rules";
+import { withPreset, type PresetId } from "../src/engine/presets";
+import { DEFAULT_RULES, PRESETS, type Rules } from "../src/engine/rules";
 import { pl } from "../src/i18n/pl";
 
 const N = Number(process.argv[2]) || 6000;
@@ -28,20 +29,20 @@ interface Result {
   ms: number;
 }
 
-function run(id: PersonaId): Result {
+function run(id: PersonaId, familyRules: Rules = DEFAULT_RULES, bankRules: Rules = PRESETS.bank, n = N): Result {
   const p = PERSONAS.find((x) => x.id === id)!;
   const me = policyOf(p.policy);
-  const family = new Float64Array(N);
-  const bank = new Float64Array(N);
+  const family = new Float64Array(n);
+  const bank = new Float64Array(n);
   const t0 = Date.now();
-  for (let i = 0; i < N; i++) {
+  for (let i = 0; i < n; i++) {
     const seed = splitmix32(i);
     // Family: the persona at seat 0, the dealer rotating with the deal.
-    const f = playRound(DEFAULT_RULES, [me, ...FIELD], seed, i % 4, { state: seed ^ 0x5bd1e995 });
+    const f = playRound(familyRules, [me, ...FIELD], seed, i % 4, { state: seed ^ 0x5bd1e995 });
     family[i] = f.match.round.result!.points[0];
     // Bank 1 on 1: the persona is the bank on even deals.
     const asBank = i % 2 === 0;
-    const b = playRound(PRESETS.bank, [me, BANK_REF], seed, asBank ? 0 : 1, { state: seed ^ 0x27d4eb2f });
+    const b = playRound(bankRules, [me, BANK_REF], seed, asBank ? 0 : 1, { state: seed ^ 0x27d4eb2f });
     bank[i] = b.match.round.result!.points[0];
   }
   return { id, family, bank, ms: Date.now() - t0 };
@@ -82,6 +83,19 @@ const rows = results.map((r, i) => {
 const monotonic = rows.every((x, i) => i === 0 || x.strength > rows[i - 1].strength);
 const distinct = rows.every((x) => x.z === null || x.z > 2);
 
+// Rule sets with other cards (PLAN.md §13): do the characters keep their
+// order? (Fewer deals; Ajnc has the cards of 17 und 4.)
+const SET_IDS: PresetId[] = ["siebzehnUndVier", "okoBere"];
+const SET_N = Math.max(500, Math.round(N / 3));
+const sets = SET_IDS.map((id) => {
+  const rules = withPreset(DEFAULT_RULES, id);
+  const res = PERSONAS.map((p) => run(p.id, { ...rules, mode: "family" }, { ...rules, mode: "bank" }, SET_N));
+  const strengths = res.map((r) => mean(combined(r)));
+  const mono = strengths.every((x, i) => i === 0 || x > strengths[i - 1]);
+  console.log(`${id}: ${strengths.map(pct).join(" ")} monotonic: ${mono}`);
+  return { id, strengths, mono };
+});
+
 const md = `# Boty — kalibracja poziomów
 
 Wygenerowane przez \`npm run tournament\` (${N} rozdań na tryb, te same
@@ -105,6 +119,15 @@ ${rows
 
 Poziomy rosną monotonicznie: **${monotonic ? "tak" : "NIE"}**. Sąsiednie
 poziomy różnią się istotnie: **${distinct ? "tak" : "NIE"}**.
+
+## Zestawy zasad (PLAN.md §13)
+
+Ten sam turniej na kartach zestawu (${SET_N} rozdań na tryb). Ajnc ma karty
+17 und 4.
+
+| Zestaw | ${PERSONAS.map((p) => pl.personas[p.id].name).join(" | ")} | Rosną monotonicznie |
+|---|${PERSONAS.map(() => "---|").join("")}---|
+${sets.map((x) => `| ${pl.rules.editor.presets[x.id].name} | ${x.strengths.map(pct).join(" | ")} | ${x.mono ? "tak" : "NIE"} |`).join("\n")}
 
 Dla odniesienia: przy 4 równych graczach udział rund z punktem w trybie
 rodzinnym wynosi ok. 25% (+ remisy), a w banku 1:1 ok. 50%.

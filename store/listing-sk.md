@@ -31,6 +31,7 @@ Hrá sa o body: každé vyhrané kolo je bod, partia sa hrá do 5, 10 alebo
 15 bodov. Žiadne peniaze, žiadne ceny — len karty a dobrá zábava.
 
 TVOJE DOMÁCE PRAVIDLÁ
+• Hotový súbor „Oko berie“: 32 kariet, J a Q za 1, K za 2, dve esá = 21.
 • Rodinná hra (všetci proti všetkým) alebo s bankárom.
 • Hodnoty figúr (J 2, Q 3, K 4 alebo vlastné), balíček s 52, 32 alebo
   24 kartami.

@@ -16,6 +16,8 @@ wszyscy jednakowi (próg 17).
 | Z bankierem (52) | 2 | 2,11 | 18.6% | 55.9% | 55.9% |
 | Rodzinne (24 karty) | 4 | 2,15 | 37.7% | — | — |
 | Rodzinne, 2 karty na start | 4 | 1,47 | 27.4% | — | — |
+| 17 und 4 / Ajnc (32, z bankierem) | 4 | 1,98 | 31.3% | 58.1% | 57.4% |
+| Oko bere (32, 1 · 1 · 2, dwa asy = 21) | 4 | 2,26 | 27.7% | 57.9% | 57.0% |
 
 ## Sprawiedliwość trybu z bankierem
 
@@ -74,6 +76,6 @@ blokowania UI.
 
 | Tryb | Graczy | Czas |
 |---|---|---|
-| Rodzinne | 4 | 7,0 ms |
-| Rodzinne | 8 | 10,7 ms |
-| Z bankierem | 4 | 8,3 ms |
+| Rodzinne | 4 | 5,8 ms |
+| Rodzinne | 8 | 10,6 ms |
+| Z bankierem | 4 | 7,9 ms |

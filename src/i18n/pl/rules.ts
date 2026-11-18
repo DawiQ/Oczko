@@ -115,7 +115,8 @@ export const rules = {
       persian: { title: "Perskie oczko", text: "Dwa asy — wygrywa ze wszystkim." },
       oczko: { title: "Oczko", text: "Równe 21." },
       fura: { title: "Fura", text: "Więcej niż 21 — ręka przegrywa." },
-    } as Record<"persian" | "oczko" | "fura", { title: string; text: string }>,
+      aces21: { title: "Dwa asy", text: "Liczą się jak 21." },
+    } as Record<"persian" | "oczko" | "fura" | "aces21", { title: string; text: string }>,
     /** An example hand for screen readers. */
     exampleA11y: (title: string, text: string) => `${title}: ${text}`,
     cardValues: "Wartości kart",
