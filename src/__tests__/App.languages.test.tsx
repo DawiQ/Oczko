@@ -104,3 +104,43 @@ describe.each(LANGS.filter((l) => l !== "pl").map((l) => [l]))("the app in %s", 
     expect([...new Set(seen.filter((t) => POLISH.test(t)))]).toEqual([]);
   });
 });
+
+describe("changing the language", () => {
+  const de = DICTIONARIES.de;
+  const pl = DICTIONARIES.pl;
+
+  it("from the settings: at once, and remembered", async () => {
+    const kv = memoryKV({ [ONBOARDING_KEY]: JSON.stringify({ v: 1, done: true }) });
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} pace={INSTANT} sleep={() => Promise.resolve()} />);
+    });
+    await settle();
+    const press = async (label: string) => {
+      const b = button(r, label);
+      if (!b) throw new Error(`no button "${label}"`);
+      await act(async () => b.props.onPress());
+      await settle();
+    };
+    expect(shown(r)).toContain(pl.home.newGame);
+    await press(pl.home.settings);
+    await press(pl.home.settingsSheet.language);
+    await press("Deutsch");
+    expect(shown(r)).toContain(de.home.newGame);
+    expect(shown(r)).not.toContain(pl.home.newGame);
+    expect(JSON.parse((await kv.get(SETTINGS_KEY))!).lang).toBe("de");
+    act(() => r.unmount());
+  });
+
+  it("follows the phone's language on \"automatic\"", async () => {
+    const spy = jest.spyOn(jest.requireMock("expo-localization") as { getLocales: () => unknown[] }, "getLocales").mockReturnValue([{ languageCode: "de" }]);
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={memoryKV({ [ONBOARDING_KEY]: JSON.stringify({ v: 1, done: true }) })} pace={INSTANT} sleep={() => Promise.resolve()} />);
+    });
+    await settle();
+    expect(shown(r)).toContain(de.home.newGame);
+    act(() => r.unmount());
+    spy.mockRestore();
+  });
+});
