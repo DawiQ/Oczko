@@ -65,6 +65,6 @@ export const history: typeof pl.history = {
       `Твої рішення: найкращих — ${x.best}, добрих — ${x.good}, ризикованих — ${x.risky}, помилок — ${x.mistake}`,
     analysing: "Аналізую…",
     analyse: "Проаналізувати мої рішення",
-    progress: "Перебіг повтору",
+    progress: "Прогрес повтору",
   },
 };

@@ -56,7 +56,7 @@ export const table: typeof pl.table = {
   caption: {
     dealing: "Роздача",
     dealingBank: (bank: string) => `Роздача · банк: ${bank}`,
-    at21: "У тебе 21 — досить?",
+    at21: "У тебе 21 — Досить?",
     myTurn: (total: number) => `Твій хід · у тебе ${total}`,
     /** The last event, then whose turn it is. */
     then: (last: string, turn: string) => `${last} · ${turn}`,

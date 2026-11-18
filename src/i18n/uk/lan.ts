@@ -1,6 +1,7 @@
 // Ukrainian: texts of the "lan" area (playing with friends over Wi‑Fi).
 import type { Reaction } from "../../lan/protocol";
 import type { pl } from "../pl";
+import { eastSlavicForm } from "../plural";
 import { common } from "./common";
 
 export const lan: typeof pl.lan = {
@@ -36,7 +37,7 @@ export const lan: typeof pl.lan = {
     note: (pro: boolean, free: number, max: number) =>
       `Без інтернету: телефони з'єднуються в локальній мережі. ${pro ? `До ${max} осіб за столом (Oczko Pro).` : `До ${free} осіб за столом (${max} — якщо в господаря Oczko Pro).`}`,
     stats: (matchesWon: number, matches: number, roundsWon: number, rounds: number) =>
-      `Через Wi‑Fi: виграно ${matchesWon} з ${matches} партій · раундів із балом: ${roundsWon}/${rounds}`,
+      `Через Wi‑Fi: виграно ${matchesWon} з ${matches} ${eastSlavicForm(matches) === "one" ? "партії" : "партій"} · раундів із балом: ${roundsWon}/${rounds}`,
   },
   host: {
     subtitle: "Твій стіл — друзі приєднуються",
@@ -89,7 +90,7 @@ export const lan: typeof pl.lan = {
   },
   guest: {
     table: "Стіл",
-    connecting: "З'єдную…",
+    connecting: "Під'єднуюся…",
     lobby: "Чекаємо, поки господар роздасть карти.",
     full: "За столом немає вільних місць.",
     version: "Інша версія застосунку — оновіть Oczko.",

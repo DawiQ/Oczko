@@ -35,7 +35,7 @@ export const rules: typeof pl.rules = {
     ace: "Туз",
     aceA11y: "Значення туза",
     aceOptions: { eleven: "11", oneOrEleven: "1 або 11" } as Record<Rules["ace"], string>,
-    startCards: "Карт на початку",
+    startCards: "Карти на початку",
     startCardsOptions: { 1: common.cards(1), 2: common.cards(2) } as Record<Rules["startCards"], string>,
     maxCards: "Ліміт карт у руці",
     noLimit: "Без",
@@ -98,7 +98,7 @@ export const rules: typeof pl.rules = {
     houseVariants: "Домашні варіанти",
     houseVariantsTexts: [
       "Значення фігур (В, Д, К), колода на 52, 32 або 24 карти, туз за 11 або за 1 чи 11, два тузи — так чи ні, одна або дві карти на початку, ліміт карт у руці, правила нічиєї та банку.",
-      "Усе це налаштуєш у «Твої домашні правила» і перед кожною новою грою.",
+      "Усе це налаштуєш у розділі «Твої домашні правила» і перед кожною новою грою.",
     ],
     examples: {
       persian: { title: "Два тузи", text: "Виграють у будь-якої руки." },
@@ -112,7 +112,7 @@ export const rules: typeof pl.rules = {
     byPips: "за номіналом",
     aceShort: { eleven: "11", oneOrEleven: "1/11" } as Record<Rules["ace"], string>,
     valueA11y: (card: string, value: string) => `${card}: ${value}`,
-    yourSettings: "Твої налаштування — змінити їх можна в «Твої домашні правила».",
+    yourSettings: "Твої налаштування — змінити їх можна в розділі «Твої домашні правила».",
     showExample: "Показати на прикладі",
   },
 };
