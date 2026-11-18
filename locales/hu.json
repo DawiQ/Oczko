@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocalNetworkUsageDescription": "Az Oczko összekapcsolja az ugyanazon a Wi‑Fi-hálózaton lévő telefonokat, hogy egy asztalnál játszhassatok.",
+    "NSCameraUsageDescription": "A kamerával beolvashatod egy asztal QR-kódját, és csatlakozhatsz a barátaid játékához."
+  }
+}

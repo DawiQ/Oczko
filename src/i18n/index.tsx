@@ -6,15 +6,18 @@ import { createContext, useContext, useMemo, type ReactNode } from "react";
 import { getLocales } from "expo-localization";
 
 import type { Lang, LocaleLike } from "./langs";
+import { cs } from "./cs";
 import { de } from "./de";
 import { en } from "./en";
+import { hu } from "./hu";
 import { pl, type Strings } from "./pl";
+import { sk } from "./sk";
 
 export * from "./langs";
 export type { Strings } from "./pl";
 export { pl } from "./pl";
 
-export const DICTIONARIES: Record<Lang, Strings> = { pl, en, de };
+export const DICTIONARIES: Record<Lang, Strings> = { pl, en, de, cs, sk, hu };
 
 /** The phone's languages in order of preference (empty when unknown). */
 export function deviceLocales(): LocaleLike[] {

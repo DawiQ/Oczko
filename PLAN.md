@@ -539,7 +539,7 @@ ale żaden tekst UI nie jest już wpisany w komponent.
   tłumaczeń przez rodzimego użytkownika (właściciel organizuje), testy
   zielone.
 
-### Etap 14 — Czeski, słowacki, węgierski
+### Etap 14 — Czeski, słowacki, węgierski ✅ (przegląd tłumaczeń przez rodzimych użytkowników — u właściciela)
 - Jak Etap 13: glosariusz, `cs.ts`, `sk.ts`, `hu.ts`, opisy sklepu
   („Oko bere”, „Oko berie”, „Huszonegy” w nazwie lub słowach kluczowych),
   grafiki, przegląd układu.

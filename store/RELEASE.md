@@ -73,9 +73,9 @@
 
 ## 6. Google Play Console
 
-- [ ] Opis per język: `store/listing-pl.md`, `-en.md`, `-de.md` (nazwa, krótki i pełny opis), grafiki
-      (`store/feature-graphic.png`, `-en.png`, `-de.png`) i zrzuty ekranu
-      w każdym języku.
+- [ ] Opis per język: `store/listing-{pl,en,de,cs,sk,hu}.md` (nazwa, krótki i pełny
+      opis), grafiki (`store/feature-graphic.png`, `-en`, `-de`, `-cs`, `-sk`, `-hu`)
+      i zrzuty ekranu w każdym języku.
 - [ ] Kategoria: Gry → Karciane. Grupa docelowa: 13+ (ze względu na
       reklamy) — albo „wszyscy” po zablokowaniu reklam dla dzieci.
 - [ ] Ocena treści (IARC): odpowiedzi z `store/rating-answers.md`
@@ -92,7 +92,7 @@
 
 ## 7. App Store Connect
 
-- [ ] Opis i słowa kluczowe per język: `store/listing-{pl,en,de}.md`.
+- [ ] Opis i słowa kluczowe per język: `store/listing-{pl,en,de,cs,sk,hu}.md`.
 - [ ] Age Rating: `store/rating-answers.md` — **Simulated Gambling: None**.
 - [ ] App Privacy: identyfikatory (reklamy — bez śledzenia między
       aplikacjami, bez ATT), zakupy.

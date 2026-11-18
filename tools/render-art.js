@@ -67,6 +67,9 @@ const FEATURE_SUBTITLES = {
   pl: "polska gra w karty do 21",
   en: "the Polish game of 21",
   de: "das polnische 17 und 4",
+  cs: "polská hra 21 · Oko bere",
+  sk: "poľská hra 21 · Oko berie",
+  hu: "a lengyel huszonegy",
 };
 
 const iconBody = `${copper(1024, 1024)}${logo(512, 425, 1.17, true)}`;

@@ -22,7 +22,10 @@
     "locales": {
       "pl": "./locales/pl.json",
       "en": "./locales/en.json",
-      "de": "./locales/de.json"
+      "de": "./locales/de.json",
+      "cs": "./locales/cs.json",
+      "sk": "./locales/sk.json",
+      "hu": "./locales/hu.json"
     },
     "android": {
       "package": "pl.dawiq.oczko",
