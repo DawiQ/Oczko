@@ -77,6 +77,8 @@ export const rules = {
 
   /** The "Zasady" screen. */
   screen: {
+    /** The fonts' licences (the texts themselves stay in English). */
+    licenses: "Licencje czcionek",
     title: "Zasady",
     topic: "Temat",
     variants: "Warianty",

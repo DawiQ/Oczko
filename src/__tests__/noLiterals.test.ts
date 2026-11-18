@@ -11,7 +11,8 @@ import path from "path";
 const ROOT = path.join(__dirname, "../..");
 const SKIP_DIRS = ["__tests__", "i18n", "engine"];
 /** Files without text for people beyond the skipped directories. */
-const SKIP_FILES: string[] = [];
+/** Verbatim legal texts in English (the fonts' licences). */
+const SKIP_FILES: string[] = ["src/info/licenses.ts"];
 
 function files(dir: string): string[] {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((e) => {

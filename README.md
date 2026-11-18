@@ -203,7 +203,9 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   ukraiński, rosyjski i jedna wersja łacińska dla Bośni, Chorwacji,
   Czarnogóry i Serbii („sh”; telefony bs/hr/sr/cnr).
 - Czcionka: Fraunces (łacinka), Literata (cyrylica) pod jedną nazwą
-  `DISPLAY`, wybierana przy starcie wg języka (`src/ui/fonts.ts`). Słownik pojęć: `docs/i18n/GLOSSARY.md`
+  `DISPLAY`, wybierana przy starcie wg języka (`src/ui/fonts.ts`).
+  Obie na licencji SIL OFL 1.1 — jej tekst z informacją o prawach autorskich
+  jest w aplikacji (Zasady → „Licencje czcionek”, `src/info/licenses.ts`). Słownik pojęć: `docs/i18n/GLOSSARY.md`
   (Draw / Stay, Bust!, Two aces!; Noch eine / Genug, Überkauft!, Feuer!).
 - `App.languages.test.tsx` — cała aplikacja w każdym języku (lobby, partia do
   końca, zakładki, ustawienia): na ekranie i w etykietach dostępności żadnych

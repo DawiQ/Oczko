@@ -1,17 +1,19 @@
 // "Zasady": every variant described, hands drawn as cards, the values from the
 // house rules. Layout: docs/mockups, screen 10.
 import { useState } from "react";
-import { ScrollView, StyleSheet, Text, View } from "react-native";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
 import { cardOf } from "../engine/cards";
 import type { Rules } from "../engine/rules";
 import { useStrings } from "../i18n";
+import { BottomSheet } from "../ui/BottomSheet";
 import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
 import { Segmented } from "../ui/controls";
 import { DISPLAY } from "../ui/fonts";
 import { Header } from "../ui/Header";
 import { P } from "../ui/palette";
+import { FONT_LICENSES } from "./licenses";
 
 type Topic = "family" | "bank" | "variants";
 
@@ -38,6 +40,7 @@ const T = ({ children }: { children: string }) => <Text style={s.p}>{children}</
 export function RulesScreen({ rules, onTutorial, onBack }: { rules: Rules; onTutorial: () => void; onBack?: () => void }) {
   const str = useStrings();
   const t = str.rules.screen;
+  const [licenses, setLicenses] = useState(false);
   const L = str.cards.rankLetters;
   const [topic, setTopic] = useState<Topic>(rules.mode);
   const values: [string, string][] = [
@@ -117,13 +120,30 @@ export function RulesScreen({ rules, onTutorial, onBack }: { rules: Rules; onTut
           <Text style={s.small}>{t.yourSettings}</Text>
         </Section>
         <Button3D label={t.showExample} tone="dark" height={48} onPress={onTutorial} />
+        <Pressable style={s.licensesLink} onPress={() => setLicenses(true)} accessibilityRole="button" accessibilityLabel={t.licenses}>
+          <Text style={s.licensesText}>{t.licenses}</Text>
+        </Pressable>
       </ScrollView>
+      {licenses && (
+        <BottomSheet snapPoints={[560]} onClose={() => setLicenses(false)} accessibilityLabel={t.licenses} header={<Text style={s.licensesTitle}>{t.licenses}</Text>}>
+          {FONT_LICENSES.map((x) => (
+            <View key={x.name} style={{ gap: 6, paddingBottom: 16 }}>
+              <Text style={s.h}>{x.name}</Text>
+              <Text style={s.licenseBody}>{x.text}</Text>
+            </View>
+          ))}
+        </BottomSheet>
+      )}
     </View>
   );
 }
 
 const s = StyleSheet.create({
   screen: { flex: 1, backgroundColor: P.bg },
+  licensesLink: { minHeight: 44, alignItems: "center", justifyContent: "center" },
+  licensesText: { color: P.muted, fontSize: 12.5, textDecorationLine: "underline" },
+  licensesTitle: { color: P.text, fontFamily: DISPLAY, fontSize: 20, paddingHorizontal: 18, paddingBottom: 4 },
+  licenseBody: { color: P.textSoft, fontSize: 11, lineHeight: 15 },
   content: { paddingHorizontal: 16, paddingBottom: 24, gap: 10 },
   panel: { backgroundColor: P.surface, borderColor: P.line, borderWidth: 1, borderRadius: 18, padding: 14, gap: 6 },
   h: { color: P.text, fontSize: 15, fontWeight: "700" },

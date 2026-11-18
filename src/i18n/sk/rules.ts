@@ -78,6 +78,8 @@ export const rules: typeof pl.rules = {
 
   /** The "Pravidlá" screen. */
   screen: {
+    /** The fonts' licences (the texts themselves stay in English). */
+    licenses: "Licencie písiem",
     title: "Pravidlá",
     topic: "Téma",
     variants: "Varianty",
