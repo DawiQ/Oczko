@@ -22,7 +22,8 @@ export function useTrainer(
   evaluatorFactory: () => ChunkedEvaluator = chunkedEvaluator,
   allow?: () => boolean
 ): Evaluation | "locked" | null {
-  const key = enabled && snap.phase === "myTurn" ? `${snap.roundNo}:${snap.view.myHand.join(",")}` : null;
+  // Only real decisions (not a forced move, e.g. the bank drawing to 17).
+  const key = enabled && snap.phase === "myTurn" && snap.view.legal.length > 1 ? `${snap.roundNo}:${snap.view.myHand.join(",")}` : null;
   const view = snap.view;
   const [ev, setEv] = useState<{ key: string; e: Evaluation | "locked" } | null>(null);
   const evaluator = useRef<ChunkedEvaluator | null>(null);

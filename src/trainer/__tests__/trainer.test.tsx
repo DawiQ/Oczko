@@ -94,6 +94,24 @@ describe("trainer", () => {
     expect(result).toMatchObject({ best: "hit" });
   });
 
+  it("stays silent on a forced move (no hint spent)", async () => {
+    const snap = await myTurn();
+    const forced: GameSnapshot = { ...snap, view: { ...snap.view, legal: ["hit"] } };
+    const fake: ChunkedEvaluator = { cancel: () => {}, evaluate: jest.fn() };
+    const allow = jest.fn(() => true);
+    let result: Evaluation | "locked" | null = null;
+    function Probe() {
+      result = useTrainer(forced, true, () => fake, allow);
+      return null;
+    }
+    await act(async () => {
+      create(<Probe />);
+    });
+    expect(result).toBeNull();
+    expect(allow).not.toHaveBeenCalled();
+    expect(fake.evaluate).not.toHaveBeenCalled();
+  });
+
   it("is locked when no hint is left", async () => {
     const snap = await myTurn();
     const fake: ChunkedEvaluator = { cancel: () => {}, evaluate: jest.fn() };
