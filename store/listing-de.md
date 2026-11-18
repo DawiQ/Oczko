@@ -32,9 +32,10 @@ geht bis 5, 10 oder 15. Kein Geld, keine Preise — nur Karten und Spaß.
 
 DEINE HAUSREGELN
 • Fertiger Regelsatz „17 und 4“: 32 Karten, B 2, D 3, K 4, Feuer schlägt alles.
+  Dazu Oko bere, Ajnc, Ochko (36 Karten) und Pontoon.
 • Familienspiel (alle gegen alle) oder mit Bankhalter.
-• Werte der Bilder (B 2, D 3, K 4 oder eigene), ein Stapel mit 52, 32 oder
-  24 Karten.
+• Werte der Bilder (B 2, D 3, K 4 oder eigene), ein Stapel mit 52, 36, 32
+  oder 24 Karten.
 • Feuer ja oder nein, das Ass als 11 oder als 1 oder 11, eine oder zwei
   Startkarten, ein Kartenlimit, Regeln für Unentschieden und die Bank.
 Einmal einstellen — beim ersten Start — und jederzeit ändern.

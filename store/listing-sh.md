@@ -33,9 +33,10 @@ bodova. Bez novca, bez nagrada — samo karte i dobra zabava.
 
 TVOJA KUĆNA PRAVILA
 • Gotov skup pravila „Ajnc“: 32 karte, J 2, Q 3, K 4, suvi ajnc pobjeđuje.
+  Uz to 17 und 4, Oko bere, Očko (36 karata) i Pontoon.
 • Svi protiv svih ili s bankarom.
-• Vrijednosti figura (J 2, Q 3, K 4 ili po želji), špil od 52, 32 ili 24
-  karte.
+• Vrijednosti figura (J 2, Q 3, K 4 ili po želji), špil od 52, 36, 32 ili
+  24 karte.
 • Dva asa da ili ne, as kao 11 ili kao 1 ili 11, jedna ili dvije karte na
   početku, najviše karata u ruci, pravila za neriješeno i za bank.
 Postaviš ih jednom — pri prvom pokretanju — i mijenjaš kad god hoćeš.

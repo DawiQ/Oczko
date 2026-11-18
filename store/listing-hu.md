@@ -32,8 +32,12 @@ pontig tart. Nincs pénz, nincsenek nyeremények — csak kártya és jó
 hangulat.
 
 HÁZI SZABÁLYAID
+• Kész szabálykészletek más országokból: 17 und 4 (Németország, Ausztria),
+  Oko bere (Csehország, Szlovákia), Ajnc (Balkán), Ocsko (36 lapos pakli),
+  Pontoon (Nagy-Britannia).
 • Családi játék (mindenki mindenki ellen) vagy bankárral.
-• A figurák értéke (B 2, D 3, K 4 vagy saját), 52, 32 vagy 24 lapos pakli.
+• A figurák értéke (B 2, D 3, K 4 vagy saját), 52, 36, 32 vagy 24 lapos
+  pakli.
 • Két ász igen vagy nem, az ász 11-et vagy tetszés szerint 1-et vagy 11-et
   ér, egy vagy két kezdő lap, lapkorlát a kézben, a döntetlen és a bank
   szabályai.

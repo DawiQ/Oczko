@@ -30,8 +30,11 @@ Gra się na punkty: wygrana runda to punkt, partia do 5, 10 albo 15 punktów.
 Nie ma tu pieniędzy ani nagród — tylko karty i dobra zabawa.
 
 JAK GRASZ U SIEBIE?
+• Gotowe zestawy zasad z innych krajów: 17 und 4 (Niemcy, Austria), Oko
+  bere (Czechy, Słowacja), Ajnc (Bałkany), Очко (talia 36 kart), Pontoon
+  (Wielka Brytania).
 • Tryb rodzinny (wszyscy na wszystkich) albo z bankierem.
-• Wartości figur (W 2, D 3, K 4 albo własne), talia 52, 32 lub 24 karty.
+• Wartości figur (W 2, D 3, K 4 albo własne), talia 52, 36, 32 lub 24 karty.
 • Perskie oczko, as za 11 albo za 1 lub 11, jedna lub dwie karty na start,
   limit kart, zasady remisów i banku.
 Ustawiasz raz — przy pierwszym uruchomieniu — i zmieniasz, kiedy chcesz.
