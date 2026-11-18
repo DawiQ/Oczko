@@ -10,6 +10,8 @@ export interface MonetizationConfig {
   revenueCatKey: string;
   /** RevenueCat entitlement that unlocks Oczko Pro. */
   entitlement: string;
+  /** RevenueCat offering to sell ("" = the one marked current in RevenueCat). */
+  offering: string;
   /** AdMob rewarded ad unit id for this platform ("" = no ads; a dev build
    *  uses Google's test unit). */
   rewardedUnit: string;
@@ -20,6 +22,7 @@ type Extra = {
     revenueCatAndroidKey?: string;
     revenueCatIosKey?: string;
     entitlement?: string;
+    offering?: string;
     rewardedAndroid?: string;
     rewardedIos?: string;
     termsUrl?: string;
@@ -33,6 +36,7 @@ export function monetizationConfig(): MonetizationConfig {
   return {
     revenueCatKey: (ios ? m.revenueCatIosKey : m.revenueCatAndroidKey) ?? "",
     entitlement: m.entitlement || "pro",
+    offering: m.offering ?? "",
     rewardedUnit: (ios ? m.rewardedIos : m.rewardedAndroid) ?? "",
   };
 }

@@ -86,8 +86,8 @@
 - [ ] Reklamy: „Aplikacja zawiera reklamy” — tak.
 - [ ] Polityka prywatności: opublikuj `store/privacy.md` pod adresem i wpisz
       go w Play Console oraz w `app.json` → `extra.monetization.privacyUrl`.
-- [ ] Produkty: subskrypcja roczna z okresem próbnym i produkt jednorazowy
-      (te same w RevenueCat).
+- [ ] Produkty: np. subskrypcja roczna z okresem próbnym i produkt
+      jednorazowy (te same w RevenueCat; nazwy dowolne — kod ich nie zna).
 
 ## 7. App Store Connect
 
@@ -100,9 +100,14 @@
 
 ## 8. Monetyzacja (konfiguracja właściciela)
 
-1. [ ] **RevenueCat**: projekt „Oczko”, uprawnienie (entitlement) `pro`,
-   oferta `default` z pakietami: roczny (z okresem próbnym) i dożywotni.
-   Klucze publiczne SDK w `app.json` → `expo.extra.monetization`
+1. [ ] **RevenueCat**: projekt „Oczko”, uprawnienie (entitlement) `pro`
+   (inna nazwa → `extra.monetization.entitlement`), oferta oznaczona jako
+   bieżąca (albo jej identyfikator w `extra.monetization.offering`).
+   Pakiety dowolne: tygodniowy, miesięczny, 2/3/6 miesięcy, roczny,
+   dożywotni lub „Custom” (rodzaj wg okresu produktu; produkt bez okresu =
+   na zawsze). Kolejność na ekranie = kolejność w ofercie; domyślnie
+   zaznaczony plan z okresem próbnym. Zmiany w panelu działają bez nowego
+   wydania. Klucze publiczne SDK w `app.json` → `expo.extra.monetization`
    (`revenueCatAndroidKey`, `revenueCatIosKey`). Bez kluczy zakupy są
    niedostępne, aplikacja działa.
 2. [ ] **AdMob**: aplikacja Android i iOS, jednostka „Rewarded”. ID aplikacji

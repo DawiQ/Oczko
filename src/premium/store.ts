@@ -1,11 +1,15 @@
-// Oczko Pro purchases through RevenueCat (react-native-purchases): the yearly
-// plan (with the store's free trial) and the one-time purchase, behind a small
-// interface the app (and the tests) use.
-import Purchases, { PACKAGE_TYPE, type CustomerInfo, type PurchasesPackage } from "react-native-purchases";
+// Oczko Pro purchases through RevenueCat (react-native-purchases): whatever
+// packages the chosen offering holds (subscriptions of any period, a one-time
+// purchase), behind a small interface the app (and the tests) use. No product
+// is named here.
+import Purchases, { type CustomerInfo, type PurchasesOfferings, type PurchasesPackage } from "react-native-purchases";
 
 import { Linking, Platform } from "react-native";
 
 import { monetizationConfig } from "./config";
+import { planKind, type Plan } from "./plans";
+
+export type { Plan, PlanKind } from "./plans";
 
 /** A promo code as typed: letters and digits only, upper case; null when it
  *  cannot be one (Google Play codes are 6+ letters and digits). */
@@ -16,15 +20,6 @@ export function cleanPromoCode(raw: string): string | null {
 
 /** Google Play's redeem page with the code filled in. */
 export const playRedeemUrl = (code: string) => `https://play.google.com/redeem?code=${encodeURIComponent(code)}`;
-
-export interface Plan {
-  id: string;
-  kind: "yearly" | "lifetime" | "other";
-  /** "19,99 zł" — the store's price in the player's currency. */
-  price: string;
-  /** Free trial length (null: none, or not offered to this account). */
-  trialDays: number | null;
-}
 
 /** "pending": paid, but the store has not confirmed it yet (e.g. a cash
  *  payment); Pro turns on by itself when it does (onChange). */
@@ -80,7 +75,7 @@ export function planOf(p: PurchasesPackage): Plan {
       : isoDays(prod.defaultOption?.freePhase?.billingPeriod?.iso8601 ?? null);
   return {
     id: p.identifier,
-    kind: p.packageType === PACKAGE_TYPE.ANNUAL ? "yearly" : p.packageType === PACKAGE_TYPE.LIFETIME ? "lifetime" : "other",
+    kind: planKind(String(p.packageType), prod.subscriptionPeriod, String(prod.productCategory) === "NON_SUBSCRIPTION"),
     price: prod.priceString,
     trialDays: trial,
   };
@@ -100,8 +95,13 @@ export const noStore: StoreApi = {
   onChange: () => () => {},
 };
 
+/** The offering to sell: the one named in app.json, else RevenueCat's current one. */
+export function pickOffering(all: Pick<PurchasesOfferings, "all" | "current">, id: string): PurchasesPackage[] {
+  return ((id && all.all[id]) || all.current)?.availablePackages ?? [];
+}
+
 export function revenueCatStore(): StoreApi {
-  const { revenueCatKey, entitlement } = monetizationConfig();
+  const { revenueCatKey, entitlement, offering } = monetizationConfig();
   if (!revenueCatKey) return noStore;
   try {
     Purchases.configure({ apiKey: revenueCatKey });
@@ -137,8 +137,7 @@ export function revenueCatStore(): StoreApi {
       }
     },
     plans: async () => {
-      const offerings = await Purchases.getOfferings();
-      packages = offerings.current?.availablePackages ?? [];
+      packages = pickOffering(await Purchases.getOfferings(), offering);
       return packages.map(planOf);
     },
     purchase: async (planId) => {

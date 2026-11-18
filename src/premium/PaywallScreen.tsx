@@ -1,5 +1,5 @@
-// "Oczko Pro": what it gives, the plans from the store (the yearly one with its
-// free trial first), buy, restore. Opened from wherever a limit is reached;
+// "Oczko Pro": what it gives, the plans from the store (in the offering's
+// order set in RevenueCat; the one with a free trial picked first), buy, restore. Opened from wherever a limit is reached;
 // the headline says what the player was after.
 import { useEffect, useState } from "react";
 import { ActivityIndicator, BackHandler, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
@@ -10,7 +10,7 @@ import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
 import { monetizationLinks } from "./config";
 import { usePremium, type PaywallReason } from "./PremiumProvider";
-import type { Plan } from "./store";
+import { ctaLabel, days, defaultPlan, finePrint, isSubscription, planNote, planTitle, type Plan } from "./plans";
 
 const HEADLINE: Record<PaywallReason, string> = {
   hints: "Trener bez limitu",
@@ -33,31 +33,6 @@ export const PRO_PERKS: { title: string; note: string }[] = [
   { title: "Talie, sukna i rewersy", note: "przy stole Wi‑Fi wygląd gospodarza widzą wszyscy" },
 ];
 
-const days = (n: number) => (n === 1 ? "1 dzień" : `${n} dni`);
-
-function planTitle(p: Plan): string {
-  return p.kind === "yearly" ? "Rocznie" : p.kind === "lifetime" ? "Na zawsze" : "Oczko Pro";
-}
-
-function planNote(p: Plan): string {
-  if (p.kind === "yearly") return p.trialDays ? `${days(p.trialDays)} za darmo, potem ${p.price} / rok` : `${p.price} / rok`;
-  if (p.kind === "lifetime") return `Jednorazowo ${p.price}`;
-  return p.price;
-}
-
-function ctaLabel(p: Plan | undefined): string {
-  if (!p) return "Kup Oczko Pro";
-  if (p.trialDays) return `Wypróbuj ${days(p.trialDays)} za darmo`;
-  return p.kind === "lifetime" ? `Kup na zawsze · ${p.price}` : `Kup · ${p.price}`;
-}
-
-function finePrint(p: Plan | undefined): string {
-  if (!p) return "";
-  if (p.kind === "lifetime") return "Płatność jednorazowa, bez odnowień.";
-  const trial = p.trialDays ? `Bez opłaty przez ${days(p.trialDays)}. Potem ` : "";
-  return `${trial}${p.price} rocznie, dopóki nie anulujesz w ustawieniach sklepu — możesz to zrobić w każdej chwili.`;
-}
-
 export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const premium = usePremium();
@@ -74,10 +49,8 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
       .plans()
       .then((list) => {
         if (!alive) return;
-        const order = { yearly: 0, lifetime: 1, other: 2 } as const;
-        const sorted = [...list].sort((a, b) => order[a.kind] - order[b.kind]);
-        setPlans(sorted);
-        setPicked(sorted[0]?.id ?? null);
+        setPlans(list);
+        setPicked(defaultPlan(list)?.id ?? null);
       })
       .catch(() => alive && setPlans([]));
     return () => {
@@ -177,7 +150,7 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
                     <Text style={s.planTitle}>{planTitle(p)}</Text>
                     <Text style={s.planNote}>{planNote(p)}</Text>
                   </View>
-                  {p.trialDays ? (
+                  {p.trialDays && isSubscription(p.kind) ? (
                     <View style={s.trial}>
                       <Text style={s.trialText}>{days(p.trialDays).toUpperCase()} ZA DARMO</Text>
                     </View>

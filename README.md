@@ -166,6 +166,11 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   3 podpowiedzi trenera, 1 analiza, 1 stół 7–8 osób. Reklama z nagrodą:
   +1 do wybranego limitu albo wygląd na 24 h — tylko na żądanie, nigdy
   w trakcie rundy.
+- Plany bez nazw w kodzie: paywall pokazuje pakiety oferty z RevenueCat
+  (bieżącej albo `extra.monetization.offering`) w kolejności z panelu.
+  Rodzaj planu wg typu pakietu (tygodniowy, miesięczny, 2/3/6 miesięcy,
+  roczny, dożywotni; pakiet „Custom” — wg okresu produktu), cena i okres
+  próbny ze sklepu (`src/premium/plans.ts`).
 - Konfiguracja właściciela: `store/RELEASE.md` (RevenueCat, AdMob,
   **blokada kategorii „Gambling & Betting” i „Social Casino”**, UMP).
   Bez kluczy aplikacja działa: zakupy niedostępne, reklam brak.
@@ -268,8 +273,9 @@ Pełna checklista: `store/RELEASE.md`. W skrócie:
    (plugin `plugins/withReleaseSigning.js`); Play App Signing włączone.
 3. **Build**: `node build.js --aab` (lokalnie, wymaga Android SDK i NDK)
    albo `npx eas build -p android|ios --profile production`.
-4. **RevenueCat**: projekt, uprawnienie `pro`, oferta z pakietem rocznym
-   (okres próbny) i dożywotnim; klucze w `app.json` → `extra.monetization`.
+4. **RevenueCat**: projekt, uprawnienie `pro`, oferta z dowolnymi pakietami
+   (np. roczny z okresem próbnym i dożywotni); klucze w `app.json` →
+   `extra.monetization` (`offering` — opcjonalnie inna niż bieżąca).
 5. **AdMob**: aplikacje i jednostki „Rewarded” (ID w `app.json`);
    **zablokuj kategorie „Gambling & Betting” i „Social Casino”**; komunikat
    zgód UMP dla EOG/UK/CH.
