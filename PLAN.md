@@ -556,8 +556,70 @@ ale żaden tekst UI nie jest już wpisany w komponent.
   sankcje — `docs/RYNKI.md`).
 - **Gotowe, gdy:** jak Etap 13.
 
-Presety reguł regionalnych (talia 36 kart, inne wartości figur, Pontoon,
-7½) to osobne etapy po językach — zmiana silnika, nie tłumaczenie.
+Zestawy reguł regionalnych (talia 36 kart, inne wartości figur, Pontoon)
+— Etapy 16–18 i §13. Język nie zmienia reguł; zestaw tylko podpowiada się
+przy pierwszym uruchomieniu według kraju telefonu.
+
+### Etap 16 — Zestawy reguł: Niemcy/Austria, Czechy/Słowacja, Bałkany
+Szczegóły i decyzje: §13.
+- Silnik: opcja dwóch asów z trzema wartościami zamiast `persian: boolean`
+  — `"wins"` (perskie oczko / Feuer / suvi ajnc: wygrywa wszystko), `"is21"`
+  (CZ/SK „fojer”: dwa asy liczą się jak 21), `"off"`. Tabele przypadków
+  w testach punktacji, rozliczeń, `handValue`, ewaluatora (P(fura) przy
+  „is21”), `viewFor`/`eventsFor` (ogłoszenie tylko przy „wins”).
+- Zgodność danych: `normalizeRules` czyta stare reguły (`persian: true/false`)
+  we wszystkich zapisach — reguły domowe, wybory nowej gry, zapis partii,
+  historia (powtórki starych partii bez zmian), Wi‑Fi (protokół v3: nowe
+  reguły; stary gość dostaje odmowę „version”). `ENGINE_VERSION` bez zmian
+  (stare reguły dają ten sam przebieg — test powtórek z zapisanych partii).
+- Zestawy (`src/engine/presets.ts`, nazwy w słownikach): „Oczko” (PL,
+  domyślny), „Siebzehn und Vier” (DE/AT), „Oko bere / Oko berie” (CZ/SK),
+  „Ajnc” (BCMS); wartości i opcje wg §13.
+- Edytor reguł: wybór zestawu na górze; wartości figur także „1 · 1 · 2”;
+  opcja dwóch asów z trzema wartościami. Zasady (ekran) opisują zestaw
+  w użyciu.
+- Pierwsze uruchomienie („Jak grasz u siebie?”): podpowiedziany zestaw kraju
+  telefonu (`expo-localization` → `regionCode`, a bez niego język), zawsze
+  do zmiany; makieta HTML do akceptacji przed wdrożeniem
+  (`docs/mockups/oczko-zestawy.html`).
+- Pomiary: `npm run stats` dla każdego zestawu (fura, długość partii,
+  limity graczy dla talii 32) → `docs/STATS.md`; `npm run tournament` dla
+  zestawów o innych wartościach (CZ/SK) — kolejność postaci musi zostać
+  monotoniczna, inaczej strojenie progów botów per zestaw.
+- Opisy sklepu DE/CS/SK/BCMS: wzmianka o lokalnych zasadach.
+- **Gotowe, gdy:** zestawy w edytorze i przy pierwszym uruchomieniu, stare
+  zapisy i powtórki działają, pomiary w dokumentach, testy zielone.
+
+### Etap 17 — Talia 36 kart i „Очко” (UA, KZ, diaspora)
+- Silnik: `DeckSize` 36 (szóstki–asy); limit graczy dla 36 zmierzony
+  (`npm run stats`), walidatory, protokół Wi‑Fi (nowa talia).
+- Opcja „bank dobiera do 17” (bank nie może stanąć niżej i nie dobiera od
+  17 — reguła rosyjskiego Очко); w trybie rodzinnym bez znaczenia.
+- Zestaw „Очко / Двадцять одне”: 36 kart, В 2, Д 3, К 4, Т 11, dwa tuzy
+  wygrywają („золоте очко”), z bankierem.
+- Ewaluator i boty: pomiary dla talii 36 (turniej, monotoniczność poziomów).
+- Bez dodatkowych układów (777, 678, pięć figur) — warianty lokalne,
+  niejednolite; ewentualnie później jako opcje.
+- **Gotowe, gdy:** jak Etap 16.
+
+### Etap 18 — Pontoon (Wielka Brytania, Irlandia, Australia)
+- Silnik: wartości figur 10 (już możliwe), as 1 lub 11 (już możliwe);
+  nowe układy z kolejnością: Pontoon (as + karta za 10 w dwóch kartach) >
+  Five Card Trick (5 kart ≤ 21) > 21 > reszta; remis dla banku. Opcje
+  reguł `pontoon` i `fiveCardTrick`; porównanie rąk w `scoreRound`
+  i w ewaluatorze wg kolejności układów.
+- Bez „kupowania kart” (w Pontoonie to podbijanie stawki) — tylko „Dobieram”
+  i „Starczy”.
+- Zestaw „Pontoon”; nazwy układów w słownikach (EN „Pontoon”, „Five Card
+  Trick”).
+- Australia: ryzyko klasyfikacji R18+ (§9) — teksty sklepu i kwestionariusz
+  bez symulowanego hazardu, jak wszędzie.
+- **Gotowe, gdy:** jak Etap 16, plus turniej botów dla zestawu Pontoon.
+
+Poza planem (do decyzji po danych ze sklepów): Węgry (zasady Huszonegy do
+potwierdzenia u rodzimych graczy), Szwecja/Finlandia (figury 11–13, as 1
+albo 14 — rozszerzenie zakresu wartości), Włochy/Hiszpania (7½ — osobna gra,
+talia 40 kart), talie z kolorami niemieckimi/węgierskimi (wygląd, nie reguły).
 
 ---
 
@@ -668,3 +730,27 @@ dla Polski (`store/rating-answers.md`).
   (wykrywa wywołanie bez słownika).
 - `locales` w `app.json` działa dla iOS i Androida (SDK 58); nazwa „Oczko”
   jest wspólna, per język tylko komunikaty uprawnień iOS (`locales/*.json`).
+
+---
+
+## 13. Zestawy reguł regionalnych — decyzje
+
+Źródła: `docs/RYNKI.md` (Wikipedia, Pagat, lokalne strony; część sprzeczna
+— zaznaczone). Zestaw = gotowe reguły + nazwa w słowniku; gracz może je
+potem zmienić w „Jak grasz u siebie”. Partia, zapis i historia przechowują
+same reguły, nie zestaw.
+
+| Zestaw | Kraje (podpowiedź) | Talia | Figury W/D/K, as | Dwa asy | Tryb domyślny | Uwagi |
+|---|---|---|---|---|---|---|
+| Oczko | PL i pozostałe | 52 | 2 / 3 / 4, 11 | wins | rodzinny | obecne domyślne |
+| Siebzehn und Vier | DE, AT | 32 | 2 / 3 / 4, 11 | wins („Feuer”) | z bankierem | źródła sprzeczne (de.wiki 2/3/4, en.wiki 1/1/2, t-online 10) — przyjęte de.wiki; do potwierdzenia u rodzimych graczy |
+| Oko bere / Oko berie | CZ, SK | 32 | 1 / 1 / 2, 11 | is21 („fojer”) | z bankierem, remis dla banku | wartości wg cs.wiki i lentiamo.sk |
+| Ajnc | BA, HR, ME, RS | 32 | 2 / 3 / 4, 11 | wins („suvi ajnc”) | z bankierem | tradycyjne zasady 1:1 z Oczkiem |
+| Очко / Двадцять одне (Etap 17) | UA, KZ, MD, kraje bałtyckie | 36 | 2 / 3 / 4, 11 | wins („золоте очко”) | z bankierem, bank do 17 | ru/uk.wiki |
+| Pontoon (Etap 18) | GB, IE, AU, NZ | 52 | 10 / 10 / 10, 1 lub 11 | — (Pontoon: as + 10) | z bankierem, remis dla banku | Pagat; Five Card Trick |
+
+- Podpowiedź: kraj telefonu (`regionCode`), a bez niego język (de → DE,
+  cs → CZ, sk → SK, sh → Ajnc, uk/ru → Очко po Etapie 17); inaczej „Oczko”.
+- Tryb domyślny zestawu to tylko podpowiedź; rodzinny jest dostępny zawsze.
+- Boty: progi postaci (14–20) dobrane dla wartości 2/3/4; dla zestawów
+  z innymi wartościami (1/1/2, figury 10, talia 36) decyduje pomiar turnieju.

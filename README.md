@@ -23,6 +23,7 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 13 | Angielski i niemiecki: cała aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 14 | Czeski, słowacki, węgierski: aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 15 | Ukraiński, rosyjski, BCMS (łacinka); czcionka dla cyrylicy | gotowe |
+| 16–18 | Zestawy reguł regionalnych: 17 und 4, Oko bere, Ajnc; talia 36 i Очко; Pontoon | plan (`PLAN.md` §13) |
 
 ## Uruchomienie
 
