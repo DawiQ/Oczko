@@ -188,6 +188,8 @@ describe("rule sets", () => {
     await settle();
     const rules = JSON.parse((await kv.get("oczko.rules.v1"))!);
     expect(rules).toMatchObject({ deck: 32, persian: "is21", mode: "bank" });
+    // The first new game starts in the set's mode.
+    expect(JSON.parse((await kv.get("oczko.newgame.v1"))!).mode).toBe("bank");
     act(() => r.unmount());
     spy.mockRestore();
   });

@@ -67,7 +67,7 @@ export type Screen =
   | { name: "tutorial"; key: number }
   | { name: "houseRules"; from: Tab }
   /** The rules opened from the table's menu (back resumes the game). */
-  | { name: "rules"; backToGame: boolean }
+  | { name: "rules"; backToGame: boolean; /** The game's own rules (opened from the table). */ rules?: Rules }
   | { name: "history"; from: Tab }
   /** Playing with friends over Wi‑Fi (its own steps and back handling). */
   | { name: "lan"; key: number }
@@ -154,7 +154,7 @@ function GameScreen({
   earned: BadgeId[];
   onExit: () => void;
   onNewGame: () => void;
-  onRules: () => void;
+  onRules: (rules: Rules) => void;
 }) {
   const [fresh, setFresh] = useState<BadgeId[]>([]);
   const [gameOpts] = useState<UseGameOptions>(() => ({
@@ -175,7 +175,7 @@ function GameScreen({
       kv={opts.kv}
       onExit={onExit}
       onNewGame={onNewGame}
-      onRules={onRules}
+      onRules={() => onRules(snapshot.rules)}
       onGiveUp={() => void clearSavedGame(opts.kv)}
       trainer={on ? () => <TrainerPanel evaluation={ev} onMore={() => premium.showPaywall("hints")} /> : undefined}
       recommend={on && ev && ev !== "locked" ? ev.best : null}
@@ -267,7 +267,10 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
   const finishOnboarding = (rules: Rules) => {
     void saveHouseRules(kv, rules);
     void saveOnboardingDone(kv);
-    setStored((s) => (s ? { ...s, rules, onboarded: true } : s));
+    // The first new game starts in the mode chosen here (a set's usual mode).
+    const choices = { ...stored!.choices, mode: rules.mode };
+    void saveChoices(kv, choices);
+    setStored((s) => (s ? { ...s, rules, choices, onboarded: true } : s));
   };
 
   const back = useCallback((): boolean => {
@@ -422,7 +425,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
         />
       );
     case "rules":
-      return withLimit(<RulesScreen rules={stored.rules} onBack={back} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />);
+      return withLimit(<RulesScreen rules={screen.rules ?? stored.rules} onBack={back} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />);
     case "newGame":
       return withLimit(
         <NewGameScreen
@@ -445,7 +448,7 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
           earned={earnedBadges(stored.stats)}
           onExit={() => home()}
           onNewGame={() => setScreen({ name: "newGame", training: false })}
-          onRules={() => setScreen({ name: "rules", backToGame: true })}
+          onRules={(rules) => setScreen({ name: "rules", backToGame: true, rules })}
         />
       );
     default:

@@ -25,7 +25,8 @@ type ExampleId = "persian" | "aces21" | "oczko" | "fura";
  *  without the rule), 21, and a fura that is one under any values. */
 function examples(rules: Rules): { id: ExampleId; cards: number[]; value: string; color: string }[] {
   const aces = [c(14, 0), c(14, 3)];
-  const fura = [c(10, 3), c(9, 0), c(5, 1)];
+  // Cards in every deck (24 cards: 9–A).
+  const fura = [c(10, 3), c(10, 1), c(9, 0)];
   return [
     ...(rules.persian === "wins" ? [{ id: "persian" as const, cards: aces, value: "AA", color: P.accent }] : []),
     ...(rules.persian === "is21" ? [{ id: "aces21" as const, cards: aces, value: "21", color: P.ok }] : []),

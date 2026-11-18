@@ -24,7 +24,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 14 | Czeski, słowacki, węgierski: aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 15 | Ukraiński, rosyjski, BCMS (łacinka); czcionka dla cyrylicy | gotowe |
 | 16 | Zestawy reguł: Oczko, 17 und 4, Oko bere/berie, Ajnc; dwa asy w trzech wariantach | gotowe |
-| 17–18 | Talia 36 i Очко; Pontoon | plan (`PLAN.md` §13) |
+| 17 | Talia 36 kart, „bank dobiera do 17”, zestaw Очко | gotowe |
+| 18 | Pontoon | plan (`PLAN.md` §13) |
 
 ## Uruchomienie
 
@@ -221,7 +222,7 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 ## Zestawy zasad
 
 - `src/engine/presets.ts`: Oczko (PL), 17 und 4 (DE/AT), Oko bere/berie
-  (CZ/SK), Ajnc (Bałkany) — talia, wartości figur, as, dwa asy, tryb
+  (CZ/SK), Ajnc (Bałkany), Очко (UA/KZ/MD: talia 36, bank dobiera do 17) — talia, wartości figur, as, dwa asy, tryb
   (`PLAN.md` §13). Nazwy w słownikach.
 - Dwa asy: „wygrywają” (perskie oczko), „liczą 21” (czeskie „fojer”),
   „bez reguły”. Stare zapisy (reguła jako `true`/`false`) wczytywane bez

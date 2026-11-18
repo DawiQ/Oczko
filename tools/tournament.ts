@@ -149,10 +149,10 @@ Siła zwykłego progu („staje przy t”) na kartach zestawu:
 |---|${THRESHOLDS.map(() => "---|").join("")}
 ${sets.map((x) => `| ${pl.rules.editor.presets[x.id].name} | ${x.curve.map(pct).join(" | ")} |`).join("\n")}
 
-Na talii 32 kart (bez kart 2–6) progi 14–18 dają prawie tę samą siłę —
+Na taliach 32 i 36 kart (bez kart 2–6 / 2–5) progi 14–18 dają prawie tę samą siłę —
 środkowe poziomy (Kuba, Hela, Ola, Marek) różnią się o ok. 1–2 pkt proc.,
 a samymi progami nie da się ich rozsunąć. Witek (ciągnie do 20) jest tu
-słabszy niż na 52 kartach. Decyzja (PLAN.md §13): postacie bez zmian —
+słabszy niż na 52 kartach (Очко: bank dobiera do 17). Decyzja (PLAN.md §13): postacie bez zmian —
 ich styl i opisy („staje przy 14”) zostają prawdziwe; kolejność poziomów
 obowiązuje dla domyślnego Oczka.
 

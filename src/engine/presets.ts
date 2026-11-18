@@ -33,7 +33,9 @@ export const PRESETS_BY_ID: Record<PresetId, PresetRules> = {
  *  family game, limits — stays as it was). */
 export function withPreset(base: Rules, id: PresetId): Rules {
   const p = PRESETS_BY_ID[id];
-  return { ...base, ...p, values: { ...p.values } };
+  // The bank passing on two aces needs the rule where they win.
+  const bankRotation = base.bankRotation === "onPersian" && p.persian !== "wins" ? "everyRound" : base.bankRotation;
+  return { ...base, ...p, values: { ...p.values }, bankRotation };
 }
 
 /** The set whose cards the rules use (deck, values, ace, two aces), if any;
@@ -55,7 +57,8 @@ const BY_LANG: Record<string, PresetId> = { de: "siebzehnUndVier", cs: "okoBere"
 
 /** The set to suggest at the first start: the phone's country, else its language; else Oczko. */
 export function suggestPreset(region: string | null | undefined, lang: string | null | undefined): PresetId {
-  return (region && BY_REGION[region.toUpperCase()]) || (lang && BY_LANG[lang.toLowerCase()]) || "oczko";
+  if (region) return BY_REGION[region.toUpperCase()] ?? "oczko";
+  return (lang && BY_LANG[lang.toLowerCase()]) || "oczko";
 }
 
 /** The set for the phone's preferred locale. */

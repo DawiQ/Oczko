@@ -25,6 +25,12 @@ describe("rule sets", () => {
     expect(withPreset(DEFAULT_RULES, "oczko")).toEqual(DEFAULT_RULES);
   });
 
+  it("a set without winning aces drops \"the bank passes on two aces\"", () => {
+    const base = { ...DEFAULT_RULES, mode: "bank" as const, bankRotation: "onPersian" as const };
+    expect(withPreset(base, "okoBere").bankRotation).toBe("everyRound");
+    expect(withPreset(base, "siebzehnUndVier").bankRotation).toBe("onPersian");
+  });
+
   it("a set changes the cards and the mode, not the target", () => {
     const r = withPreset({ ...DEFAULT_RULES, target: 15 }, "okoBere");
     expect(r).toMatchObject({ deck: 32, persian: "is21", mode: "bank", target: 15 });
@@ -40,7 +46,9 @@ describe("rule sets", () => {
     expect(suggestPreset("cz", null)).toBe("okoBere");
     expect(suggestPreset("RS", "sr")).toBe("ajnc");
     expect(suggestPreset(null, "sk")).toBe("okoBere");
-    expect(suggestPreset("US", "de")).toBe("siebzehnUndVier");
+    // A known country outside the sets: Oczko, whatever the language.
+    expect(suggestPreset("US", "de")).toBe("oczko");
+    expect(suggestPreset("PL", "cs")).toBe("oczko");
     expect(suggestPreset("PL", "pl")).toBe("oczko");
     expect(suggestPreset(undefined, undefined)).toBe("oczko");
     expect(suggestedRules("CZ", "cs")).toEqual(withPreset(DEFAULT_RULES, "okoBere"));

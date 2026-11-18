@@ -18,6 +18,7 @@ wszyscy jednakowi (próg 17).
 | Rodzinne, 2 karty na start | 4 | 1,47 | 27.4% | — | — |
 | 17 und 4 / Ajnc (32, z bankierem) | 4 | 1,98 | 31.3% | 58.1% | 57.4% |
 | Oko bere (32, 1 · 1 · 2, dwa asy = 21) | 4 | 2,26 | 27.7% | 57.9% | 57.0% |
+| Очко (36, z bankierem, bank do 17) | 4 | 2,01 | 30.3% | 59.9% | 60.5% |
 
 ## Sprawiedliwość trybu z bankierem
 
@@ -52,6 +53,7 @@ Przy pustej talii można już tylko powiedzieć „Starczy”.
 |---|---|---|
 | 24 | 5 | 2: 0.00%, 3: 0.00%, 4: 0.00%, 5: 0.00%, 6: 5.22% (ponad limit), 7: 91.45% (ponad limit), 8: 100.00% (ponad limit) |
 | 32 | 7 | 2: 0.00%, 3: 0.00%, 4: 0.00%, 5: 0.00%, 6: 0.00%, 7: 0.00%, 8: 0.14% (ponad limit) |
+| 36 | 8 | 2: 0.00%, 3: 0.00%, 4: 0.00%, 5: 0.00%, 6: 0.00%, 7: 0.00%, 8: 0.00% |
 | 52 | 8 | 2: 0.00%, 3: 0.00%, 4: 0.00%, 5: 0.00%, 6: 0.00%, 7: 0.00%, 8: 0.00% |
 
 ## Długość partii do 10 punktów
@@ -76,6 +78,6 @@ blokowania UI.
 
 | Tryb | Graczy | Czas |
 |---|---|---|
-| Rodzinne | 4 | 5,8 ms |
-| Rodzinne | 8 | 10,6 ms |
-| Z bankierem | 4 | 7,9 ms |
+| Rodzinne | 4 | 5,6 ms |
+| Rodzinne | 8 | 8,8 ms |
+| Z bankierem | 4 | 8,0 ms |

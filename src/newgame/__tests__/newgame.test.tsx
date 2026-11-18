@@ -66,6 +66,17 @@ describe("rules in words", () => {
     pick("Liczą 21");
     expect(rules).toMatchObject({ persian: "is21", bankRotation: "everyRound" });
     expect(r.root.findAll((n) => n.props.accessibilityLabel === "Po perskim")).toHaveLength(0);
+    // Ajnc has the cards of 17 und 4: the one picked stays marked.
+    pick("Ajnc");
+    const marked = () => r.root.findAll((n) => n.props.accessibilityState?.checked && typeof n.props.onPress === "function").map((n) => n.props.accessibilityLabel as string);
+    expect(marked().some((l) => l.startsWith("Ajnc"))).toBe(true);
+    pick("17 und 4");
+    expect(marked().some((l) => l.startsWith("17 und 4"))).toBe(true);
+    expect(marked().some((l) => l.startsWith("Ajnc"))).toBe(false);
+    // From 1 · 1 · 2 to own values: the counters appear.
+    pick("Oko bere");
+    pick("Własne");
+    expect(r.root.findAll((n) => n.props.accessibilityLabel === "Walet: więcej").length).toBeGreaterThan(0);
     expect(textOf(r)).toContain("Własne");
     act(() => r.unmount());
   });

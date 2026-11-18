@@ -1,5 +1,6 @@
 // House-rule choices. `basic`: the onboarding's five questions; otherwise
 // every option (new game's BottomSheet, settings).
+import { useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 
 import type { DeckSize } from "../engine/cards";
@@ -28,20 +29,29 @@ export function RulesEditor({
 }) {
   const str = useStrings();
   const t = str.rules.editor;
-  const preset = facesPreset(rules);
+  // The faces' own counters (also when the values match a preset, e.g. 1 · 1 · 2).
+  const [customFaces, setCustomFaces] = useState(false);
+  // The set picked here wins when several have the same cards (17 und 4, Ajnc).
+  const [picked, setPicked] = useState<PresetId | null>(null);
+  const preset = customFaces ? "custom" : facesPreset(rules);
   const set = (patch: Partial<Rules>) => onChange({ ...rules, ...patch });
   const setPreset = (p: FacesPreset) => {
-    if (p === "custom") onChange(withFaces(rules, rules.values[11], rules.values[12], rules.values[13] === 4 ? 5 : rules.values[13]));
-    else onChange(withFaces(rules, ...FACES[p]));
+    setCustomFaces(p === "custom");
+    if (p !== "custom") onChange(withFaces(rules, ...FACES[p]));
   };
-  const regional = presetOf(rules, preferPreset ?? presetForLocales(deviceLocales()));
+  const regional = presetOf(rules, picked ?? preferPreset ?? presetForLocales(deviceLocales()));
   return (
     <View>
       <Label>{t.preset}</Label>
       <Segmented
         label={t.preset}
         value={regional ?? ("custom" as const)}
-        onChange={(id) => id !== "custom" && onChange(withPreset(rules, id))}
+        onChange={(id) => {
+          if (id === "custom") return;
+          setPicked(id);
+          setCustomFaces(false);
+          onChange(withPreset(rules, id));
+        }}
         options={PRESET_IDS.map((id) => ({ value: id as PresetId | "custom", label: t.presets[id].name, sub: t.presets[id].sub }))}
       />
       {!regional && <Text style={s.custom}>{t.presetCustom}</Text>}

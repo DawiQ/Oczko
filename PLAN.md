@@ -590,7 +590,7 @@ Szczegóły i decyzje: §13.
 - **Gotowe, gdy:** zestawy w edytorze i przy pierwszym uruchomieniu, stare
   zapisy i powtórki działają, pomiary w dokumentach, testy zielone.
 
-### Etap 17 — Talia 36 kart i „Очко” (UA, KZ, diaspora)
+### Etap 17 — Talia 36 kart i „Очко” (UA, KZ, diaspora) ✅
 - Silnik: `DeckSize` 36 (szóstki–asy); limit graczy dla 36 zmierzony
   (`npm run stats`), walidatory, protokół Wi‑Fi (nowa talia).
 - Opcja „bank dobiera do 17” (bank nie może stanąć niżej i nie dobiera od
@@ -754,7 +754,7 @@ same reguły, nie zestaw.
 - Tryb domyślny zestawu to tylko podpowiedź; rodzinny jest dostępny zawsze.
 - Boty: progi postaci (14–20) dobrane dla wartości 2/3/4; dla zestawów
   z innymi wartościami (1/1/2, figury 10, talia 36) decyduje pomiar turnieju.
-- Wynik pomiaru (Etap 16, `docs/BOTS.md`): na talii 32 kart siła progów
+- Wynik pomiaru (Etapy 16–17, `docs/BOTS.md`): na taliach 32 i 36 kart siła progów
   14–18 jest prawie równa (krzywa płaska), więc środkowe poziomy różnią się
   o 1–2 pkt proc., a Witek (do 20) jest słabszy. Postacie zostają bez zmian
   (styl i opisy prawdziwe); kolejność poziomów obowiązuje dla Oczka.
