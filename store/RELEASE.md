@@ -40,9 +40,15 @@
 
 - [x] `node build.js` — menu: APK / AAB (`--aab`) / iOS (Xcode lub EAS).
 - [x] `eas.json`: `development` (dev client), `preview` (APK), `production`.
-- [ ] `node build.js --aab` → `dist/oczko-<wersja>.aab` (albo
-      `npx eas build -p android --profile production`).
-- [ ] `npx eas build -p ios --profile production` (albo `node build.js --ios --eas`).
+- [x] Build AAB sprawdzony: `expo prebuild -p android` +
+      `./gradlew bundleRelease -PreactNativeArchitectures=arm64-v8a`
+      → `app-release.aab` (ok. 33 MB; SDK 37, NDK 27.1, JDK 21; bez klucza
+      uploadu podpisany kluczem debug).
+- [ ] Wydanie: `node build.js --aab` z kluczem uploadu → `dist/oczko-<wersja>.aab`
+      (albo `npx eas build -p android --profile production`).
+- [ ] `npx eas build -p ios --profile production` (albo `node build.js --ios --eas`)
+      — wymaga konta Apple; build iOS nie był uruchamiany (brak macOS/EAS
+      w środowisku deweloperskim).
 - [x] Przed buildem: `npm test`, `npm run typecheck`, `npm run lint` na zielono.
 
 ## 4. Testy na urządzeniach

@@ -474,7 +474,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** testy providera z fałszywym sklepem i reklamami; bez
   kluczy aplikacja działa.
 
-### Etap 11 — Grafiki, dźwięki, wydanie
+### Etap 11 — Grafiki, dźwięki, wydanie ✅ (AAB sprawdzony; iOS — przez EAS u właściciela)
 - `tools/render-*.js`: ikona, splash, sukna, rewersy, stemple („Fura!”,
   „Perskie oczko!”), portrety postaci; `tools/render-sounds.py`.
 - `build.js` z Pana bez kroków silnika; `eas.json`; podpisywanie.
