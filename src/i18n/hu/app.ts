@@ -35,17 +35,17 @@ export const app: typeof pl.app = {
       adLabel: "+1 nagy asztal ma",
     },
     hints: {
-      title: "Edzői tippek",
-      text: "Oczko Pro nélkül naponta három tipp jár. A következőt egy reklámért kapod — csak akkor nézed meg, ha szeretnéd.",
+      title: "Edzői tanácsok",
+      text: "Oczko Pro nélkül naponta három tanács jár. A következőt egy reklámért kapod — csak akkor nézed meg, ha szeretnéd.",
       proLabel: "Korlátlan edző",
-      adLabel: "+1 tipp ma",
+      adLabel: "+1 tanács ma",
     },
   },
   /** Settings rows of Oczko Pro, looks, ads' privacy and codes. */
   extra: {
     looks: "Megjelenés",
     looksSub: "Paklik, posztók és hátlapok",
-    hints: "Edzői tippek",
+    hints: "Edzői tanácsok",
     hintsSub: (left: number) => `Mára maradt: ${left}. Továbbiak reklámért vagy az Oczko Pro csomaggal`,
     pro: "Oczko Pro",
     proActive: "Aktív — előfizetés kezelése",

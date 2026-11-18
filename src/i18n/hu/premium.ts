@@ -14,6 +14,8 @@ const until = (ms: number) => {
 
 /** "az App Store-ban", "a Google Playen". */
 const inStore = (store: string) => (store === "App Store" ? `az ${store}-ban` : `a ${store}en`);
+/** "az App Store-t", "a Google Playt". */
+const storeAcc = (store: string) => (store === "App Store" ? `az ${store}-t` : `a ${store}t`);
 
 export const premium: typeof pl.premium = {
   /** The product's name. */
@@ -124,7 +126,7 @@ export const premium: typeof pl.premium = {
     fine: "A kód egyszer és csak egy bolti fiókon működik. Másik eszközön a kódból kapott Oczko Pro a „Vásárlások visszaállítása” gombbal állítható vissza.",
     openFailed: "Nem sikerült megnyitni a boltot. Próbáld újra.",
     finishIn: (store: string) => `Fejezd be ${inStore(store)}`,
-    stepOpened: (store: string) => `Megnyitottuk: ${store}`,
+    stepOpened: (store: string) => `Megnyitottuk ${storeAcc(store)}`,
     stepConfirm: "Erősítsd meg a kódot a boltban",
     stepBack: "Gyere vissza ide — mi ellenőrizzük",
     checkNow: "Ellenőrzés most",
@@ -132,7 +134,7 @@ export const premium: typeof pl.premium = {
     checking: "A bolti fiók ellenőrzése…",
     accepted: "Kód elfogadva!",
     active: "OCZKO PRO AKTÍV",
-    gives: "Korlátlan tippek és elemzések, nagy asztalok, minden pakli és posztó, reklámok nélkül.",
+    gives: "Korlátlan tanácsok és elemzések, nagy asztalok, minden pakli és posztó, reklámok nélkül.",
     play: "Játék",
     offline: "Nincs kapcsolat",
     notYet: "Az Oczko Pro még nem látszik",
@@ -172,7 +174,7 @@ export const premium: typeof pl.premium = {
       "back.black": { name: "Fekete", note: "" },
       "back.gold": { name: "Arany", note: "" },
     },
-    previewLabel: (deck: string, felt: string, back: string) => `Előnézet: pakli: ${deck}, posztó: ${felt}, hátlap: ${back}`,
+    previewLabel: (deck: string, felt: string, back: string) => `Előnézet — pakli: ${deck}, posztó: ${felt}, hátlap: ${back}`,
     itemLabel: (name: string, inUse: boolean, locked: boolean) => `${name}${inUse ? ", aktív" : ""}${locked ? ", az Oczko Pro csomagban" : ""}`,
     inUse: "aktív",
     /** "21:05-ig" — a trial's end ("-ig" has one form). */

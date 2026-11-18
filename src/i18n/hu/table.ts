@@ -170,8 +170,8 @@ export const table: typeof pl.table = {
     persianSub: (name: string | null) => (name ? `${name} — két ász, mindent üt` : "Két ász — ez a kéz mindent üt"),
   },
   trainer: {
-    lockedLabel: "A mai tippek elfogytak. Továbbiak az Oczko Pro csomaggal",
-    lockedTitle: "Edző · a mai tippek elfogytak",
+    lockedLabel: "A mai tanácsok elfogytak. Továbbiak az Oczko Pro csomaggal",
+    lockedTitle: "Edző · a mai tanácsok elfogytak",
     lockedMore: "Továbbiak: Oczko Pro, vagy reklám a beállításokban (körön kívül).",
     computingLabel: "Az edző számolja az esélyeket",
     computing: "Edző · számolom az esélyeket…",

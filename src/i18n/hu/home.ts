@@ -40,7 +40,7 @@ export const home: typeof pl.home = {
     normal: "Normál",
     fast: "Gyors",
     houseRules: "Házi szabályaid",
-    resetTips: "Tippek mutatása újra",
+    resetTips: "Útmutatók újbóli megjelenítése",
     resetTipsSub: "Útmutatás, amikor valami először történik",
     language: "Nyelv",
     /** "Automatikus (Magyar)": the phone's language. */

@@ -9,11 +9,11 @@ Oczko — Huszonegy
 
 ## Rövid leírás — Google Play (80)
 
-A lengyel huszonegy pontokra: családi játék, bankárral vagy Wi‑Fi-n.
+A lengyel huszonegy pontokra: családi játék, bankárral, barátokkal Wi‑Fi-n.
 
 ## Promóciós szöveg — App Store (170)
 
-Kérek vagy elég? A klasszikus Oczko a házi szabályaiddal, nyolc karakter az
+„Kérek” vagy „Elég”? A klasszikus Oczko a házi szabályaiddal, nyolc karakter az
 asztalnál, edző, aki mutatja az esélyeidet, és játék barátokkal Wi‑Fi-n.
 
 ## Kulcsszavak — App Store (100, vesszővel elválasztva, szóköz nélkül)
@@ -45,8 +45,8 @@ Professzorig és a Grófig, akik minden lépés előtt mérlegelik az esélyeket
 A szinteket több ezer lejátszott körön hangoltuk be.
 
 EDZŐ ÉS ELEMZÉS
-Az edző megmutatja a túllépés esélyét, és hogy mekkora eséllyel nyersz,
-ha megállsz vagy kérsz még. A parti után lépésről lépésre visszanézheted,
+Az edző megmutatja a túllépés esélyét, és hogy mekkora eséllyel nyersz
+„Elég” vagy „Kérek” esetén. A parti után lépésről lépésre visszanézheted,
 és értékelést kapsz a döntéseidről.
 
 BARÁTOKKAL WI‑FI-N
@@ -71,5 +71,5 @@ A teljes játék ingyenes — a Pro semmit sem változtat a játék menetén.
 ## Ár és elérhetőség
 
 Ingyenes, alkalmazáson belüli vásárlással (Oczko Pro: éves, ingyenes
-próbaidővel, vagy egyszeri vásárlás). Reklám csak jutalomért, és csak ha a
+próbaidővel, vagy egyszeri vásárlás). Csak jutalmazott reklámok, és csak ha a
 játékos kéri.

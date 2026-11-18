@@ -22,7 +22,7 @@ export const lan: typeof pl.lan = {
   errors: {
     openFailed: "Nem sikerült megnyitni az asztalt. Ellenőrizd a Wi‑Fi-kapcsolatot.",
     joinFailed: "Nem sikerült csatlakozni az asztalhoz.",
-    badCode: "Ebben a hálózatban nincs ilyen kód.",
+    badCode: "Ezen a hálózaton nincs ilyen kódú asztal.",
   },
   menu: {
     title: "Barátokkal",
@@ -52,7 +52,7 @@ export const lan: typeof pl.lan = {
     target: "Hány pontig",
     targetA11y: "A parti hossza",
     oneRound: "1 kör",
-    deal: "Osztás",
+    deal: "Lapok kiosztása",
   },
   slot: {
     /** "Olga (te)" */
@@ -75,7 +75,7 @@ export const lan: typeof pl.lan = {
     cameraNote: "A kamera csak az asztalkód beolvasásához kell.",
     allowCamera: "Kamera engedélyezése",
     title: "Csatlakozás asztalhoz",
-    found: "Asztalok a hálózaton",
+    found: "Asztalok ezen a hálózaton",
     searching: "Keresés… Ha nem látod az asztalt, írd be a kódot, vagy olvasd be a QR-kódot a házigazda telefonjáról.",
     /** A found table for screen readers (null: another app version). */
     tableA11y: (name: string, open: number | null) => `${name}${open !== null ? `, szabad helyek: ${open}` : ", más alkalmazásverzió"}`,
@@ -104,7 +104,7 @@ export const lan: typeof pl.lan = {
     moveTime: (name: string, sec: number) => `${name}: ${sec} mp a lépésre`,
     myMoveTime: (sec: number) => `Te lépsz: ${sec} mp, utána „Elég”`,
     reaction: (name: string, text: string) => `${name}: ${text}`,
-    botNow: "Bot most",
+    botNow: "Játsszon a bot",
     botNowA11y: "Most játsszon a bot",
     wait: "Várjunk",
     waitA11y: "Várjunk még",

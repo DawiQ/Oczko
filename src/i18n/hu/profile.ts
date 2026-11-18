@@ -8,9 +8,9 @@ export const profile: typeof pl.profile = {
   /** Badges by id (progress.ts). */
   badges: {
     persian: { name: "Két ász", desc: "Két ász egy kézben" },
-    exact21: { name: "Pontosan 21", desc: "Kör 21-gyel befejezve" },
+    exact21: { name: "Pontosan 21", desc: "21-gyel befejezett kör" },
     fiveCard: { name: "21 öt lapból", desc: "21 öt vagy több lapból" },
-    edge: { name: "Pengeélen", desc: "Győzelem 21-gyel, „Kérek” után 17 vagy több mellett" },
+    edge: { name: "Pengeélen", desc: "Győzelem 21-gyel, miután 17-nél vagy többnél is kértél lapot" },
     ironBank: { name: "Vasbank", desc: "A bank minden párharcot megnyer (2+ játékos)" },
     streak: { name: "Sorozat", desc: "5 megnyert kör egymás után" },
     veteran: { name: "Veterán", desc: "100 lejátszott parti" },
@@ -24,7 +24,7 @@ export const profile: typeof pl.profile = {
   /** Tiles: a number above, these below. */
   tiles: {
     matches: "parti",
-    won: "megnyerve",
+    won: "megnyert",
     busts: "kör túl sokkal",
     rounds: "kör",
     roundsWon: "pontszerző kör",
@@ -54,10 +54,10 @@ export const profile: typeof pl.profile = {
   rivals: "Ellenfelek",
   rivalLine: (won: number, matches: number) => `${won} / ${matches}`,
 
-  history: "Parti-előzmények",
-  historyLink: "Parti-előzmények ›",
+  history: "Partielőzmények",
+  historyLink: "Partielőzmények ›",
   reset: "Statisztikák nullázása",
   resetTitle: "Nullázod a statisztikákat?",
-  resetMessage: "A rang, a jelvények és az eredmények elölről kezdődnek. A parti-előzményeket ez nem érinti.",
+  resetMessage: "A rang, a jelvények és az eredmények elölről kezdődnek. A partielőzményeket ez nem érinti.",
   resetConfirm: "Nullázás",
 };

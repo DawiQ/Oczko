@@ -83,7 +83,7 @@ export const rules: typeof pl.rules = {
     variants: "Változatok",
     goal: "Cél",
     goalText:
-      "Az Oczko a huszonegy lengyel változata. Gyűjts minél közelebb 21-hez, de ne többet. Sorban mindenki azt mondja: „Kérek” (kap egy lapot) vagy „Elég” (befejezi).",
+      "Az Oczko a huszonegy lengyel változata. Próbálj minél közelebb kerülni a 21-hez, de ne lépd túl. Sorban mindenki azt mondja: „Kérek” (kap egy lapot) vagy „Elég” (befejezi).",
     flow: "Menet",
     flowTexts: [
       "Mindenki kap egy kezdő lapot. Sorban játszotok, attól balra kezdve, aki oszt. A kör végén mindenki felfedi a lapjait.",
@@ -92,7 +92,7 @@ export const rules: typeof pl.rules = {
     banker: "Bankár",
     bankerTexts: [
       "Egy ember a bank. A többiek csak a bankkal játszanak egy-egy párharcot; a bank lép utoljára, és látja, kinek lett túl sok.",
-      "A magasabb érték nyeri a párharcot (+1). Akinek túl sok lett, az mindig veszít; ha a banknak lesz túl sok, mindenki ellen veszít, aki 21 alatt maradt. A döntetlen általában a banké.",
+      "A magasabb érték nyeri a párharcot (+1). Akinek túl sok lett, az mindig veszít; ha a banknak lesz túl sok, mindenki ellen veszít, aki nem lépte túl a 21-et. A döntetlen általában a banké.",
       "A bank pontot kap, ha több párharcot nyer, mint amennyit elveszít (vagy — a beállítástól függően — minden megnyert párharcért egy pontot). A bank minden körben továbbkerül a következő emberhez.",
     ],
     houseVariants: "Házi változatok",

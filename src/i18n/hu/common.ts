@@ -35,7 +35,7 @@ export const cards: typeof pl.cards = {
   },
   /** "pikk dáma" */
   spoken: (rank: string, suit: string) => `${suit} ${rank}`,
-  faceDown: "lefordított lap",
+  faceDown: "lefelé fordított lap",
 };
 
 export const ui: typeof pl.ui = {
