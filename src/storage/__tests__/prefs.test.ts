@@ -31,7 +31,7 @@ describe("preferences in storage", () => {
     expect(await loadHouseRules(kv)).toEqual(DEFAULT_RULES);
     await saveHouseRules(kv, PRESETS.bank);
     expect(await loadHouseRules(kv)).toEqual(PRESETS.bank);
-    expect(await loadHouseRules(memoryKV({ [HOUSE_RULES_KEY]: JSON.stringify({ ...DEFAULT_RULES, deck: 36 }) }))).toEqual(DEFAULT_RULES);
+    expect(await loadHouseRules(memoryKV({ [HOUSE_RULES_KEY]: JSON.stringify({ ...DEFAULT_RULES, deck: 40 }) }))).toEqual(DEFAULT_RULES);
   });
 
   it("onboarding", async () => {
