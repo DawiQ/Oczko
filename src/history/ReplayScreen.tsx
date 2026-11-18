@@ -27,7 +27,8 @@ function frameText(r: HistoryRecord, f: Frame, s: Strings): string {
   const who = f.decision.seat === r.me ? s.common.you : seats[f.decision.seat].name;
   if (f.decision.action === "stand") return t.stand(who);
   const hand = f.match.round.hands[f.decision.seat];
-  return t.hit(who, handValue(hand, f.match.rules));
+  const v = handValue(hand, f.match.rules);
+  return v.special ? `${t.hit(who, v)}, ${s.table.specials[v.special]}` : t.hit(who, v);
 }
 
 export function ReplayScreen({
@@ -116,19 +117,27 @@ export function ReplayScreen({
             const color = seat.kind === "bot" ? personaById(seat.persona)?.color ?? P.muted : P.accent;
             const acting = f.decision?.seat === k;
             const name = k === record.me ? str.common.you : seat.name;
+            const special = v.special ? str.table.specials[v.special] : null;
             return (
-              <View key={k} style={[s.seat, acting && s.seatActing]} accessible accessibilityLabel={t.seatLabel(name, v)}>
+              <View key={k} style={[s.seat, acting && s.seatActing]} accessible accessibilityLabel={special ? `${t.seatLabel(name, v)}, ${special}` : t.seatLabel(name, v)}>
                 <Portrait name={seat.name} persona={seat.kind === "bot" ? seat.persona : null} size={30} color={color} />
-                <Text style={s.name} numberOfLines={1}>
-                  {name}
-                  {round.bank === k ? t.bankMark : ""}
-                </Text>
+                <View style={s.name}>
+                  <Text style={s.nameText} numberOfLines={1}>
+                    {name}
+                    {round.bank === k ? t.bankMark : ""}
+                  </Text>
+                  {special && (
+                    <Text style={s.special} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                      {special}
+                    </Text>
+                  )}
+                </View>
                 <View style={s.hand}>
                   {hand.map((c, j) => (
                     <CardFace key={c} card={c} size="sm" style={{ marginLeft: j ? -10 : 0 }} />
                   ))}
                 </View>
-                <Text style={[s.total, v.bust && { color: P.danger }]}>{v.persian ? "AA" : v.total}</Text>
+                <Text style={[s.total, v.bust && { color: P.danger }, special !== null && { color: P.accent }]}>{v.persian ? "AA" : v.total}</Text>
                 <Text style={s.points}>{f.match.scores[k]}</Text>
               </View>
             );
@@ -201,7 +210,9 @@ const s = StyleSheet.create({
   board: { backgroundColor: P.felt, borderRadius: 18, padding: 10, gap: 6 },
   seat: { flexDirection: "row", alignItems: "center", gap: 8, padding: 6, borderRadius: 12 },
   seatActing: { backgroundColor: "rgba(232,146,90,0.18)" },
-  name: { width: 70, color: P.feltText, fontSize: 12.5, fontWeight: "700" },
+  name: { width: 70 },
+  nameText: { color: P.feltText, fontSize: 12.5, fontWeight: "700" },
+  special: { color: P.accent, fontSize: 10.5, fontWeight: "700" },
   hand: { flex: 1, flexDirection: "row" },
   total: { width: 30, textAlign: "right", color: P.text, fontFamily: DISPLAY, fontSize: 16 },
   points: { width: 26, textAlign: "right", color: P.feltMuted, fontSize: 12, fontWeight: "700" },

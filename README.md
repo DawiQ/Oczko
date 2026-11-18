@@ -231,6 +231,8 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - Układy Pontoonu (opcje `pontoon`, `fiveCardTrick`): pontoon (as + karta
   za 10) > pięć kart bez fury > 21 > reszta; remis dla banku (`handRank`).
   Bez „kupowania kart” — tylko „Dobieram” i „Starczy”. Wi‑Fi protokół v5.
+  Nazwa układu przy wyniku (stół, podsumowanie rundy, powtórka, etykiety
+  dostępności) i przykłady na ekranie „Zasady”.
 - Stare zapisy (reguła jako `true`/`false`) wczytywane bez
   zmiany przebiegu; Wi‑Fi protokół v3 (36 kart: v4).
 - Pierwsze uruchomienie: zestaw kraju telefonu (`regionCode`, potem język);

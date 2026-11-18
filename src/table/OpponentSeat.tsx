@@ -71,6 +71,7 @@ export function seatA11y(seat: SeatInfo, s: Strings = pl): string {
   const st = statusLabel(seat, s);
   if (st) parts.push(st);
   if (seat.value && !seat.value.persian) parts.push(seat.value.bust ? t.bust(seat.value.total) : t.total(seat.value.total));
+  if (seat.value?.special) parts.push(s.table.specials[seat.value.special]);
   if (seat.isBank) parts.push(t.bank);
   if (seat.isDealer) parts.push(t.dealer);
   parts.push(s.common.points(seat.score));
@@ -122,7 +123,11 @@ export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; siz
               </View>
             ))}
       </View>
-      {seat.value && !seat.value.bust && !seat.value.persian && <Text style={s.total}>{seat.value.total}</Text>}
+      {seat.value && !seat.value.bust && !seat.value.persian && (
+        <Text style={[s.total, seat.value.special && s.totalSpecial]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {seat.value.special ? `${seat.value.total} · ${str.table.specials[seat.value.special]}` : seat.value.total}
+        </Text>
+      )}
       {status && (
         <View style={[s.pill, pillStyle(seat)]}>
           <Text style={[s.pillText, pillText(seat)]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{status}</Text>
@@ -170,7 +175,8 @@ const s = StyleSheet.create({
   name: { color: P.feltText, fontSize: 12, fontWeight: "700", maxWidth: 100 },
   nameSm: { fontSize: 10.5 },
   cards: { flexDirection: "row", minHeight: 32, alignItems: "center" },
-  total: { color: P.text, fontFamily: DISPLAY, fontSize: 13 },
+  total: { color: P.text, fontFamily: DISPLAY, fontSize: 13, maxWidth: 100 },
+  totalSpecial: { color: P.accent },
   pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
   pillText: { fontSize: 11, fontWeight: "700" },
   pillThink: { backgroundColor: "rgba(255,255,255,0.12)" },

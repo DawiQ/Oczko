@@ -1,10 +1,13 @@
 import { threshold } from "../../ai/policies";
+import { withPreset } from "../../engine/presets";
 import { DEFAULT_RULES, PRESETS, type Rules } from "../../engine/rules";
 import { GameController } from "../../game/GameController";
 import { INSTANT } from "../../game/pace";
 import { makeSetup } from "../../game/setup";
 import type { GameSnapshot } from "../../game/TableGame";
+import { pl } from "../../i18n/pl";
 import { hintFor } from "../hints";
+import { seatA11y } from "../OpponentSeat";
 import { fanCard, opponentsOf, seatSize, seatSpots } from "../layout";
 import { caption, eventText, headline, statusLabel } from "../texts";
 
@@ -48,6 +51,20 @@ describe("table texts", () => {
       expect(end.phase).toBe("matchEnd");
       expect(headline(end).title).toMatch(/Partia dla Ciebie!|Partię wygrywa/);
     }
+  });
+
+  it("name Pontoon's hands (why a lower total wins) in the seats' labels", async () => {
+    const seen = new Set<string>();
+    for (let seed = 1; seed < 40 && seen.size < 2; seed++) {
+      for (const s of await play({ ...withPreset(DEFAULT_RULES, "pontoon"), target: 3 }, ["ola", "hela", "witek"], seed)) {
+        for (const seat of s.seats) {
+          if (!seat.value?.special) continue;
+          seen.add(seat.value.special);
+          expect(seatA11y(seat)).toContain(pl.table.specials[seat.value.special]);
+        }
+      }
+    }
+    expect([...seen].sort()).toEqual(["fiveCard", "pontoon"]);
   });
 
   it("offer a tip only once per kind", async () => {

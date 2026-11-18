@@ -43,7 +43,7 @@ export function Hand({ cards, value, reduceMotion, highlight }: { cards: Card[];
           );
         })}
       </View>
-      <View style={[s.total, value.bust && s.totalBust, value.persian && s.totalPersian, value.total === 21 && !value.bust && s.total21]}>
+      <View style={[s.total, value.bust && s.totalBust, value.persian && s.totalPersian, (value.total === 21 || value.special) && !value.bust && s.total21]}>
         <Text style={[s.totalText, value.persian && { color: P.onAccent, fontSize: 20 }]} accessibilityElementsHidden>
           {value.persian ? str.table.persianShort : value.total}
         </Text>

@@ -3,6 +3,7 @@
 import { Animated, Text } from "react-native";
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 
+import { withPreset } from "../../engine/presets";
 import { DEFAULT_RULES } from "../../engine/rules";
 import { pl } from "../../i18n";
 import { RulesScreen } from "../RulesScreen";
@@ -33,5 +34,27 @@ describe("RulesScreen", () => {
     expect(t).toContain("Literata");
     expect(t).toContain("SIL Open Font License, Version 1.1");
     act(() => r.unmount());
+  });
+
+  /** The titles of the example hands. */
+  const exampleTitles = (rules: typeof DEFAULT_RULES) => {
+    let r!: ReactTestRenderer;
+    act(() => {
+      r = create(<RulesScreen rules={rules} onTutorial={() => {}} />);
+    });
+    const labels = r.root.findAll((n) => typeof n.props.accessibilityLabel === "string" && n.props.accessible === true).map((n) => n.props.accessibilityLabel as string);
+    act(() => r.unmount());
+    return labels;
+  };
+
+  it("shows Pontoon's hands with the Pontoon set, and a 21 that is no pontoon", () => {
+    const t = pl.rules.screen;
+    const pontoon = exampleTitles(withPreset(DEFAULT_RULES, "pontoon"));
+    expect(pontoon).toContain(t.exampleA11y(pl.table.specials.pontoon, pl.rules.editor.pontoonSub));
+    expect(pontoon).toContain(t.exampleA11y(pl.table.specials.fiveCard, pl.rules.editor.fiveCardTrickSub));
+    expect(pontoon).toContain(t.exampleA11y(t.examples.oczko.title, t.examples.oczko.text));
+    const oczko = exampleTitles(DEFAULT_RULES);
+    expect(oczko.some((l) => l.startsWith(pl.table.specials.pontoon))).toBe(false);
+    expect(oczko).toContain(t.exampleA11y(t.examples.persian.title, t.examples.persian.text));
   });
 });

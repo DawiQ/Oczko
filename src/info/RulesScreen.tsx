@@ -3,10 +3,10 @@
 import { useState } from "react";
 import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 
-import { cardOf } from "../engine/cards";
+import { cardOf, LOWEST_RANK, rankOf } from "../engine/cards";
 import type { Rules } from "../engine/rules";
 import { handValue } from "../engine/score";
-import { useStrings } from "../i18n";
+import { useStrings, type Strings } from "../i18n";
 import { BottomSheet } from "../ui/BottomSheet";
 import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
@@ -20,18 +20,32 @@ type Topic = "family" | "bank" | "variants";
 
 const c = cardOf;
 type ExampleId = "persian" | "aces21" | "oczko" | "fura";
+type Example = { id: string; title: string; text: string; cards: number[]; value: string; color: string };
 
 /** Example hands under the rules in use: two aces as the rules say (none
  *  without the rule), 21, and a fura that is one under any values. */
-function examples(rules: Rules): { id: ExampleId; cards: number[]; value: string; color: string }[] {
+function examples(rules: Rules, s: Strings): Example[] {
+  const t = s.rules.screen.examples;
+  const plain = (id: ExampleId, cards: number[], value: string, color: string): Example => ({ id, ...t[id], cards, value, color });
   const aces = [c(14, 0), c(14, 3)];
   // Cards in every deck (24 cards: 9–A).
   const fura = [c(10, 3), c(10, 1), c(9, 0)];
+  // Pontoon's hands: an ace and a ten; five of the lowest cards (when they make no fura).
+  const low = LOWEST_RANK[rules.deck];
+  const five = [c(low, 0), c(low, 1), c(low, 2), c(low, 3), c(low + 1, 0)];
+  const fiveValue = rules.maxCards !== null && rules.maxCards < 5 ? null : handValue(five, rules);
+  // 21: an ace and a ten — unless that is a pontoon; then three cards (where the deck has them).
+  const oczko = rules.pontoon
+    ? [[c(10, 2), c(6, 1), c(5, 0)], [c(10, 2), c(10, 3), c(14, 1)]].find((h) => h.every((x) => rankOf(x) >= low) && handValue(h, rules).total === 21)
+    : [c(10, 2), c(14, 1)];
+  const e = s.rules.editor;
   return [
-    ...(rules.persian === "wins" ? [{ id: "persian" as const, cards: aces, value: "AA", color: P.accent }] : []),
-    ...(rules.persian === "is21" ? [{ id: "aces21" as const, cards: aces, value: "21", color: P.ok }] : []),
-    { id: "oczko", cards: [c(10, 2), c(14, 1)], value: "21", color: P.ok },
-    { id: "fura", cards: fura, value: String(handValue(fura, rules).total), color: P.danger },
+    ...(rules.persian === "wins" ? [plain("persian", aces, "AA", P.accent)] : []),
+    ...(rules.persian === "is21" ? [plain("aces21", aces, "21", P.ok)] : []),
+    ...(rules.pontoon ? [{ id: "pontoon", title: s.table.specials.pontoon, text: e.pontoonSub, cards: [c(14, 2), c(10, 1)], value: "21", color: P.accent }] : []),
+    ...(fiveValue?.special === "fiveCard" ? [{ id: "fiveCard", title: s.table.specials.fiveCard, text: e.fiveCardTrickSub, cards: five, value: String(fiveValue.total), color: P.accent }] : []),
+    ...(oczko ? [plain("oczko", oczko, "21", P.ok)] : []),
+    plain("fura", fura, String(handValue(fura, rules).total), P.danger),
   ];
 }
 
@@ -104,16 +118,17 @@ export function RulesScreen({ rules, onTutorial, onBack }: { rules: Rules; onTut
           </Section>
         )}
         <View style={s.panel}>
-          {examples(rules).map((e, i) => (
-            <View key={e.id} style={[s.example, i > 0 && s.sep]} accessible accessibilityLabel={t.exampleA11y(t.examples[e.id].title, t.examples[e.id].text)}>
+          {examples(rules, str).map((e, i) => (
+            <View key={e.id} style={[s.example, i > 0 && s.sep]} accessible accessibilityLabel={t.exampleA11y(e.title, e.text)}>
               <View style={s.cards}>
-                {e.cards.map((card) => (
-                  <CardFace key={card} card={card} size="sm" style={{ marginRight: 3 }} />
+                {e.cards.map((card, i) => (
+                  // Five cards overlap to fit the column (104 px, cards 30 px).
+                  <CardFace key={card} card={card} size="sm" style={{ marginLeft: i === 0 ? 0 : e.cards.length > 3 ? Math.floor((104 - 30 * e.cards.length) / (e.cards.length - 1)) : 3 }} />
                 ))}
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={s.exTitle}>{t.examples[e.id].title}</Text>
-                <Text style={s.exText}>{t.examples[e.id].text}</Text>
+                <Text style={s.exTitle}>{e.title}</Text>
+                <Text style={s.exText}>{e.text}</Text>
               </View>
               <Text style={[s.exValue, { color: e.color }]}>{e.value}</Text>
             </View>

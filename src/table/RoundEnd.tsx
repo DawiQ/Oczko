@@ -71,18 +71,27 @@ export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; 
       <ScrollView style={{ maxHeight: 260 }} contentContainerStyle={{ paddingVertical: 4 }}>
         {order.map((x) => {
           const o = outcome(snap, x, str);
+          // Pontoon / five cards: why a lower total wins.
+          const special = x.value?.special ? str.table.specials[x.value.special] : null;
           return (
-            <View key={x.seat} style={s.row} accessible accessibilityLabel={t.row(x.name, x.isBank, x.value, o.text)}>
+            <View key={x.seat} style={s.row} accessible accessibilityLabel={t.row(x.name, x.isBank, x.value, special ? `${special}, ${o.text}` : o.text)}>
               <Portrait name={x.name} persona={x.persona} size={30} color={x.color} />
-              <Text style={s.who} numberOfLines={1}>
-                {t.who(x.name, x.isBank)}
-              </Text>
+              <View style={s.who}>
+                <Text style={s.whoText} numberOfLines={1}>
+                  {t.who(x.name, x.isBank)}
+                </Text>
+                {special && (
+                  <Text style={s.special} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                    {special}
+                  </Text>
+                )}
+              </View>
               <View style={s.hand}>
                 {(x.hand ?? []).map((c, i) => (
                   <CardFace key={c} card={c} size="sm" style={{ marginLeft: i ? -12 : 0 }} />
                 ))}
               </View>
-              <Text style={[s.val, x.value?.bust && { color: P.danger }]}>{x.value?.persian ? str.table.persianShort : x.value?.total ?? ""}</Text>
+              <Text style={[s.val, x.value?.bust && { color: P.danger }, special !== null && { color: P.accent }]}>{x.value?.persian ? str.table.persianShort : x.value?.total ?? ""}</Text>
               <View style={{ width: 52, alignItems: "flex-end" }}>
                 <Pill text={o.text} tone={o.tone} />
               </View>
@@ -199,7 +208,9 @@ const s = StyleSheet.create({
   title: { color: P.text, fontFamily: DISPLAY, fontSize: 21, flex: 1 },
   sub: { color: P.muted, fontSize: 13, marginTop: 2, marginBottom: 6 },
   row: { flexDirection: "row", alignItems: "center", gap: 8, paddingVertical: 6, borderBottomWidth: 1, borderBottomColor: P.line },
-  who: { width: 74, color: P.text, fontSize: 13, fontWeight: "700" },
+  who: { width: 74 },
+  whoText: { color: P.text, fontSize: 13, fontWeight: "700" },
+  special: { color: P.accent, fontSize: 11, fontWeight: "700" },
   hand: { flex: 1, flexDirection: "row" },
   val: { width: 34, textAlign: "right", color: P.text, fontFamily: DISPLAY, fontSize: 17 },
   pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 3 },
