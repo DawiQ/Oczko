@@ -1,7 +1,8 @@
 // Russian: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Правила" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "от семёрки" },
       24: { label: common.cards(24), sub: "от девятки" },
     } as Record<DeckSize, Option>,
-    persian: "Два туза",
-    yes: "Да",
-    no: "Нет",
+    twoAces: "Два туза",
+    twoAcesOptions: { wins: "Выигрывают", is21: "Это 21", off: "Без правила" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Набор правил",
+    presetCustom: "Свои",
+    presets: {
+      oczko: { name: "Oczko", sub: "Польша" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Германия, Австрия" },
+      okoBere: { name: "Oko bere", sub: "Чехия, Словакия" },
+      ajnc: { name: "Ajnc", sub: "Балканы" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Туз",
     aceA11y: "Стоимость туза",
     aceOptions: { eleven: "11", oneOrEleven: "1 или 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Два туза",
     noPersian: "Без правила двух тузов",
+    is21: "Два туза = 21",
     ace: { eleven: "Туз = 11", oneOrEleven: "Туз = 1 или 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Каждый играет против банка: берёт карты и говорит «Хватит», банк отвечает последним${bankWinsTies ? " и выигрывает ничьи" : ""}.`,
     family: "Каждый берёт карты и говорит «Хватит», когда захочет. Балл получает сумма, ближайшая к 21 без перебора.",
     persian: " Два туза бьют всё.",
+    is21: " Два туза считаются как 21.",
     oneOrEleven: " Туз считается за 1 или 11.",
   },
 

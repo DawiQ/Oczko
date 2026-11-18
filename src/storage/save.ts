@@ -1,7 +1,7 @@
 // The game in progress (resume after closing the app): oczko.save.v1.
 import { isCard } from "../engine/cards";
 import type { MatchState } from "../engine/match";
-import { validateRules } from "../engine/rules";
+import { validateRules, type Rules } from "../engine/rules";
 import type { RoundState } from "../engine/round";
 import { ENGINE_VERSION } from "../engine/version";
 import type { SavedGame } from "../game/GameController";
@@ -62,6 +62,18 @@ export function looksLikeSavedGame(x: unknown): x is SavedGame {
  *  round was not shown and recorded yet). */
 export const isResumable = (s: SavedGame | null): s is SavedGame => !!s && (s.match.winner === null || !s.shown);
 
-export const loadSavedGame = (kv: KV) => readJSON(kv, SAVE_KEY, looksLikeSavedGame);
+/** Rules as the engine reads them now (a save from before version 1.1 has
+ *  the two-aces rule as a boolean). */
+const current = (r: Rules): Rules => validateRules(r) ?? r;
+const currentMatch = (m: MatchState): MatchState => ({ ...m, rules: current(m.rules), round: { ...m.round, rules: current(m.round.rules) } });
+
+export function upgradeSavedGame(s: SavedGame): SavedGame {
+  return { ...s, setup: { ...s.setup, rules: current(s.setup.rules) }, match: currentMatch(s.match), roundStart: currentMatch(s.roundStart) };
+}
+
+export const loadSavedGame = async (kv: KV) => {
+  const s = await readJSON(kv, SAVE_KEY, looksLikeSavedGame);
+  return s && upgradeSavedGame(s);
+};
 export const saveGame = (kv: KV, s: SavedGame) => writeJSON(kv, SAVE_KEY, s);
 export const clearSavedGame = (kv: KV) => removeKey(kv, SAVE_KEY);

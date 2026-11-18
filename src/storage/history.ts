@@ -1,4 +1,5 @@
 // The last matches (oczko.history.v1), newest first.
+import { validateRules } from "../engine/rules";
 import { looksLikeRecord, type HistoryRecord } from "../history/record";
 import { readJSON, writeJSON, type KV } from "./kv";
 
@@ -16,7 +17,8 @@ const looksLikeStored = (x: unknown): x is Stored => typeof x === "object" && x 
 /** Broken records are dropped one by one, never the whole history. */
 export async function loadHistory(kv: KV): Promise<HistoryRecord[]> {
   const s = await readJSON(kv, HISTORY_KEY, looksLikeStored);
-  return s ? s.records.filter(looksLikeRecord) : [];
+  // Rules as the engine reads them now (before version 1.1 the two-aces rule was a boolean).
+  return s ? s.records.filter(looksLikeRecord).map((r) => ({ ...r, setup: { ...r.setup, rules: validateRules(r.setup.rules) ?? r.setup.rules } })) : [];
 }
 
 const save = (kv: KV, records: HistoryRecord[]) => writeJSON(kv, HISTORY_KEY, { v: 1, records: records.slice(0, MAX_HISTORY) });

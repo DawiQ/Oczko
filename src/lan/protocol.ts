@@ -14,7 +14,8 @@ import type { GameSnapshot } from "../game/TableGame";
 import type { GameMode } from "../game/setup";
 
 /** Bumped on any incompatible change: older and newer apps refuse each other. */
-export const PROTOCOL_VERSION = 2;
+/** 3: the two-aces rule has three values (rule sets, PLAN.md Etap 16). */
+export const PROTOCOL_VERSION = 3;
 /** The port a table listens on (the next ones if taken). */
 export const LAN_PORT = 47676;
 /** A longer line is dropped (and the connection closed): no peer needs it. */

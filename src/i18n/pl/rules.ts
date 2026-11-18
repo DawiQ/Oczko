@@ -1,7 +1,8 @@
 // Polish: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Zasady" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import { common } from "./common";
 
 type Option = { label: string; sub?: string };
@@ -28,9 +29,17 @@ export const rules = {
       32: { label: common.cards(32), sub: "od siódemki" },
       24: { label: common.cards(24), sub: "od dziewiątki" },
     } as Record<DeckSize, Option>,
-    persian: "Perskie oczko",
-    yes: "Tak",
-    no: "Nie",
+    twoAces: "Dwa asy",
+    twoAcesOptions: { wins: "Wygrywają", is21: "Liczą 21", off: "Bez reguły" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Zestaw zasad",
+    presetCustom: "Własne",
+    presets: {
+      oczko: { name: "Oczko", sub: "Polska" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Niemcy, Austria" },
+      okoBere: { name: "Oko bere", sub: "Czechy, Słowacja" },
+      ajnc: { name: "Ajnc", sub: "Bałkany" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Wartość asa",
     aceOptions: { eleven: "11", oneOrEleven: "1 lub 11" } as Record<Rules["ace"], string>,
@@ -63,6 +72,7 @@ export const rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Perskie oczko",
     noPersian: "Bez perskiego oczka",
+    is21: "Dwa asy = 21",
     ace: { eleven: "As za 11", oneOrEleven: "As za 1 lub 11" } as Record<Rules["ace"], string>,
   },
 
@@ -72,6 +82,7 @@ export const rules = {
       `Każdy gra z bankiem: dobiera karty i mówi „Starczy”, bank odpowiada na końcu${bankWinsTies ? " i wygrywa remisy" : ""}.`,
     family: "Każdy dobiera karty i mówi „Starczy”, gdy chce. Punkt dostaje wynik najbliżej 21 bez fury.",
     persian: " Dwa asy to perskie oczko — wygrywa wszystko.",
+    is21: " Dwa asy liczą się jak 21.",
     oneOrEleven: " As liczy się za 1 albo 11.",
   },
 

@@ -7,7 +7,7 @@ describe("rules", () => {
     expect(DEFAULT_RULES).toMatchObject({
       deck: 52,
       ace: "eleven",
-      persian: true,
+      persian: "wins",
       startCards: 1,
       mode: "family",
       familyTie: "allScore",

@@ -134,7 +134,7 @@ describe("moves", () => {
   });
 
   it("two aces dealt without perskie oczko are fura (ace 11)", () => {
-    const rules: Rules = { ...family, startCards: 2, persian: false };
+    const rules: Rules = { ...family, startCards: 2, persian: "off" };
     const s = dealRound(rules, 2, stockFor(rules, ["5♥ 6♥", "A♥ A♠"]), 0, null);
     expect(s.status[1]).toBe("bust");
     expect(s.turn).toBe(0);
@@ -186,7 +186,7 @@ describe("invariants over random rounds", () => {
     PRESETS.small24,
     { ...family, startCards: 2, ace: "oneOrEleven" },
     { ...bank, bustRevealed: false, maxCards: 4 },
-    { ...family, persian: false, familyTie: "noneScore" },
+    { ...family, persian: "off", familyTie: "noneScore" },
   ];
 
   it("keeps the deck whole, statuses final, one seat moving", () => {
@@ -257,7 +257,7 @@ describe("edge cases", () => {
   });
 
   it("the bank skips when every player's fura comes in the deal", () => {
-    const rules: Rules = { ...bank, startCards: 2, persian: false };
+    const rules: Rules = { ...bank, startCards: 2, persian: "off" };
     const s = dealRound(rules, 3, stockFor(rules, ["5♥ 6♥", "A♥ A♦", "A♣ A♠"], "", 0, 0), 0, 0);
     expect(s.status).toEqual(["stood", "bust", "bust"]);
     expect(s.result!.points).toEqual([1, 0, 0]);

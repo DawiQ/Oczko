@@ -26,7 +26,7 @@ describe("rules in words", () => {
 
   it("summarises and previews neutrally", () => {
     expect(summaryLines(DEFAULT_RULES)).toEqual(["Rodzinne · W 2, D 3, K 4 · 52 karty", "Perskie oczko · As za 11"]);
-    expect(summaryLines({ ...PRESETS.bank, persian: false, ace: "oneOrEleven", deck: 24 })).toEqual([
+    expect(summaryLines({ ...PRESETS.bank, persian: "off", ace: "oneOrEleven", deck: 24 })).toEqual([
       "Z bankierem · W 2, D 3, K 4 · 24 karty",
       "Bez perskiego oczka · As za 1 lub 11",
     ]);

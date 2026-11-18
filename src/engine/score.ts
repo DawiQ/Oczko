@@ -9,14 +9,16 @@ export interface HandValue {
   soft: boolean;
   /** Over 21 (never for perskie oczko). */
   bust: boolean;
-  /** Exactly two aces with the perskie oczko rule on. */
+  /** Exactly two aces with the perskie oczko rule on ("wins"). */
   persian: boolean;
 }
 
 export const ACE = 14;
 
+const twoAces = (hand: readonly Card[]) => hand.length === 2 && rankOf(hand[0]) === ACE && rankOf(hand[1]) === ACE;
+
 export function isPersian(hand: readonly Card[], rules: Rules): boolean {
-  return rules.persian && hand.length === 2 && rankOf(hand[0]) === ACE && rankOf(hand[1]) === ACE;
+  return rules.persian === "wins" && twoAces(hand);
 }
 
 export function handValue(hand: readonly Card[], rules: Rules): HandValue {
@@ -36,6 +38,8 @@ export function handValue(hand: readonly Card[], rules: Rules): HandValue {
       soft = true;
     }
   }
+  // Czech/Slovak "fojer": two aces are 21.
+  if (rules.persian === "is21" && twoAces(hand)) return { total: 21, soft: false, bust: false, persian: false };
   const persian = isPersian(hand, rules);
   return { total, soft, bust: !persian && total > 21, persian };
 }

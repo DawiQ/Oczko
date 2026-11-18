@@ -3,9 +3,9 @@
 import { CLASSIC_VALUES, type FaceRank, type Rules } from "../engine/rules";
 import { pl, type Strings } from "../i18n/pl";
 
-export type FacesPreset = "234" | "345" | "custom";
+export type FacesPreset = "234" | "345" | "112" | "custom";
 
-export const FACES: Record<Exclude<FacesPreset, "custom">, [number, number, number]> = { "234": [2, 3, 4], "345": [3, 4, 5] };
+export const FACES: Record<Exclude<FacesPreset, "custom">, [number, number, number]> = { "234": [2, 3, 4], "345": [3, 4, 5], "112": [1, 1, 2] };
 
 export function facesPreset(r: Rules): FacesPreset {
   const w = [r.values[11], r.values[12], r.values[13]];
@@ -27,7 +27,7 @@ export function summaryLines(r: Rules, s: Strings = pl): [string, string] {
   const t = s.rules.summary;
   return [
     `${s.rules.modes[r.mode]} · ${t.faces(r.values[11], r.values[12], r.values[13])} · ${t.deck(r.deck)}`,
-    `${r.persian ? t.persian : t.noPersian} · ${t.ace[r.ace]}`,
+    `${r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : t.noPersian} · ${t.ace[r.ace]}`,
   ];
 }
 
@@ -38,7 +38,7 @@ export const summaryLine = (r: Rules, s: Strings = pl) => summaryLines(r, s).joi
 export function preview(r: Rules, s: Strings = pl): string {
   const t = s.rules.preview;
   const start = r.mode === "bank" ? t.bank(r.bankTie === "bankWins") : t.family;
-  const persian = r.persian ? t.persian : "";
+  const persian = r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : "";
   const aceTxt = r.ace === "oneOrEleven" ? t.oneOrEleven : "";
   return start + persian + aceTxt;
 }

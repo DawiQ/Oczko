@@ -1,7 +1,8 @@
 // Slovak: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Pravidlá" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "od sedmičky" },
       24: { label: common.cards(24), sub: "od deviatky" },
     } as Record<DeckSize, Option>,
-    persian: "Dve esá vyhrávajú",
-    yes: "Áno",
-    no: "Nie",
+    twoAces: "Dve esá",
+    twoAcesOptions: { wins: "Vyhrávajú", is21: "Rátajú 21", off: "Bez pravidla" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Súbor pravidiel",
+    presetCustom: "Vlastné",
+    presets: {
+      oczko: { name: "Oczko", sub: "Poľsko" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Nemecko, Rakúsko" },
+      okoBere: { name: "Oko berie", sub: "Česko, Slovensko" },
+      ajnc: { name: "Ajnc", sub: "Balkán" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Eso",
     aceA11y: "Hodnota esa",
     aceOptions: { eleven: "11", oneOrEleven: "1 alebo 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Dve esá vyhrávajú",
     noPersian: "Bez pravidla dvoch es",
+    is21: "Dve esá = 21",
     ace: { eleven: "Eso za 11", oneOrEleven: "Eso za 1 alebo 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Každý hrá proti banku: berie karty a povie „Stačí“, bank odpovedá na konci${bankWinsTies ? " a vyhráva remízy" : ""}.`,
     family: "Každý berie karty a povie „Stačí“, keď chce. Bod získa súčet najbližšie k 21 — ale nie vyšší.",
     persian: " Dve esá porazia všetko.",
+    is21: " Dve esá sa rátajú ako 21.",
     oneOrEleven: " Eso platí za 1 alebo 11.",
   },
 

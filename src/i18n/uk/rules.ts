@@ -1,7 +1,8 @@
 // Ukrainian: texts of the "rules" area — house-rule options (editor), the
 // rules in words (summaries, preview) and the "Правила" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "від сімки" },
       24: { label: common.cards(24), sub: "від дев'ятки" },
     } as Record<DeckSize, Option>,
-    persian: "Два тузи",
-    yes: "Так",
-    no: "Ні",
+    twoAces: "Два тузи",
+    twoAcesOptions: { wins: "Виграють", is21: "Це 21", off: "Без правила" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Набір правил",
+    presetCustom: "Власні",
+    presets: {
+      oczko: { name: "Oczko", sub: "Польща" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Німеччина, Австрія" },
+      okoBere: { name: "Oko bere", sub: "Чехія, Словаччина" },
+      ajnc: { name: "Ajnc", sub: "Балкани" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Туз",
     aceA11y: "Значення туза",
     aceOptions: { eleven: "11", oneOrEleven: "1 або 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Два тузи",
     noPersian: "Без двох тузів",
+    is21: "Два тузи = 21",
     ace: { eleven: "Туз — 11", oneOrEleven: "Туз — 1 або 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Кожен грає з банком: бере карти й каже «Досить», банк відповідає наприкінці${bankWinsTies ? " і виграє нічиї" : ""}.`,
     family: "Кожен бере карти й каже «Досить», коли хоче. Бал отримує результат, найближчий до 21 без перебору.",
     persian: " Два тузи виграють у будь-якої руки.",
+    is21: " Два тузи рахуються як 21.",
     oneOrEleven: " Туз рахується як 1 або 11.",
   },
 

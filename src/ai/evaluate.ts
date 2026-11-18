@@ -59,7 +59,9 @@ function valueTable(rules: Rules): Int8Array {
 
 const isAce = (c: Card) => rankOf(c) === ACE;
 
-function totalOf(sum: number, aces: number, eleven: boolean): number {
+/** `aces21`: two aces in two cards count 21 (`n` = cards in the hand). */
+function totalOf(sum: number, aces: number, eleven: boolean, aces21 = false, n = 0): number {
+  if (aces21 && n === 2 && aces === 2) return 21;
   if (eleven) return sum + 11 * aces;
   const t = sum + aces;
   return aces > 0 && t + 10 <= 21 ? t + 10 : t;
@@ -156,7 +158,7 @@ function exactBust(st: Setup): number {
   for (const c of st.pool) {
     const a = aces + (isAce(c) ? 1 : 0);
     const s = sum + (isAce(c) ? 0 : st.value[c]);
-    const persian = st.rules.persian && st.myCards.length === 1 && a === 2;
+    const persian = st.rules.persian !== "off" && st.myCards.length === 1 && a === 2;
     if (!persian && totalOf(s, a, st.eleven) > 21) bust++;
   }
   return bust / st.pool.length;
@@ -230,6 +232,7 @@ const FEW_TRIES = 6;
 export function runSamples(acc: Accumulator, count: number): void {
   const st = acc.st;
   const { rules, value, eleven } = st;
+  const aces21 = rules.persian === "is21";
   const deck = acc.deck;
   const poolLen = st.pool.length;
   let seed = acc.seed;
@@ -290,8 +293,8 @@ export function runSamples(acc: Accumulator, count: number): void {
           if (isAce(c)) ac++;
           else su += value[c];
         }
-        const tot = totalOf(su, ac, eleven);
-        const isPers = rules.persian && n[s] + h === 2 && ac === 2;
+        const tot = totalOf(su, ac, eleven, aces21, n[s] + h);
+        const isPers = rules.persian === "wins" && n[s] + h === 2 && ac === 2;
         const over = !isPers && tot > 21;
         let ok: boolean;
         if (isPers) ok = false; // it would have been announced
@@ -309,8 +312,8 @@ export function runSamples(acc: Accumulator, count: number): void {
       }
     }
     for (let s = 0; s < st.seats; s++) {
-      const tot = totalOf(sum[s], aces[s], eleven);
-      pers[s] = rules.persian && n[s] === 2 && aces[s] === 2 ? 1 : 0;
+      const tot = totalOf(sum[s], aces[s], eleven, aces21, n[s]);
+      pers[s] = rules.persian === "wins" && n[s] === 2 && aces[s] === 2 ? 1 : 0;
       bust[s] = !pers[s] && tot > 21 ? 1 : 0;
     }
     // The stock: the rest of the pool, shuffled lazily as it is drawn; both
@@ -334,6 +337,7 @@ export function runSamples(acc: Accumulator, count: number): void {
 function playOut(acc: Accumulator, top0: number, hitFirst: boolean, rand: () => number): number {
   const st = acc.st;
   const { rules, value, eleven } = st;
+  const aces21 = rules.persian === "is21";
   const deck = acc.deck;
   const poolLen = st.pool.length;
   const sum = acc.sum2;
@@ -366,18 +370,18 @@ function playOut(acc: Accumulator, top0: number, hitFirst: boolean, rand: () => 
     if (isAce(c)) aces[s]++;
     else sum[s] += value[c];
     n[s]++;
-    if (rules.persian && n[s] === 2 && aces[s] === 2) {
+    if (rules.persian === "wins" && n[s] === 2 && aces[s] === 2) {
       pers[s] = 1;
       return false;
     }
-    if (totalOf(sum[s], aces[s], eleven) > 21) {
+    if (totalOf(sum[s], aces[s], eleven, aces21, n[s]) > 21) {
       bust[s] = 1;
       return false;
     }
     return n[s] < maxCards;
   };
   const playTo = (s: number, standAt: number) => {
-    while (totalOf(sum[s], aces[s], eleven) < standAt && take(s));
+    while (totalOf(sum[s], aces[s], eleven, aces21, n[s]) < standAt && take(s));
   };
 
   const me = st.me;
@@ -396,7 +400,7 @@ function playOut(acc: Accumulator, top0: number, hitFirst: boolean, rand: () => 
 function myShare(acc: Accumulator, sum: Int16Array, aces: Int8Array, n: Int8Array, bust: Uint8Array, pers: Uint8Array): number {
   const st = acc.st;
   const { rules, eleven, me } = st;
-  const total = (s: number) => totalOf(sum[s], aces[s], eleven);
+  const total = (s: number) => totalOf(sum[s], aces[s], eleven, st.rules.persian === "is21", n[s]);
   if (rules.mode === "family") {
     let anyPers = false;
     for (let s = 0; s < st.seats; s++) if (pers[s]) anyPers = true;

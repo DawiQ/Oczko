@@ -174,7 +174,7 @@ describe("a round decided in the deal", () => {
   it("counts its points when the match starts or moves on", () => {
     // A seed where the first round ends at once: the only player is dealt two
     // aces without the perskie rule (fura), so the bank does not play.
-    const rules: Rules = { ...bank, startCards: 2, persian: false, target: 50 };
+    const rules: Rules = { ...bank, startCards: 2, persian: "off", target: 50 };
     let found: MatchState | null = null;
     for (let seed = 0; seed < 20000 && !found; seed++) {
       const m = newMatch(rules, 2, seed);

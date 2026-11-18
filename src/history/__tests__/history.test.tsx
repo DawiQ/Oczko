@@ -166,7 +166,7 @@ describe("replay edge cases", () => {
     // Bank 1:1 without perskie oczko, 2 start cards: find a seed whose round 2
     // ends at once (the player gets two aces = fura), after round 1 played by "stand".
     const { newMatch, matchApply, nextRound } = jest.requireActual("../../engine/match") as typeof import("../../engine/match");
-    const rules: Rules = { ...PRESETS.bank, startCards: 2, persian: false, target: 1, bankTie: "nobody" };
+    const rules: Rules = { ...PRESETS.bank, startCards: 2, persian: "off", target: 1, bankTie: "nobody" };
     for (let seed = 0; seed < 50000; seed++) {
       let m = newMatch(rules, 2, seed, 0);
       if (m.round.result) continue;

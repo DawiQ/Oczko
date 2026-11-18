@@ -4,7 +4,7 @@ import { cards } from "../testUtils";
 
 const eleven = DEFAULT_RULES;
 const oneOr: Rules = { ...DEFAULT_RULES, ace: "oneOrEleven" };
-const noPersian: Rules = { ...DEFAULT_RULES, persian: false };
+const noPersian: Rules = { ...DEFAULT_RULES, persian: "off" };
 const faces345: Rules = { ...DEFAULT_RULES, values: { ...DEFAULT_RULES.values, 11: 3, 12: 4, 13: 5 } };
 
 type Row = [string, Rules, string, { total: number; soft: boolean; bust: boolean; persian: boolean }];
@@ -23,7 +23,7 @@ const rows: Row[] = [
   ["ace 1/11: soft", oneOr, "A♥ 6♠", v(17, false, false, true)],
   ["ace 1/11: hard when 11 would bust", oneOr, "A♥ 6♠ 9♦", v(16)],
   ["ace 1/11: two aces = 12 soft (with perskie)", oneOr, "A♥ A♠", v(12, false, true, true)],
-  ["ace 1/11: two aces = 12 soft (no perskie)", { ...oneOr, persian: false }, "A♥ A♠", v(12, false, false, true)],
+  ["ace 1/11: two aces = 12 soft (no perskie)", { ...oneOr, persian: "off" }, "A♥ A♠", v(12, false, false, true)],
   ["ace 1/11: four aces + 7 = 21 soft", oneOr, "A♥ A♠ A♦ A♣ 7♥", v(21, false, false, true)],
   ["ace 1/11: bust", oneOr, "K♥ 10♠ 9♦ A♣", v(24, true)],
   ["other face values", faces345, "W♥ D♣ K♠", v(12)],

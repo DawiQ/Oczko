@@ -1,7 +1,8 @@
 // Bosnian-Croatian-Serbian: texts of the "rules" area — house-rule options
 // (editor), the rules in words (summaries, preview) and the "Pravila" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "od sedmice" },
       24: { label: common.cards(24), sub: "od devetke" },
     } as Record<DeckSize, Option>,
-    persian: "Dva asa pobjeđuju",
-    yes: "Da",
-    no: "Ne",
+    twoAces: "Dva asa",
+    twoAcesOptions: { wins: "Pobjeđuju", is21: "Vrijede 21", off: "Bez pravila" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Skup pravila",
+    presetCustom: "Vlastita",
+    presets: {
+      oczko: { name: "Oczko", sub: "Poljska" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Njemačka, Austrija" },
+      okoBere: { name: "Oko bere", sub: "Češka, Slovačka" },
+      ajnc: { name: "Ajnc", sub: "Balkan" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Vrijednost asa",
     aceOptions: { eleven: "11", oneOrEleven: "1 ili 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Dva asa pobjeđuju",
     noPersian: "Bez pravila dva asa",
+    is21: "Dva asa = 21",
     ace: { eleven: "As = 11", oneOrEleven: "As = 1 ili 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Svi igraju protiv banka: vuku karte i kažu „Dosta“, a bank odgovara na kraju${bankWinsTies ? " i pobjeđuje pri neriješenom" : ""}.`,
     family: "Svi vuku karte i kažu „Dosta“ kad hoće. Bod ide rezultatu najbližem 21 bez trope.",
     persian: " Dva asa pobjeđuju sve.",
+    is21: " Dva asa vrijede kao 21.",
     oneOrEleven: " As vrijedi 1 ili 11.",
   },
 

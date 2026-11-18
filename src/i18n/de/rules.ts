@@ -1,7 +1,8 @@
 // German: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Regeln" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "ab der Sieben" },
       24: { label: common.cards(24), sub: "ab der Neun" },
     } as Record<DeckSize, Option>,
-    persian: "Feuer",
-    yes: "Ja",
-    no: "Nein",
+    twoAces: "Zwei Asse",
+    twoAcesOptions: { wins: "Gewinnen", is21: "Zählen 21", off: "Keine Regel" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Regelsatz",
+    presetCustom: "Eigene",
+    presets: {
+      oczko: { name: "Oczko", sub: "Polen" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Deutschland, Österreich" },
+      okoBere: { name: "Oko bere", sub: "Tschechien, Slowakei" },
+      ajnc: { name: "Ajnc", sub: "Balkan" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ass",
     aceA11y: "Wert des Asses",
     aceOptions: { eleven: "11", oneOrEleven: "1 oder 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Feuer",
     noPersian: "Ohne Feuer",
+    is21: "Zwei Asse = 21",
     ace: { eleven: "Ass = 11", oneOrEleven: "Ass = 1 oder 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Alle spielen gegen die Bank: Karten ziehen, dann „Genug“ sagen. Die Bank ist zuletzt dran${bankWinsTies ? " und gewinnt bei Unentschieden" : ""}.`,
     family: "Alle ziehen Karten und sagen „Genug“, wann sie wollen. Den Punkt bekommt, wer am nächsten an 21 liegt, ohne sich zu überkaufen.",
     persian: " Zwei Asse („Feuer“) schlagen alles.",
+    is21: " Zwei Asse zählen als 21.",
     oneOrEleven: " Das Ass zählt 1 oder 11.",
   },
 

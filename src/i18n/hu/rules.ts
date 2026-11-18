@@ -1,7 +1,8 @@
 // Hungarian: texts of the "rules" area — house-rule options (editor), the
 // rules in words (summaries, preview) and the "Szabályok" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "hetestől" },
       24: { label: common.cards(24), sub: "kilencestől" },
     } as Record<DeckSize, Option>,
-    persian: "Két ász",
-    yes: "Igen",
-    no: "Nem",
+    twoAces: "Két ász",
+    twoAcesOptions: { wins: "Nyernek", is21: "21-et érnek", off: "Nincs szabály" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Szabálykészlet",
+    presetCustom: "Saját",
+    presets: {
+      oczko: { name: "Oczko", sub: "Lengyelország" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Németország, Ausztria" },
+      okoBere: { name: "Oko bere", sub: "Csehország, Szlovákia" },
+      ajnc: { name: "Ajnc", sub: "Balkán" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ász",
     aceA11y: "Az ász értéke",
     aceOptions: { eleven: "11", oneOrEleven: "1 vagy 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Két ász",
     noPersian: "Két ász nélkül",
+    is21: "Két ász = 21",
     ace: { eleven: "Ász = 11", oneOrEleven: "Ász = 1 vagy 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Mindenki a bank ellen játszik: lapokat kér, majd azt mondja: „Elég”. A bank lép utoljára${bankWinsTies ? ", és döntetlennél nyer" : ""}.`,
     family: "Mindenki lapokat kér, és amikor akarja, azt mondja: „Elég”. A pontot az kapja, aki túllépés nélkül a legközelebb van a 21-hez.",
     persian: " A két ász mindent üt.",
+    is21: " A két ász 21-et ér.",
     oneOrEleven: " Az ász 1-et vagy 11-et ér.",
   },
 

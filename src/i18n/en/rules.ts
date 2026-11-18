@@ -1,7 +1,8 @@
 // English: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Rules" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "sevens up" },
       24: { label: common.cards(24), sub: "nines up" },
     } as Record<DeckSize, Option>,
-    persian: "Two aces win",
-    yes: "Yes",
-    no: "No",
+    twoAces: "Two aces",
+    twoAcesOptions: { wins: "Win", is21: "Count 21", off: "No rule" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Rule set",
+    presetCustom: "Custom",
+    presets: {
+      oczko: { name: "Oczko", sub: "Poland" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Germany, Austria" },
+      okoBere: { name: "Oko bere", sub: "Czechia, Slovakia" },
+      ajnc: { name: "Ajnc", sub: "Balkans" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ace",
     aceA11y: "Ace value",
     aceOptions: { eleven: "11", oneOrEleven: "1 or 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Two aces win",
     noPersian: "No two-aces rule",
+    is21: "Two aces = 21",
     ace: { eleven: "Ace = 11", oneOrEleven: "Ace = 1 or 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Everyone plays against the bank: draw cards, then say “Stay”. The bank answers last${bankWinsTies ? " and wins ties" : ""}.`,
     family: "Everyone draws cards and says “Stay” whenever they like. The total closest to 21 without going bust gets the point.",
     persian: " Two aces beat everything.",
+    is21: " Two aces count as 21.",
     oneOrEleven: " An ace counts as 1 or 11.",
   },
 

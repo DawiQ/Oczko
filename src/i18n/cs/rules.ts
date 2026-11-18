@@ -1,7 +1,8 @@
 // Czech: texts of the "rules" area — house-rule options (editor), the rules
 // in words (summaries, preview) and the "Pravidla" screen.
+import type { PresetId } from "../../engine/presets";
 import type { DeckSize } from "../../engine/cards";
-import type { Rules } from "../../engine/rules";
+import type { Rules, TwoAces } from "../../engine/rules";
 import type { pl } from "../pl";
 import { common } from "./common";
 
@@ -29,9 +30,17 @@ export const rules: typeof pl.rules = {
       32: { label: common.cards(32), sub: "od sedmiček" },
       24: { label: common.cards(24), sub: "od devítek" },
     } as Record<DeckSize, Option>,
-    persian: "Dvě esa",
-    yes: "Ano",
-    no: "Ne",
+    twoAces: "Dvě esa",
+    twoAcesOptions: { wins: "Vyhrávají", is21: "Počítají 21", off: "Bez pravidla" } as Record<TwoAces, string>,
+    /** Regional rule sets (PLAN.md §13): name and where it is played. */
+    preset: "Sada pravidel",
+    presetCustom: "Vlastní",
+    presets: {
+      oczko: { name: "Oczko", sub: "Polsko" },
+      siebzehnUndVier: { name: "17 und 4", sub: "Německo, Rakousko" },
+      okoBere: { name: "Oko bere", sub: "Česko, Slovensko" },
+      ajnc: { name: "Ajnc", sub: "Balkán" },
+    } as Record<PresetId, { name: string; sub: string }>,
     ace: "Eso",
     aceA11y: "Hodnota esa",
     aceOptions: { eleven: "11", oneOrEleven: "1 nebo 11" } as Record<Rules["ace"], string>,
@@ -64,6 +73,7 @@ export const rules: typeof pl.rules = {
     deck: (n: DeckSize) => common.cards(n),
     persian: "Dvě esa",
     noPersian: "Bez dvou es",
+    is21: "Dvě esa = 21",
     ace: { eleven: "Eso za 11", oneOrEleven: "Eso za 1 nebo 11" } as Record<Rules["ace"], string>,
   },
 
@@ -73,6 +83,7 @@ export const rules: typeof pl.rules = {
       `Každý hraje s bankem: bere karty, dokud neřekne „Stačí“; bank hraje poslední${bankWinsTies ? " a vyhrává remízy" : ""}.`,
     family: "Každý bere karty, dokud neřekne „Stačí“. Bod dostane, kdo je nejblíž 21 a nepřetáhne.",
     persian: " Dvě esa vyhrávají nad vším.",
+    is21: " Dvě esa se počítají jako 21.",
     oneOrEleven: " Eso platí 1 nebo 11.",
   },
 

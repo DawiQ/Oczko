@@ -48,7 +48,7 @@ describe("P(fura) is exact", () => {
     // A♥ alone: another ace makes perskie oczko (not fura); only 10 + 11 = 21 and so on
     const ace = viewFor(table(DEFAULT_RULES, ["5♥", "A♥"]), 1);
     expect(evaluate(ace, { samples: 10, rng: { state: 1 }, opponentModel: model }).bustIfHit).toBe(0);
-    const noPersian = viewFor(table({ ...DEFAULT_RULES, persian: false }, ["5♥", "A♥"]), 1);
+    const noPersian = viewFor(table({ ...DEFAULT_RULES, persian: "off" }, ["5♥", "A♥"]), 1);
     expect(evaluate(noPersian, { samples: 10, rng: { state: 1 }, opponentModel: model }).bustIfHit).toBeCloseTo(3 / 51, 12);
   });
 });

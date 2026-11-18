@@ -3,13 +3,19 @@ import type { DeckSize } from "./cards";
 
 export type FaceRank = 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9 | 10 | 11 | 12 | 13;
 
+/** Exactly two aces in two cards: perskie oczko — win over everything
+ *  ("wins"); count as 21 (Czech/Slovak "fojer", "is21"); nothing special
+ *  ("off": 22 with the ace worth 11). */
+export type TwoAces = "wins" | "is21" | "off";
+
 export interface Rules {
   deck: DeckSize;
   /** Points of ranks 2..13 (W = 11, D = 12, K = 13); 1..11. The ace is set by `ace`. */
   values: Record<FaceRank, number>;
   ace: "eleven" | "oneOrEleven";
-  /** Exactly two aces win over everything. */
-  persian: boolean;
+  /** Exactly two aces in two cards (see `TwoAces`). Stored as a boolean
+   *  before version 1.1 (true = "wins", false = "off"); `validateRules` reads both. */
+  persian: TwoAces;
   startCards: 1 | 2;
   /** Card limit of a hand (reached → the hand stops); null = none. */
   maxCards: number | null;
@@ -40,7 +46,7 @@ export const DEFAULT_RULES: Rules = {
   deck: 52,
   values: CLASSIC_VALUES,
   ace: "eleven",
-  persian: true,
+  persian: "wins",
   startCards: 1,
   maxCards: null,
   mode: "family",
@@ -91,7 +97,9 @@ export function validateRules(r: unknown): Rules | null {
 
   if (!oneOf(o.deck, [24, 32, 52] as const)) return null;
   if (!oneOf(o.ace, ["eleven", "oneOrEleven"] as const)) return null;
-  if (typeof o.persian !== "boolean") return null;
+  // Before version 1.1 a boolean.
+  const persian: TwoAces | null = o.persian === true ? "wins" : o.persian === false ? "off" : oneOf(o.persian, ["wins", "is21", "off"] as const) ? o.persian : null;
+  if (persian === null) return null;
   if (!oneOf(o.startCards, [1, 2] as const)) return null;
   if (o.maxCards !== null && !isInt(o.maxCards, o.startCards + 1, MAX_CARDS_LIMIT)) return null;
   if (!oneOf(o.mode, ["family", "bank"] as const)) return null;
@@ -108,7 +116,7 @@ export function validateRules(r: unknown): Rules | null {
     deck: o.deck,
     values,
     ace: o.ace,
-    persian: o.persian,
+    persian,
     startCards: o.startCards,
     maxCards: o.maxCards as number | null,
     mode: o.mode,
