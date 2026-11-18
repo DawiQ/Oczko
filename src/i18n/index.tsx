@@ -11,13 +11,16 @@ import { de } from "./de";
 import { en } from "./en";
 import { hu } from "./hu";
 import { pl, type Strings } from "./pl";
+import { ru } from "./ru";
+import { sh } from "./sh";
 import { sk } from "./sk";
+import { uk } from "./uk";
 
 export * from "./langs";
 export type { Strings } from "./pl";
 export { pl } from "./pl";
 
-export const DICTIONARIES: Record<Lang, Strings> = { pl, en, de, cs, sk, hu };
+export const DICTIONARIES: Record<Lang, Strings> = { pl, en, de, cs, sk, hu, uk, ru, sh };
 
 /** The phone's languages in order of preference (empty when unknown). */
 export function deviceLocales(): LocaleLike[] {

@@ -70,6 +70,9 @@ const FEATURE_SUBTITLES = {
   cs: "polská hra 21 · Oko bere",
   sk: "poľská hra 21 · Oko berie",
   hu: "a lengyel huszonegy",
+  uk: "польська гра в 21",
+  ru: "польская игра в 21",
+  sh: "poljska igra 21 · ajnc",
 };
 
 const iconBody = `${copper(1024, 1024)}${logo(512, 425, 1.17, true)}`;

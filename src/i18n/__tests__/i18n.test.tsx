@@ -5,7 +5,8 @@ import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { DEFAULT_RULES } from "../../engine/rules";
 import { SettingsSheet } from "../../home/SettingsSheet";
 import { DEFAULT_SETTINGS } from "../../storage/settings";
-import { DICTIONARIES, deviceLang, I18nProvider, isLangSetting, LANG_NAMES, LANGS, pl, resolveLang, useStrings, type Lang, type Strings } from "..";
+import { DISPLAY, displayFont } from "../../ui/fonts";
+import { DICTIONARIES, deviceLang, I18nProvider, isCyrillic, isLangSetting, LANG_NAMES, LANGS, pl, resolveLang, useStrings, type Lang, type Strings } from "..";
 
 /** Every leaf of a dictionary: "path" → "string" | "function/arity" | "array/len" | "object". */
 function shape(x: unknown, prefix = ""): Record<string, string> {
@@ -46,7 +47,7 @@ describe("dictionaries", () => {
   });
 
   it("other languages have no Polish letters (nothing left untranslated)", () => {
-    for (const lang of others) expect([lang, texts(DICTIONARIES[lang]).filter((t) => /[ąćęłńśźżĄĆĘŁŃŚŹŻ]/.test(t))]).toEqual([lang, []]);
+    for (const lang of others) expect([lang, texts(DICTIONARIES[lang]).filter((t) => /[ąęłńśźżĄĘŁŃŚŹŻ]/.test(t))]).toEqual([lang, []]);
   });
 
   it("Polish texts are not empty", () => {
@@ -64,6 +65,19 @@ describe("language choice", () => {
     expect(deviceLang([{ languageCode: "pl" }], ["pl", "en"])).toBe("pl");
     expect(deviceLang([{ languageCode: "de" }, { languageCode: "en" }], ["pl", "en", "de"])).toBe("de");
     expect(deviceLang([{ languageCode: "fr" }, { languageCode: "pl" }], ["pl", "en"])).toBe("pl");
+  });
+
+  it("serves Bosnian, Croatian, Serbian and Montenegrin phones with one Latin version", () => {
+    for (const code of ["bs", "hr", "sr", "cnr"]) expect(deviceLang([{ languageCode: code }])).toBe("sh");
+  });
+
+  it("gives Cyrillic languages their own display font", () => {
+    expect(isCyrillic("uk")).toBe(true);
+    expect(isCyrillic("ru")).toBe(true);
+    expect(LANGS.filter(isCyrillic)).toEqual(["uk", "ru"]);
+    // (Font files are stubs in Jest; the choice is by script.)
+    expect(Object.keys(displayFont(true))).toEqual([DISPLAY]);
+    expect(Object.keys(displayFont(false))).toEqual([DISPLAY]);
   });
 
   it("falls back to English, or the first language without it", () => {

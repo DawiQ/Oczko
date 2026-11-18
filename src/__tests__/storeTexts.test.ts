@@ -40,7 +40,8 @@ describe.each(LANGS.map((l) => [l]))("store texts: %s", (lang) => {
   });
 
   it("iOS permission texts with the same keys as Polish", () => {
-    expect(appJson.locales[lang]).toBe(`./locales/${lang}.json`);
+    // "sh" serves the phones in Bosnian, Croatian and Serbian.
+    for (const code of lang === "sh" ? ["bs", "hr", "sr"] : [lang]) expect(appJson.locales[code]).toBe(`./locales/${lang}.json`);
     const keys = (l: string) => Object.keys(JSON.parse(read(`locales/${l}.json`)).ios).sort();
     expect(keys(lang)).toEqual(keys("pl"));
   });

@@ -547,7 +547,7 @@ ale żaden tekst UI nie jest już wpisany w komponent.
   liczebniku.
 - **Gotowe, gdy:** jak Etap 13.
 
-### Etap 15 — Ukraiński, rosyjski, BCMS
+### Etap 15 — Ukraiński, rosyjski, BCMS ✅ (przegląd tłumaczeń przez rodzimych użytkowników — u właściciela)
 - Cyrylica: czcionka z Etapu 12 sprawdzona na wszystkich ekranach.
 - `uk.ts` (wymagany na Ukrainie), `ru.ts` (Kazachstan, diaspora; nazwa
   zawsze „Очко 21”, nigdy samo „Очко”), `sh.ts` — jedna wersja łacińska

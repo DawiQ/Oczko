@@ -25,7 +25,12 @@
       "de": "./locales/de.json",
       "cs": "./locales/cs.json",
       "sk": "./locales/sk.json",
-      "hu": "./locales/hu.json"
+      "hu": "./locales/hu.json",
+      "uk": "./locales/uk.json",
+      "ru": "./locales/ru.json",
+      "hr": "./locales/sh.json",
+      "sr": "./locales/sh.json",
+      "bs": "./locales/sh.json"
     },
     "android": {
       "package": "pl.dawiq.oczko",

@@ -1,7 +1,7 @@
 // App root: the onboarding, the main tabs (Graj · Profil · Zasady), new game,
 // the table and the screens opened from them. Navigation is a plain `Screen`
 // state (no library); Android "back" is handled here.
-import { useFonts } from "expo-font";
+import { loadAsync as loadFonts } from "expo-font";
 import * as SplashScreen from "expo-splash-screen";
 import { StatusBar } from "expo-status-bar";
 import { useCallback, useEffect, useState } from "react";
@@ -19,7 +19,7 @@ import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
 import type { SavedGame } from "./src/game/GameController";
 import { PACES, type Pace } from "./src/game/pace";
 import { freshSeed, localizeSetup, makeSetup } from "./src/game/setup";
-import { deviceLang, deviceLocales, I18nProvider, resolveLang, useStrings, type Lang, type Strings } from "./src/i18n";
+import { deviceLang, deviceLocales, I18nProvider, isCyrillic, resolveLang, useStrings, type Lang, type Strings } from "./src/i18n";
 import { useGame, type GameSource, type UseGameOptions } from "./src/game/useGame";
 import { HomeScreen, type ResumeInfo } from "./src/home/HomeScreen";
 import { LanScreen, type LanDeps } from "./src/lan/LanScreen";
@@ -51,7 +51,7 @@ import { LooksScreen } from "./src/premium/LooksScreen";
 import { PremiumProvider, usePremium } from "./src/premium/PremiumProvider";
 import type { StoreApi } from "./src/premium/store";
 import type { Reward } from "./src/premium/wallet";
-import { FONT_SOURCES } from "./src/ui/fonts";
+import { displayFont } from "./src/ui/fonts";
 import { setHapticsEnabled } from "./src/ui/haptics";
 import { P } from "./src/ui/palette";
 import { initSounds, setSoundEnabled } from "./src/ui/sound";
@@ -217,9 +217,10 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
   const premium = usePremium();
   const looks = useLooks();
   const [limit, setLimit] = useState<null | "analysis" | "bigTable" | "hints">(null);
-  const [fontsLoaded, fontError] = useFonts(FONT_SOURCES);
-  // A missing font must not block the app: it falls back to the system font.
-  const ready = !!stored && (fontsLoaded || !!fontError);
+  // The display face for the language's script, once the settings are read;
+  // a missing font must not block the app (it falls back to the system font).
+  const [fontsDone, setFontsDone] = useState(false);
+  const ready = !!stored && fontsDone;
   useEffect(() => {
     if (ready) SplashScreen.hideAsync().catch(() => {});
   }, [ready]);
@@ -229,8 +230,12 @@ function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV;
     loadAll(kv).then((s) => {
       if (!alive) return;
       applySettings(s.settings);
-      onLang(resolveLang(s.settings.lang, deviceLocales()));
+      const lang = resolveLang(s.settings.lang, deviceLocales());
+      onLang(lang);
       setStored(s);
+      loadFonts(displayFont(isCyrillic(lang)))
+        .catch(() => {})
+        .finally(() => alive && setFontsDone(true));
     });
     void initSounds();
     return () => {

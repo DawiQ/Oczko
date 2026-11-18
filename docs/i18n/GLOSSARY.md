@@ -154,3 +154,86 @@ Dodatki z przeglądu: „szansa na furę” — CS „riziko přetažení”, SK
 prekročiť 21”, HU „túllépés esélye”. Neutralność płciowa dotyczy też innych
 ludzi przy stole (gospodarz, goście): CS/SK bez czasu przeszłego z rodzajem
 („Už nejsi u stolu — rozhodnutí hostitele”).
+
+---
+
+# Słownik pojęć — UK, RU, BCMS (Etap 15)
+
+Zasady jak wyżej. Neutralność płciowa: UK/RU/BCMS mają czas przeszły
+z rodzajem — o graczach i innych ludziach przy stole tylko czas teraźniejszy,
+tryb rozkazujący, rzeczowniki, formy bezosobowe („Перебір!”, „Твій хід”).
+Zwracamy się na „ty”. Zero słownictwa hazardu: UK/RU ставка, ставити (w sensie
+zakładu), казино, фішки/фишки, крупʼє/крупье, джекпот; BCMS ulog, opklada,
+kladiti se, kazino, žetoni, krupije, džekpot.
+
+**RU — słowo „очко”:** potocznie wulgarne. Nigdy samo: w nazwie zawsze
+„Очко 21” / „двадцать одно”; w tekstach gra to „двадцать одно” albo
+„Oczko” (marka). Punkty to „баллы”, nie „очки”.
+
+**BCMS:** jedna wersja łacińska, ijekawska, słownictwo wspólne dla Bośni,
+Chorwacji, Czarnogóry i Serbii; gdzie słowa się różnią — wybierz neutralne
+(np. „bod” zamiast „poen”, „špil” jako talia, unikaj „tjedan/nedelja”,
+„vlak/voz” itp.). Nazwa języka w ustawieniach: „Bosanski · Hrvatski · Srpski”.
+
+| PL | UK | RU | BCMS | Uwagi |
+|---|---|---|---|---|
+| Oczko (marka) | Oczko | Oczko | Oczko | podtytuł: UK „польська гра в 21”, RU „польская игра в 21”, BCMS „poljska igra 21 · ajnc” |
+| Dobieram | Ще | Ещё | Još | przycisk |
+| Starczy | Досить | Хватит | Dosta | przycisk, status |
+| Fura! | Перебір! | Перебор! | Tropa! | „ma furę (24)” → „перебір (24)” / „перебор (24)” / „tropa (24)” |
+| Perskie oczko! | Два тузи! | Два туза! | Dva asa! | w zasadach raz: UK „(золоте очко)”, RU „(золотое очко)”, BCMS „(suvi ajnc)” |
+| bank / bankier | банк / банкір | банк / банкир | bank / bankar | „Z bankierem” → „З банкіром” / „С банкиром” / „S bankarom” |
+| tryb rodzinny | Сімейна гра | Семейная игра | Svi protiv svih | BCMS neutralnie (obiteljska/porodična różnią się) |
+| rozdanie | роздача | раздача | dijeljenje | „kto rozdaje” → „хто роздає” / „кто раздаёт” / „ko dijeli” |
+| runda | раунд | раунд | runda | |
+| partia | партія | партия | partija | |
+| punkt | бал | балл | bod | |
+| talia | колода | колода | špil | |
+| remis | нічия | ничья | neriješeno | |
+| Pokaż wynik | Показати результат | Показать результат | Prikaži rezultat | |
+| Rewanż | Реванш | Реванш | Revanš | |
+| Trener | Тренер | Тренер | Trener | |
+| Trening | Тренування | Тренировка | Trening | |
+| reguły domowe | домашні правила | домашние правила | kućna pravila | „Jak grasz u siebie” → „Твої домашні правила” / „Твои домашние правила” / „Tvoja kućna pravila” |
+| rywale | суперники | соперники | protivnici | |
+| gospodarz / gość | господар / гість | хозяин / гость | domaćin / gost | |
+| odznaka | значок | значок | značka | |
+| ranga | ранг | ранг | rang | |
+| powtórka | повтор | повтор | snimak | |
+| wygląd | вигляд | оформление | izgled | talie, sukna, rewersy: UK колоди, сукна, сорочки; RU колоды, сукна, рубашки; BCMS špilovi, čoje, poleđine |
+| szansa na furę | ризик перебору | риск перебора | rizik trope | |
+
+## Karty
+
+| | UK | RU | BCMS |
+|---|---|---|---|
+| litery J/Q/K/A | В / Д / К / Т | В / Д / К / Т | J / Q / K / A |
+| kolory ♥ ♦ ♣ ♠ | чирви, бубни, трефи, піки | черви, бубны, трефы, пики | herc, karo, tref, pik |
+| figury dla czytnika | валет, дама, король, туз | валет, дама, король, туз | dečko, dama, kralj, as |
+| wartości | В 2, Д 3, К 4, Т 11 | В 2, Д 3, К 4, Т 11 | J 2, Q 3, K 4, A 11 |
+
+## Postacie
+
+| id | UK | RU | BCMS | poziom UK / RU / BCMS |
+|---|---|---|---|---|
+| zosia | Зоя | Зоя | Zoja | Новачка / Новичок / Početnica |
+| kuba | Яків | Яша | Jakov | Легкий / Лёгкий / Lak |
+| witek | Вітько | Витя | Vito | Ризикант / Рисковый / Rizikaš |
+| hela | Галя | Галя | Jela | Обережна / Осторожная / Oprezna |
+| ola | Оля | Оля | Olja | Середня / Средняя / Srednja |
+| marek | Марко | Марк | Marko | Важкий / Сложный / Težak |
+| profesor | Професор | Профессор | Profesor | Експерт / Эксперт / Ekspert |
+| hrabia | Граф | Граф | Grof | Майстер / Мастер / Majstor |
+
+`withName` (narzędnik, bez przyimka): UK „Зоєю, Яковом, Вітьком, Галею,
+Олею, Марком, Професором, Графом”; RU „Зоей, Яшей, Витей, Галей, Олей,
+Марком, Профессором, Графом”; BCMS „Zojom, Jakovom, Vitom, Jelom, Oljom,
+Markom, Profesorom, Grofom”.
+
+## Liczba mnoga
+
+UK/RU/BCMS: `eastSlavicForm` (1, 21… / 2–4, 22–24… / reszta): UK „1 карта,
+2 карти, 5 карт”, „1 бал, 2 бали, 5 балів”, „1 раунд, 2 раунди, 5 раундів”;
+RU „1 карта, 2 карты, 5 карт”, „1 балл, 2 балла, 5 баллов”, „1 раунд,
+2 раунда, 5 раундов”; BCMS „1 karta, 2 karte, 5 karata”, „1 bod, 2 boda,
+5 bodova”, „1 runda, 2 runde, 5 rundi”.

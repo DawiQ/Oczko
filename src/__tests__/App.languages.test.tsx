@@ -21,7 +21,8 @@ import { ONBOARDING_KEY } from "../storage/onboarding";
 import { DEFAULT_SETTINGS, SETTINGS_KEY } from "../storage/settings";
 /* eslint-enable import/first */
 
-const POLISH = /[ąćęłńśźżĄĆĘŁŃŚŹŻ]/;
+/** Letters only Polish has among the app's languages ("ć" is also BCMS). */
+const POLISH = /[ąęłńśźżĄĘŁŃŚŹŻ]/;
 
 /** Every fixed text of a dictionary. */
 const fixedTexts = (x: unknown): string[] => (typeof x === "string" ? [x] : typeof x === "object" && x !== null ? Object.values(x).flatMap(fixedTexts) : []);

@@ -22,7 +22,7 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 12 | Wiele języków — infrastruktura: słowniki, wybór języka, protokół Wi‑Fi v2 | gotowe |
 | 13 | Angielski i niemiecki: cała aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 14 | Czeski, słowacki, węgierski: aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
-| 15 | Ukraiński, rosyjski, BCMS | plan (`PLAN.md`) |
+| 15 | Ukraiński, rosyjski, BCMS (łacinka); czcionka dla cyrylicy | gotowe |
 
 ## Uruchomienie
 
@@ -199,13 +199,17 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - Wi‑Fi: protokół v2 — reakcje jako identyfikatory; każdy telefon pokazuje
   je w swoim języku.
 - `noLiterals.test.ts` — żadnych tekstów poza słownikami.
-- Języki: polski, angielski, niemiecki, czeski, słowacki, węgierski. Słownik pojęć: `docs/i18n/GLOSSARY.md`
+- Języki: polski, angielski, niemiecki, czeski, słowacki, węgierski,
+  ukraiński, rosyjski i jedna wersja łacińska dla Bośni, Chorwacji,
+  Czarnogóry i Serbii („sh”; telefony bs/hr/sr/cnr).
+- Czcionka: Fraunces (łacinka), Literata (cyrylica) pod jedną nazwą
+  `DISPLAY`, wybierana przy starcie wg języka (`src/ui/fonts.ts`). Słownik pojęć: `docs/i18n/GLOSSARY.md`
   (Draw / Stay, Bust!, Two aces!; Noch eine / Genug, Überkauft!, Feuer!).
 - `App.languages.test.tsx` — cała aplikacja w każdym języku (lobby, partia do
   końca, zakładki, ustawienia): na ekranie i w etykietach dostępności żadnych
   polskich liter.
 - Komunikaty uprawnień iOS per język: `locales/*.json` (`app.json` → `locales`).
-- Sklep: `store/listing-{pl,en,de,cs,sk,hu}.md`, `store/feature-graphic{,-en,-de,-cs,-sk,-hu}.png`.
+- Sklep: `store/listing-<język>.md`, `store/feature-graphic[-<język>].png`.
 - `storeTexts.test.ts` — dla każdego języka: limity znaków w opisie sklepu
   (nazwa 30, krótki opis 80, tekst promocyjny 170, słowa kluczowe 100,
   pełny opis 4000), komunikaty uprawnień iOS, grafika do Google Play.
