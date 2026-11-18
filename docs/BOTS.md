@@ -34,5 +34,19 @@ Ten sam turniej na kartach zestawu (2000 rozdań na tryb). Ajnc ma karty
 | 17 und 4 | 30.3% | 38.8% | 33.5% | 39.4% | 40.5% | 40.8% | 42.2% | 42.6% | NIE |
 | Oko bere | 30.3% | 42.2% | 35.9% | 42.2% | 41.8% | 41.8% | 43.0% | 43.3% | NIE |
 
+Siła zwykłego progu („staje przy t”) na kartach zestawu:
+
+| Zestaw | 12 | 13 | 14 | 15 | 16 | 17 | 18 | 19 | 20 |
+|---|---|---|---|---|---|---|---|---|---|
+| 17 und 4 | 34.8% | 37.0% | 38.8% | 39.6% | 39.4% | 40.5% | 40.8% | 39.5% | 33.5% |
+| Oko bere | 37.0% | 40.3% | 42.2% | 42.6% | 42.2% | 41.8% | 41.0% | 39.4% | 35.9% |
+
+Na talii 32 kart (bez kart 2–6) progi 14–18 dają prawie tę samą siłę —
+środkowe poziomy (Kuba, Hela, Ola, Marek) różnią się o ok. 1–2 pkt proc.,
+a samymi progami nie da się ich rozsunąć. Witek (ciągnie do 20) jest tu
+słabszy niż na 52 kartach. Decyzja (PLAN.md §13): postacie bez zmian —
+ich styl i opisy („staje przy 14”) zostają prawdziwe; kolejność poziomów
+obowiązuje dla domyślnego Oczka.
+
 Dla odniesienia: przy 4 równych graczach udział rund z punktem w trybie
 rodzinnym wynosi ok. 25% (+ remisy), a w banku 1:1 ok. 50%.
