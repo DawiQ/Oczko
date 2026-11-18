@@ -31,6 +31,9 @@ export interface Rules {
   playerBustLoses: boolean;
   /** A fura is announced at once and its cards shown. */
   bustRevealed: boolean;
+  /** Bank mode: the bank draws below 17 and stands from 17 (Russian/Ukrainian
+   *  Очко). Missing in rules saved before version 1.2 (false). */
+  bankTo17: boolean;
   /** Points that win the match. */
   target: number;
 }
@@ -57,6 +60,7 @@ export const DEFAULT_RULES: Rules = {
   playerBustLoses: true,
   bustRevealed: true,
   target: 10,
+  bankTo17: false,
 };
 
 export const PRESETS: Record<"family" | "bank" | "small24", Rules> = {
@@ -68,7 +72,7 @@ export const PRESETS: Record<"family" | "bank" | "small24", Rules> = {
 /** Seats per deck: the stock never runs out in practice — measured by
  *  `npm run stats` (docs/STATS.md): with one more seat the 24-card deck runs
  *  out in ~5% of rounds and the 32-card one in ~0.1%. */
-export const MAX_SEATS: Record<DeckSize, number> = { 24: 5, 32: 7, 52: 8 };
+export const MAX_SEATS: Record<DeckSize, number> = { 24: 5, 32: 7, 36: 8, 52: 8 };
 export const MIN_SEATS = 2;
 
 export const MAX_TARGET = 50;
@@ -76,8 +80,10 @@ export const MAX_CARDS_LIMIT = 12;
 
 const KEYS: (keyof Rules)[] = [
   "deck", "values", "ace", "persian", "startCards", "maxCards", "mode", "familyTie",
-  "bankTie", "bankScoring", "bankRotation", "playerBustLoses", "bustRevealed", "target",
+  "bankTie", "bankScoring", "bankRotation", "playerBustLoses", "bustRevealed", "target", "bankTo17",
 ];
+/** Keys added later: rules saved before them are read with a default. */
+const LATER_KEYS: (keyof Rules)[] = ["bankTo17"];
 
 const isInt = (x: unknown, min: number, max: number): x is number =>
   typeof x === "number" && Number.isInteger(x) && x >= min && x <= max;
@@ -88,14 +94,15 @@ export function validateRules(r: unknown): Rules | null {
   if (typeof r !== "object" || r === null || Array.isArray(r)) return null;
   const o = r as Record<string, unknown>;
   const keys = Object.keys(o);
-  if (keys.length !== KEYS.length || !KEYS.every((k) => keys.includes(k))) return null;
+  const needed = KEYS.filter((k) => !LATER_KEYS.includes(k));
+  if (!keys.every((k) => (KEYS as string[]).includes(k)) || !needed.every((k) => keys.includes(k))) return null;
 
   const v = o.values;
   if (typeof v !== "object" || v === null || Array.isArray(v)) return null;
   const vk = Object.keys(v);
   if (vk.length !== FACE_RANKS.length || !FACE_RANKS.every((k) => isInt((v as Record<string, unknown>)[k], 1, 11))) return null;
 
-  if (!oneOf(o.deck, [24, 32, 52] as const)) return null;
+  if (!oneOf(o.deck, [24, 32, 36, 52] as const)) return null;
   if (!oneOf(o.ace, ["eleven", "oneOrEleven"] as const)) return null;
   // Before version 1.1 a boolean.
   const persian: TwoAces | null = o.persian === true ? "wins" : o.persian === false ? "off" : oneOf(o.persian, ["wins", "is21", "off"] as const) ? o.persian : null;
@@ -109,6 +116,8 @@ export function validateRules(r: unknown): Rules | null {
   if (!oneOf(o.bankRotation, ["everyRound", "onPersian", "fixed"] as const)) return null;
   if (typeof o.playerBustLoses !== "boolean" || typeof o.bustRevealed !== "boolean") return null;
   if (!isInt(o.target, 1, MAX_TARGET)) return null;
+  const bankTo17 = o.bankTo17 === undefined ? false : o.bankTo17;
+  if (typeof bankTo17 !== "boolean") return null;
 
   const values = {} as Record<FaceRank, number>;
   for (const k of FACE_RANKS) values[k] = (v as Record<string, number>)[k];
@@ -127,5 +136,6 @@ export function validateRules(r: unknown): Rules | null {
     playerBustLoses: o.playerBustLoses,
     bustRevealed: o.bustRevealed,
     target: o.target,
+    bankTo17,
   };
 }

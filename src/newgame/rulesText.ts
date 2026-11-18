@@ -40,5 +40,6 @@ export function preview(r: Rules, s: Strings = pl): string {
   const start = r.mode === "bank" ? t.bank(r.bankTie === "bankWins") : t.family;
   const persian = r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : "";
   const aceTxt = r.ace === "oneOrEleven" ? t.oneOrEleven : "";
-  return start + persian + aceTxt;
+  const bank17 = r.mode === "bank" && r.bankTo17 ? t.bankTo17 : "";
+  return start + persian + aceTxt + bank17;
 }

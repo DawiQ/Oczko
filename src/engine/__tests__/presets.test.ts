@@ -1,4 +1,6 @@
 // Regional rule sets and the two-aces rule variants.
+import { makeDeck, rankOf } from "../cards";
+import { apply, bankForced, legal, newRound } from "../round";
 import { cards } from "../testUtils";
 import { PRESET_IDS, PRESETS_BY_ID, presetOf, suggestedRules, suggestPreset, withPreset } from "../presets";
 import { DEFAULT_RULES, validateRules } from "../rules";
@@ -65,5 +67,48 @@ describe("two aces", () => {
     expect(validateRules({ ...DEFAULT_RULES, persian: true })?.persian).toBe("wins");
     expect(validateRules({ ...DEFAULT_RULES, persian: false })?.persian).toBe("off");
     expect(validateRules({ ...DEFAULT_RULES, persian: "maybe" })).toBeNull();
+  });
+});
+
+describe("Очко: 36 cards and the bank drawing to 17", () => {
+  it("the 36-card deck is 6–A in every suit", () => {
+    const d = makeDeck(36);
+    expect(d).toHaveLength(36);
+    expect(Math.min(...d.map(rankOf))).toBe(6);
+    expect(new Set(d).size).toBe(36);
+  });
+
+  it("is suggested in Ukraine and Kazakhstan, and for Ukrainian or Russian phones", () => {
+    expect(suggestPreset("UA", "uk")).toBe("ochko");
+    expect(suggestPreset("KZ", "ru")).toBe("ochko");
+    expect(suggestPreset(null, "ru")).toBe("ochko");
+    expect(withPreset(DEFAULT_RULES, "ochko")).toMatchObject({ deck: 36, persian: "wins", mode: "bank", bankTo17: true });
+  });
+
+  it("the bank must draw below 17 and stand from 17; players choose freely", () => {
+    const rules = withPreset(DEFAULT_RULES, "ochko");
+    for (let seed = 1; seed < 40; seed++) {
+      let s = newRound(rules, 3, seed, 0, 0);
+      while (s.turn !== null) {
+        const moves = legal(s);
+        if (s.turn === s.bank) {
+          const total = handValue(s.hands[s.turn], rules).total;
+          expect(moves).toEqual([total < 17 ? "hit" : "stand"]);
+          expect(bankForced(s)).toBe(moves[0]);
+        } else expect(moves).toEqual(["hit", "stand"]);
+        // Players stand at once; the bank does what it must.
+        const r = apply(s, s.turn, s.turn === s.bank ? moves[0] : "stand");
+        if ("error" in r) throw new Error(r.error);
+        s = r.state;
+      }
+      const bankHand = handValue(s.hands[0], rules);
+      expect(bankHand.bust || bankHand.persian || bankHand.total >= 17 || s.result !== null).toBe(true);
+    }
+  });
+
+  it("without the rule (or in the family game) nobody is forced", () => {
+    const rules = { ...withPreset(DEFAULT_RULES, "ochko"), bankTo17: false };
+    expect(legal(newRound(rules, 3, 5, 0, 0)).length).toBeLessThanOrEqual(2);
+    expect(bankForced(newRound({ ...rules, bankTo17: true, mode: "family" }, 3, 5, 0, null))).toBeNull();
   });
 });

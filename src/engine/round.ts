@@ -124,9 +124,17 @@ export function dealRound(
   return d;
 }
 
+/** The bank's move under "bank draws to 17" (null: free to choose). */
+export function bankForced(s: RoundState): Action | null {
+  if (!s.rules.bankTo17 || s.rules.mode !== "bank" || s.turn === null || s.turn !== s.bank) return null;
+  return handValue(s.hands[s.turn], s.rules).total < 17 ? "hit" : "stand";
+}
+
 export function legal(s: RoundState): Action[] {
   if (s.result || s.turn === null) return [];
-  return s.stock.length > 0 ? ["hit", "stand"] : ["stand"];
+  if (s.stock.length === 0) return ["stand"];
+  const forced = bankForced(s);
+  return forced ? [forced] : ["hit", "stand"];
 }
 
 export function apply(

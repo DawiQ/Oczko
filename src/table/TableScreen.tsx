@@ -185,7 +185,7 @@ export function TableScreen({
   const seatW = PORTRAIT_SIZE[size] + 56;
   const myTurn = snap.phase === "myTurn";
   const canHit = myTurn && snap.view.legal.includes("hit") && (!allowed || allowed.includes("hit"));
-  const canStand = myTurn && (!allowed || allowed.includes("stand"));
+  const canStand = myTurn && snap.view.legal.includes("stand") && (!allowed || allowed.includes("stand"));
   const at21 = myTurn && snap.view.myValue.total === 21;
 
   const giveUp = async () => {

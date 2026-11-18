@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "от семёрки" },
+      36: { label: common.cards(36), sub: "от шестёрки" },
       24: { label: common.cards(24), sub: "от девятки" },
     } as Record<DeckSize, Option>,
     twoAces: "Два туза",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Германия, Австрия" },
       okoBere: { name: "Oko bere", sub: "Чехия, Словакия" },
       ajnc: { name: "Ajnc", sub: "Балканы" },
+      ochko: { name: "Двадцать одно", sub: "Украина, Казахстан" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Туз",
     aceA11y: "Стоимость туза",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "Даже если у банка тоже перебор",
     bustRevealed: "Перебор виден сразу",
     bustRevealedSub: "Карты с перебором открываются сразу",
+    bankTo17: "Банк берёт до 17",
+    bankTo17Sub: "Ниже 17 обязан брать, с 17 останавливается",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Каждый берёт карты и говорит «Хватит», когда захочет. Балл получает сумма, ближайшая к 21 без перебора.",
     persian: " Два туза бьют всё.",
     is21: " Два туза считаются как 21.",
+    bankTo17: " Банк берёт до 17.",
     oneOrEleven: " Туз считается за 1 или 11.",
   },
 

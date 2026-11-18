@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "sevens up" },
+      36: { label: common.cards(36), sub: "sixes up" },
       24: { label: common.cards(24), sub: "nines up" },
     } as Record<DeckSize, Option>,
     twoAces: "Two aces",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Germany, Austria" },
       okoBere: { name: "Oko bere", sub: "Czechia, Slovakia" },
       ajnc: { name: "Ajnc", sub: "Balkans" },
+      ochko: { name: "Ochko", sub: "Ukraine, Kazakhstan" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ace",
     aceA11y: "Ace value",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "Even when the bank is bust too",
     bustRevealed: "Busts are shown at once",
     bustRevealedSub: "A bust hand is turned face up right away",
+    bankTo17: "Bank draws to 17",
+    bankTo17Sub: "Below 17 it must draw, from 17 it stays",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Everyone draws cards and says “Stay” whenever they like. The total closest to 21 without going bust gets the point.",
     persian: " Two aces beat everything.",
     is21: " Two aces count as 21.",
+    bankTo17: " The bank draws to 17.",
     oneOrEleven: " An ace counts as 1 or 11.",
   },
 

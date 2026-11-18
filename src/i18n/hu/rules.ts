@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "hetestől" },
+      36: { label: common.cards(36), sub: "hatostól" },
       24: { label: common.cards(24), sub: "kilencestől" },
     } as Record<DeckSize, Option>,
     twoAces: "Két ász",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Németország, Ausztria" },
       okoBere: { name: "Oko bere", sub: "Csehország, Szlovákia" },
       ajnc: { name: "Ajnc", sub: "Balkán" },
+      ochko: { name: "Ocsko", sub: "Ukrajna, Kazahsztán" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ász",
     aceA11y: "Az ász értéke",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "Akkor is, ha a banknak is túl sok",
     bustRevealed: "A túl sok rögtön látszik",
     bustRevealedSub: "A 21 fölötti kéz lapjai azonnal felfordulnak",
+    bankTo17: "A bank 17-ig húz",
+    bankTo17Sub: "17 alatt húznia kell, 17-től megáll",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Mindenki lapokat kér, és amikor akarja, azt mondja: „Elég”. A pontot az kapja, aki túllépés nélkül a legközelebb van a 21-hez.",
     persian: " A két ász mindent üt.",
     is21: " A két ász 21-et ér.",
+    bankTo17: " A bank 17-ig húz.",
     oneOrEleven: " Az ász 1-et vagy 11-et ér.",
   },
 

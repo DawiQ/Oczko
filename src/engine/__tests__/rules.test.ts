@@ -21,7 +21,13 @@ describe("rules", () => {
     expect(DEFAULT_RULES.values).toMatchObject({ 2: 2, 10: 10, 11: 2, 12: 3, 13: 4 });
     expect(PRESETS.bank.mode).toBe("bank");
     expect(PRESETS.small24.deck).toBe(24);
-    expect(MAX_SEATS).toEqual({ 24: 5, 32: 7, 52: 8 });
+    expect(MAX_SEATS).toEqual({ 24: 5, 32: 7, 36: 8, 52: 8 });
+  });
+
+  it("reads rules saved before \"bank draws to 17\" (no field) with the rule off", () => {
+    const old: Record<string, unknown> = json(DEFAULT_RULES);
+    delete old.bankTo17;
+    expect(validateRules(old)).toEqual(DEFAULT_RULES);
   });
 
   it("accepts every preset after a JSON round trip", () => {
@@ -38,7 +44,8 @@ describe("rules", () => {
   const bad: [string, (r: Record<string, unknown>) => void][] = [
     ["a missing field", (r) => delete r.target],
     ["an unknown field", (r) => (r.stake = 1)],
-    ["deck 36", (r) => (r.deck = 36)],
+    ["deck 40", (r) => (r.deck = 40)],
+    ["bankTo17 'yes'", (r) => (r.bankTo17 = "yes")],
     ["value 0", (r) => ((r.values as Record<string, number>)[12] = 0)],
     ["value 12", (r) => ((r.values as Record<string, number>)[2] = 12)],
     ["value 2.5", (r) => ((r.values as Record<string, number>)[2] = 2.5)],

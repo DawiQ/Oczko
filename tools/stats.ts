@@ -71,6 +71,7 @@ for (const [name, rules, seats] of [
   // Regional rule sets (PLAN.md §13); Ajnc has the cards of 17 und 4.
   ["17 und 4 / Ajnc (32, z bankierem)", withPreset(DEFAULT_RULES, "siebzehnUndVier"), 4],
   ["Oko bere (32, 1 · 1 · 2, dwa asy = 21)", withPreset(DEFAULT_RULES, "okoBere"), 4],
+  ["Очко (36, z bankierem, bank do 17)", withPreset(DEFAULT_RULES, "ochko"), 4],
 ] as const) {
   const s = roundStats(rules, seats, mixed(seats), 20000);
   presetRows.push(
@@ -141,7 +142,7 @@ function emptyStock(rules: Rules, seats: number, stopAt: number, N: number): num
 }
 
 const stockRows: string[] = [];
-for (const deck of [24, 32, 52] as const) {
+for (const deck of [24, 32, 36, 52] as const) {
   const rules: Rules = { ...DEFAULT_RULES, deck, startCards: 2 };
   const cells: string[] = [];
   for (let seats = 2; seats <= 8; seats++) {

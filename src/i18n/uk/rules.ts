@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "від сімки" },
+      36: { label: common.cards(36), sub: "від шістки" },
       24: { label: common.cards(24), sub: "від дев'ятки" },
     } as Record<DeckSize, Option>,
     twoAces: "Два тузи",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Німеччина, Австрія" },
       okoBere: { name: "Oko bere", sub: "Чехія, Словаччина" },
       ajnc: { name: "Ajnc", sub: "Балкани" },
+      ochko: { name: "Очко", sub: "Україна, Казахстан" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Туз",
     aceA11y: "Значення туза",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "Навіть коли в банку теж перебір",
     bustRevealed: "Перебір видно відразу",
     bustRevealedSub: "Карти з перебором відкриваються одразу",
+    bankTo17: "Банк бере до 17",
+    bankTo17Sub: "Нижче 17 мусить брати, від 17 зупиняється",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Кожен бере карти й каже «Досить», коли хоче. Бал отримує результат, найближчий до 21 без перебору.",
     persian: " Два тузи виграють у будь-якої руки.",
     is21: " Два тузи рахуються як 21.",
+    bankTo17: " Банк бере до 17.",
     oneOrEleven: " Туз рахується як 1 або 11.",
   },
 

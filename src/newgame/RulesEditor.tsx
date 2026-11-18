@@ -10,7 +10,7 @@ import { Counter, Label, Segmented, SwitchRow } from "../ui/controls";
 import { P } from "../ui/palette";
 import { FACES, facesPreset, withFaces, type FacesPreset } from "./rulesText";
 
-const DECKS: DeckSize[] = [52, 32, 24];
+const DECKS: DeckSize[] = [52, 36, 32, 24];
 
 export function RulesEditor({
   rules,
@@ -182,6 +182,7 @@ export function RulesEditor({
                   { value: "fixed" as const, label: t.bankRotationOptions.fixed },
                 ]}
               />
+              <SwitchRow label={t.bankTo17} sub={t.bankTo17Sub} value={rules.bankTo17} onChange={(bankTo17) => set({ bankTo17 })} />
               <SwitchRow
                 label={t.playerBustLoses}
                 sub={t.playerBustLosesSub}

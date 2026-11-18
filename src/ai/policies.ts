@@ -15,8 +15,12 @@ export type PolicySpec =
   | { kind: "evaluator"; samples: number; standAt: number; continueAt?: number };
 
 const canHit = (v: SeatView) => v.legal.includes("hit");
-/** Never draw on 21 or with a card that cannot be taken. */
-const forced = (v: SeatView): Action | null => (!canHit(v) || v.myValue.total >= 21 ? "stand" : null);
+/** The move when there is no choice: never draw on 21 or when no card can be
+ *  taken; the only legal move (the bank under "draws to 17"). */
+const forced = (v: SeatView): Action | null => {
+  if (v.legal.length === 1) return v.legal[0];
+  return !canHit(v) || v.myValue.total >= 21 ? "stand" : null;
+};
 
 /** "Dobieram" below `t`. */
 export function threshold(t: number): Policy {

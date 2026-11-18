@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "od sedmiček" },
+      36: { label: common.cards(36), sub: "od šestek" },
       24: { label: common.cards(24), sub: "od devítek" },
     } as Record<DeckSize, Option>,
     twoAces: "Dvě esa",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Německo, Rakousko" },
       okoBere: { name: "Oko bere", sub: "Česko, Slovensko" },
       ajnc: { name: "Ajnc", sub: "Balkán" },
+      ochko: { name: "Očko", sub: "Ukrajina, Kazachstán" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Eso",
     aceA11y: "Hodnota esa",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "I když má přes i bank",
     bustRevealed: "Přes je vidět hned",
     bustRevealedSub: "Přetažené ruce se odkryjí okamžitě",
+    bankTo17: "Bank bere do 17",
+    bankTo17Sub: "Pod 17 musí brát, od 17 stojí",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Každý bere karty, dokud neřekne „Stačí“. Bod dostane, kdo je nejblíž 21 a nepřetáhne.",
     persian: " Dvě esa vyhrávají nad vším.",
     is21: " Dvě esa se počítají jako 21.",
+    bankTo17: " Bank bere do 17.",
     oneOrEleven: " Eso platí 1 nebo 11.",
   },
 

@@ -470,7 +470,7 @@ export class LanHost {
     this.moveTick = setInterval(() => this.gameChanged(), 1000);
     this.moveTimer = setTimeout(() => {
       this.moveTimer = null;
-      this.game?.act(turn!, "stand");
+      this.game?.autoMove(turn!);
     }, this.opts.moveMs);
   }
 

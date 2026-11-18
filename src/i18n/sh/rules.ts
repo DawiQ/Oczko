@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "od sedmice" },
+      36: { label: common.cards(36), sub: "od šestice" },
       24: { label: common.cards(24), sub: "od devetke" },
     } as Record<DeckSize, Option>,
     twoAces: "Dva asa",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Njemačka, Austrija" },
       okoBere: { name: "Oko bere", sub: "Češka, Slovačka" },
       ajnc: { name: "Ajnc", sub: "Balkan" },
+      ochko: { name: "Očko", sub: "Ukrajina, Kazahstan" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Vrijednost asa",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "I kad i bank ima tropu",
     bustRevealed: "Tropa se vidi odmah",
     bustRevealedSub: "Karte s tropom otvaraju se odmah",
+    bankTo17: "Bank vuče do 17",
+    bankTo17Sub: "Ispod 17 mora vući, od 17 staje",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Svi vuku karte i kažu „Dosta“ kad hoće. Bod ide rezultatu najbližem 21 bez trope.",
     persian: " Dva asa pobjeđuju sve.",
     is21: " Dva asa vrijede kao 21.",
+    bankTo17: " Bank vuče do 17.",
     oneOrEleven: " As vrijedi 1 ili 11.",
   },
 

@@ -28,6 +28,7 @@ export const rules: typeof pl.rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "ab der Sieben" },
+      36: { label: common.cards(36), sub: "ab der Sechs" },
       24: { label: common.cards(24), sub: "ab der Neun" },
     } as Record<DeckSize, Option>,
     twoAces: "Zwei Asse",
@@ -40,6 +41,7 @@ export const rules: typeof pl.rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Deutschland, Österreich" },
       okoBere: { name: "Oko bere", sub: "Tschechien, Slowakei" },
       ajnc: { name: "Ajnc", sub: "Balkan" },
+      ochko: { name: "Ochko", sub: "Ukraine, Kasachstan" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ass",
     aceA11y: "Wert des Asses",
@@ -65,6 +67,8 @@ export const rules: typeof pl.rules = {
     playerBustLosesSub: "Auch wenn sich die Bank ebenfalls überkauft",
     bustRevealed: "Überkaufen sofort sichtbar",
     bustRevealedSub: "Überkaufte Hände werden gleich aufgedeckt",
+    bankTo17: "Bank zieht bis 17",
+    bankTo17Sub: "Unter 17 muss sie ziehen, ab 17 hört sie auf",
   },
 
   /** The lobby's / settings' short lines. */
@@ -84,6 +88,7 @@ export const rules: typeof pl.rules = {
     family: "Alle ziehen Karten und sagen „Genug“, wann sie wollen. Den Punkt bekommt, wer am nächsten an 21 liegt, ohne sich zu überkaufen.",
     persian: " Zwei Asse („Feuer“) schlagen alles.",
     is21: " Zwei Asse zählen als 21.",
+    bankTo17: " Die Bank zieht bis 17.",
     oneOrEleven: " Das Ass zählt 1 oder 11.",
   },
 

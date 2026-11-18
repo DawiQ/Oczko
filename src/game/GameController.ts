@@ -7,7 +7,7 @@ import { personaById, type PersonaId } from "../ai/personas";
 import { decideAsync, type PolicySpec } from "../ai/policies";
 import { matchApply, newMatch, nextRound as engineNextRound, type MatchState } from "../engine/match";
 import { makeRng, splitmix32, type Rng } from "../engine/rng";
-import type { Action, RoundEvent } from "../engine/round";
+import { legal, type Action, type RoundEvent } from "../engine/round";
 import { handValue } from "../engine/score";
 import { eventsFor, viewFor, type OtherSeat, type SeatView } from "../engine/view";
 import { PACES, type Pace } from "./pace";
@@ -126,6 +126,17 @@ export class GameController implements TableGame {
     this.listeners.add(listener);
     return () => this.listeners.delete(listener);
   };
+
+  /** "Starczy", or the only legal move (the bank under "draws to 17"). */
+  private defaultMove(): Action {
+    const moves = legal(this.match.round);
+    return moves.includes("stand") ? "stand" : (moves[0] ?? "stand");
+  }
+
+  /** A person's move made for them (Wi‑Fi: time is up). */
+  autoMove(seat: number): GameError | null {
+    return this.act(seat, this.defaultMove());
+  }
 
   hit = (): GameError | null => this.act(this.me, "hit");
   stand = (): GameError | null => this.act(this.me, "stand");
@@ -308,7 +319,7 @@ export class GameController implements TableGame {
         if (g !== this.gen || d === null) return;
         this.botRng = d.rng;
         this.thinking = null;
-        if (this.applyMove(seat, d.action)) this.applyMove(seat, "stand");
+        if (this.applyMove(seat, d.action)) this.applyMove(seat, this.defaultMove());
       }
     } finally {
       if (g === this.gen) this.running = false;

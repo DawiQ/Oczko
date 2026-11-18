@@ -27,6 +27,7 @@ export const rules = {
     deckOptions: {
       52: { label: common.cards(52) },
       32: { label: common.cards(32), sub: "od siódemki" },
+      36: { label: common.cards(36), sub: "od szóstki" },
       24: { label: common.cards(24), sub: "od dziewiątki" },
     } as Record<DeckSize, Option>,
     twoAces: "Dwa asy",
@@ -39,6 +40,7 @@ export const rules = {
       siebzehnUndVier: { name: "17 und 4", sub: "Niemcy, Austria" },
       okoBere: { name: "Oko bere", sub: "Czechy, Słowacja" },
       ajnc: { name: "Ajnc", sub: "Bałkany" },
+      ochko: { name: "Очко", sub: "Ukraina, Kazachstan" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Wartość asa",
@@ -64,6 +66,8 @@ export const rules = {
     playerBustLosesSub: "Także gdy bank też ma furę",
     bustRevealed: "Furę widać od razu",
     bustRevealedSub: "Karty z furą odkrywane natychmiast",
+    bankTo17: "Bank dobiera do 17",
+    bankTo17Sub: "Poniżej 17 musi dobierać, od 17 staje",
   },
 
   /** The lobby's / settings' short lines. */
@@ -83,6 +87,7 @@ export const rules = {
     family: "Każdy dobiera karty i mówi „Starczy”, gdy chce. Punkt dostaje wynik najbliżej 21 bez fury.",
     persian: " Dwa asy to perskie oczko — wygrywa wszystko.",
     is21: " Dwa asy liczą się jak 21.",
+    bankTo17: " Bank dobiera do 17.",
     oneOrEleven: " As liczy się za 1 albo 11.",
   },
 
