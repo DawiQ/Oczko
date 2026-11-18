@@ -63,7 +63,7 @@
 
 - [ ] Telefon (Play: min. 2, App Store 6,7" i 5,5"): lobby, stół w trakcie
       rundy (z trenerem), perskie oczko, koniec rundy, profil, Wi‑Fi (kod
-      stołu). Bez kasynowych motywów; wygląd „Zielone” lub „Orzech”.
+      stołu). Bez motywów kojarzących się z hazardem; wygląd „Zielone” lub „Orzech”.
 
 ## 6. Google Play Console
 
@@ -103,8 +103,8 @@
    w pluginie `react-native-google-mobile-ads` (`app.json`, teraz testowe),
    ID jednostek w `expo.extra.monetization.rewardedAndroid / rewardedIos`.
 3. [ ] **AdMob — zablokowane kategorie (obowiązkowo)**: Blocking controls →
-   Sensitive categories: zablokuj **„Gambling & Betting”** i **„Social
-   Casino”** dla obu aplikacji. Oczko to gra na punkty, bez pieniędzy
+   Sensitive categories: zablokuj **„Gambling & Betting”**
+   i **„Social Casino”** dla obu aplikacji. Oczko to gra na punkty, bez pieniędzy
    i nagród — reklamy hazardu nie mogą się w niej pojawiać.
 4. [ ] **Formularz zgód (UMP)**: AdMob → Privacy & messaging, komunikat GDPR
    dla EOG/UK/CH. Bez zgody reklamy są niespersonalizowane; zmiana zgody

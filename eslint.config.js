@@ -9,7 +9,7 @@ module.exports = defineConfig([
   },
   {
     // Node scripts and the Jest setup (CommonJS).
-    files: ["tools/**/*.js", "jest.setup.js", "eslint.config.js"],
+    files: ["tools/**/*.js", "plugins/**/*.js", "build.js", "jest.setup.js", "eslint.config.js"],
     languageOptions: {
       globals: { __dirname: "readonly", require: "readonly", module: "writable", process: "readonly", jest: "readonly" },
     },
