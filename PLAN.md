@@ -484,11 +484,82 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** build AAB i iOS przechodzi, checklista RELEASE.md
   wypełniona.
 
+### Etap 12 — Infrastruktura wielu języków (bez widocznej zmiany) ⏳
+Szczegóły i decyzje: §12. Po tym etapie aplikacja nadal jest tylko po polsku,
+ale żaden tekst UI nie jest już wpisany w komponent.
+- `src/i18n/`: typ `Lang`, słownik bazowy `pl.ts` (obiekt z kluczami
+  pogrupowanymi wg ekranów), typ `Strings = typeof pl` — kompilator pilnuje
+  kompletności każdego innego języka; `t()` z parametrami (`{name}`),
+  `plural(lang, n, forms)` wg reguł CLDR (własna implementacja, bez `Intl`).
+- `LocaleProvider` + `useT()`; moduły bez Reacta (`table/texts.ts`,
+  `hints.ts`, `rulesText.ts`, `tutorialScript.ts`, `profile/progress.ts`,
+  `premium/plans.ts`, `history/analysis.ts`) dostają słownik parametrem.
+- Przeniesienie wszystkich tekstów (ok. 730 polskich literałów w ~45 plikach
+  + teksty bez znaków diakrytycznych) do `pl.ts`, plik po pliku.
+- Karty: litery figur i nazwy kolorów dla czytnika ekranu w słowniku
+  (PL W/D/K, EN J/Q/K, DE B/D/K…).
+- Postacie: imiona i opisy w słowniku (lokalne imiona per język, te same
+  portrety i poziomy).
+- Wi‑Fi: protokół v2 — reakcje jako identyfikatory (`bravo`, `oops`…),
+  nie polskie napisy; każdy telefon pokazuje je w swoim języku. Starszy gość
+  dostaje odmowę „version”.
+- Ustawienia `oczko.settings.v2`: pole `lang` („auto” = język telefonu albo
+  wybrany); migracja z v1. Wykrywanie: `expo-localization`; wiersz „Język”
+  w Ustawieniach; zmiana bez restartu.
+- Czcionka: Fraunces ma łacinę rozszerzoną (ł, ő, č, đ), ale nie cyrylicę
+  ani greckie — `DISPLAY` zależny od pisma (dla cyrylicy druga czcionka OFL
+  z cyrylicą, wybór i licencja w tym etapie).
+- Test słów zakazanych: listy per język (§12) i skan słowników.
+- Testy: kompletność kluczy i parametrów `{…}` we wszystkich słownikach,
+  reguły liczby mnogiej (tabele), brak polskich znaków w słownikach innych
+  języków, test dymny aplikacji w każdym dostępnym języku, protokół v2.
+- Aktualizacja `CLAUDE.md` (teksty przez `t()`, zasady neutralności płciowej
+  dla wszystkich języków) i README.
+- **Gotowe, gdy:** w komponentach i modułach UI nie ma literałów tekstu
+  (test lub lint to sprawdza), aplikacja po polsku wygląda i działa jak
+  przed etapem, wszystkie testy zielone.
+
+### Etap 13 — Angielski i niemiecki
+- Słownik pojęć (glosariusz) dla EN i DE: „Dobieram”, „Starczy”, „Fura!”,
+  „Perskie oczko!”, „Bank”, nazwy trybów i reguł — bez słownictwa kasyna
+  (§12). Nazwa w sklepie: EN „Oczko — 21 card game”, DE „Oczko — 17 und 4”.
+- Tłumaczenia `en.ts`, `de.ts`; teksty samouczka i zasad przepisane, nie
+  tłumaczone dosłownie.
+- `app.json` → `locales`: nazwa aplikacji i komunikaty uprawnień (sieć
+  lokalna, aparat) dla iOS (i Androida, jeśli SDK pozwala — do sprawdzenia).
+- Sklep: `store/listing-en.md`, `store/listing-de.md`, grafika do Google
+  Play z napisem per język (`tools/render-art.js`), zrzuty ekranu.
+- Przegląd układu: najdłuższe teksty (niemiecki ~30% dłuższy) na małym
+  ekranie — zrzuty kluczowych ekranów w obu językach.
+- **Gotowe, gdy:** cała aplikacja i opisy sklepu w EN i DE, przegląd
+  tłumaczeń przez rodzimego użytkownika (właściciel organizuje), testy
+  zielone.
+
+### Etap 14 — Czeski, słowacki, węgierski
+- Jak Etap 13: glosariusz, `cs.ts`, `sk.ts`, `hu.ts`, opisy sklepu
+  („Oko bere”, „Oko berie”, „Huszonegy” w nazwie lub słowach kluczowych),
+  grafiki, przegląd układu.
+- Reguły liczby mnogiej cs/sk (1 / 2–4 / 5+), węgierski bez odmiany po
+  liczebniku.
+- **Gotowe, gdy:** jak Etap 13.
+
+### Etap 15 — Ukraiński, rosyjski, BCMS
+- Cyrylica: czcionka z Etapu 12 sprawdzona na wszystkich ekranach.
+- `uk.ts` (wymagany na Ukrainie), `ru.ts` (Kazachstan, diaspora; nazwa
+  zawsze „Очко 21”, nigdy samo „Очко”), `sh.ts` — jedna wersja łacińska
+  dla Serbii, Chorwacji, BiH i Czarnogóry („Ajnc”).
+- Dystrybucja: Rosja i Białoruś wyłączone w konsolach sklepów (płatności,
+  sankcje — `docs/RYNKI.md`).
+- **Gotowe, gdy:** jak Etap 13.
+
+Presety reguł regionalnych (talia 36 kart, inne wartości figur, Pontoon,
+7½) to osobne etapy po językach — zmiana silnika, nie tłumaczenie.
+
 ---
 
 ## 8. Trwałe dane (klucze)
 
-`oczko.save.v1`, `oczko.stats.v1`, `oczko.settings.v1`, `oczko.rules.v1`
+`oczko.save.v1`, `oczko.stats.v1`, `oczko.settings.v1` (od Etapu 12: `v2` z polem `lang`), `oczko.rules.v1`
 (reguły domowe z onboardingu), `oczko.newgame.v1`, `oczko.history.v1`,
 `oczko.onboarding.v1`, `oczko.hints.v1`, `oczko.premium.v1`, `oczko.pro.v1`,
 `oczko.looks.v1`, `oczko.lanStats.v1`.
@@ -543,3 +614,47 @@ na 24 h. Reset o północy.
   ratingów).
 - `docs/STATS.md` i `docs/BOTS.md` aktualne.
 - Pliki tymczasowe usunięte.
+
+---
+
+## 12. Wiele języków — decyzje i zasady
+
+Podstawa: raport rynków `docs/RYNKI.md`. Kolejność języków wg rynków: EN (sklepy,
+język zapasowy) → DE (DE/AT) → CS, SK → HU → UK, RU (KZ) → BCMS.
+
+| Decyzja | Wartość |
+|---|---|
+| Biblioteka | brak (własne `t()`, typy z `pl.ts`); jedyna nowa zależność: `expo-localization` |
+| Język bazowy | polski (`pl.ts` — źródło kluczy i typów) |
+| Język zapasowy | angielski dla telefonu w nieobsługiwanym języku; polski, gdy telefon po polsku |
+| Wybór | „Automatycznie (język telefonu)” albo ręcznie w Ustawieniach |
+| Liczba mnoga | własne reguły CLDR: pl, cs/sk, uk/ru, sh (1 / 2–4 / reszta z wyjątkami), en/de (1 / reszta), hu (bez odmiany) |
+| Nazwa gry w UI | „Oczko” jako marka we wszystkich językach; lokalna nazwa gry w podtytule i opisie sklepu |
+| Postacie | lokalne imiona per język, te same portrety, kolory i poziomy |
+| Wi‑Fi | reakcje i komunikaty jako identyfikatory; imiona graczy bez zmian |
+| Reguły | język nie zmienia reguł (presety regionalne osobno) |
+| Tłumaczenia | szkic tłumaczenia w repozytorium + przegląd rodzimego użytkownika przed wydaniem języka |
+
+**Słownictwo bez hazardu w każdym języku.** Test słów zakazanych dostaje listy
+rdzeni per język, m.in.:
+EN casino, chip(s), bet, wager, stake, croupier, jackpot, gambl, blackjack,
+card counting; DE Kasino/Casino, Jeton, Einsatz, Wette, wetten, Croupier,
+Jackpot, Glücksspiel; CS/SK kasino, žeton, sázk/stávk, krupiér, jackpot;
+HU kaszinó, zseton, tét, fogad, krupié, jackpot; UK/RU казино, фішк/фишк,
+ставк, крупʼє/крупье, джекпот; BCMS kazino, žeton, ulog, oklad, krupije,
+džekpot. Granice słowa i wyjątki (np. DE „Wetter”, HU „tét” vs „tétel”)
+ustalane z testem, jak dla polskiego.
+
+**Neutralność płciowa.** Jak po polsku: bez form czasu przeszłego zależnych od
+płci (CS, SK, UK, RU, BCMS) — czas teraźniejszy, tryb rozkazujący,
+rzeczowniki („Fura!”, „Twoja kolej”).
+
+**Ryzyko „simulated gambling”.** Teksty i opisy sklepu w każdym języku: gra na
+punkty, bez stawek; nigdy „blackjack”/„casino” w nazwie ani słowach
+kluczowych; kwestionariusze ocen wiekowych z tymi samymi odpowiedziami co
+dla Polski (`store/rating-answers.md`).
+
+**Do sprawdzenia w Etapie 12:** obsługa `locales` w `app.json` dla Androida
+w SDK 58 (nazwa aplikacji per język), dostępność `Intl` w Hermes (jeśli
+pewna — formatowanie dat historii przez `Intl.DateTimeFormat`), czcionka
+z cyrylicą pasująca do Fraunces.

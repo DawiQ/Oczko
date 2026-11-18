@@ -291,7 +291,9 @@ Pełna checklista: `store/RELEASE.md`. W skrócie:
 
 ## Dokumenty
 
-- `PLAN.md` — plan implementacji, decyzje (§0), specyfikacja silnika, etapy.
+- `PLAN.md` — plan implementacji, decyzje (§0), specyfikacja silnika, etapy
+  (Etapy 12–15 i §12: wiele języków — zaplanowane).
+- `docs/RYNKI.md` — raport rynków zagranicznych (ranking, bariery, ASO).
 - `CLAUDE.md` — zasady pracy i architektury.
 - `docs/BLUEPRINT.md` — opis aplikacji Pan (wzorzec architektury).
 - `docs/mockups/oczko-makiety.html` — makiety ekranów (zaakceptowane),
