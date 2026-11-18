@@ -14,7 +14,7 @@ export const onboarding: typeof pl.onboarding = {
   tutorial: {
     endTitle: "Takhle se hraje Oczko!",
     endText:
-      "Vítek přetáhl (přes — víc než 21), Kuba skončil níž, takže bod je tvůj. Hraje se do domluveného počtu bodů; a dvě esa vyhrávají nad vším.",
+      "Vítek přetáhl (víc než 21 — má přes), Kuba skončil níž, takže bod je tvůj. Hraje se do domluveného počtu bodů; a dvě esa vyhrávají nad vším.",
     play: "Hrát partii",
     lobby: "Do lobby",
   },

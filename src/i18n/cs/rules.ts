@@ -70,8 +70,8 @@ export const rules: typeof pl.rules = {
   /** The rules in one or two sentences ("Ve zkratce"). */
   preview: {
     bank: (bankWinsTies: boolean) =>
-      `Každý hraje s bankem: bere karty a řekne „Stačí“, bank hraje poslední${bankWinsTies ? " a vyhrává remízy" : ""}.`,
-    family: "Každý bere karty a řekne „Stačí“, kdy chce. Bod dostane, kdo je nejblíž 21 a nepřetáhne.",
+      `Každý hraje s bankem: bere karty, dokud neřekne „Stačí“; bank hraje poslední${bankWinsTies ? " a vyhrává remízy" : ""}.`,
+    family: "Každý bere karty, dokud neřekne „Stačí“. Bod dostane, kdo je nejblíž 21 a nepřetáhne.",
     persian: " Dvě esa vyhrávají nad vším.",
     oneOrEleven: " Eso platí 1 nebo 11.",
   },
@@ -83,7 +83,7 @@ export const rules: typeof pl.rules = {
     variants: "Varianty",
     goal: "Cíl",
     goalText:
-      "Dostaň se co nejblíž k 21, ale ne výš — podobně jako v Oko bere neboli Jednadvacet. Každý postupně říká „Ještě“ (bere kartu), nebo „Stačí“ (končí).",
+      "Dostaň se co nejblíž k 21, ale ne výš — podobně jako při hře Oko bere neboli Jednadvacet. Každý postupně říká „Ještě“ (bere kartu), nebo „Stačí“ (končí).",
     flow: "Průběh",
     flowTexts: [
       "Každý dostane kartu na začátek. Hraje se postupně, zleva od toho, kdo rozdává. Na konci kola všichni odkryjí karty.",
@@ -101,7 +101,7 @@ export const rules: typeof pl.rules = {
       "Všechno nastavíš v části „Tvoje domácí pravidla“ a u každé nové hry.",
     ],
     examples: {
-      persian: { title: "Dvě esa", text: "Dvě esa — vyhrávají nad vším." },
+      persian: { title: "Dvě esa", text: "Eso a eso — vyhrávají nad vším." },
       oczko: { title: "Oczko", text: "Přesně 21." },
       fura: { title: "Přes", text: "Víc než 21 — ruka prohrává." },
     } as Record<"persian" | "oczko" | "fura", { title: string; text: string }>,

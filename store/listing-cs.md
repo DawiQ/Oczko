@@ -14,7 +14,7 @@ Polská hra 21, jako Oko bere, na body: rodinná hra, s bankéřem i přes Wi‑
 ## Propagační text — App Store (170)
 
 Ještě, nebo stačí? Klasické Oczko podle tvých domácích pravidel, osm postav
-u stolu, trenér, který ukáže šance, a partie s přáteli ve stejné Wi‑Fi.
+u stolu, trenér, který ukáže šance, a partie s přáteli ve stejné síti Wi‑Fi.
 
 ## Klíčová slova — App Store (100, oddělená čárkou, bez mezer)
 
@@ -27,7 +27,7 @@ se tak, jak se hraje doma u stolu. Každý postupně říká „Ještě“, nebo
 Kolo vyhrává, kdo je nejblíž 21 — kdo přetáhne, má přes. Dvě esa? To je
 fojer — nejlepší ruka ze všech!
 
-Hraje se na body: každé vyhrané kolo je bod, partie jde do 5, 10 nebo 15.
+Hraje se na body: každé vyhrané kolo je bod, partie jde do 5, 10 nebo 15 bodů.
 Žádné peníze, žádné výhry — jen karty a dobrá zábava.
 
 TVOJE DOMÁCÍ PRAVIDLA

@@ -53,8 +53,8 @@ export const table: typeof pl.table = {
   },
   /** The live caption under the table. */
   caption: {
-    dealing: "Rozdávání",
-    dealingBank: (bank: string) => `Rozdávání · bank: ${bank}`,
+    dealing: "Rozdání",
+    dealingBank: (bank: string) => `Rozdání · bank: ${bank}`,
     at21: "Máš 21 — Stačí?",
     myTurn: (total: number) => `Tvůj tah · máš ${total}`,
     /** The last event, then whose turn it is. */

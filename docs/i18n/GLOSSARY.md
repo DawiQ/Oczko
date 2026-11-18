@@ -149,3 +149,8 @@ CS/SK: `czechForm` (1 / 2–4 / 5+): CS „1 karta, 2 karty, 5 karet”, „1 bo
 2 body, 5 bodů”, „1 kolo, 2 kola, 5 kol”; SK „1 karta, 2 karty, 5 kariet”,
 „1 bod, 2 body, 5 bodov”, „1 kolo, 2 kolá, 5 kôl”. HU: `hungarianForm`
 (liczebnik + liczba pojedyncza): „5 kártya”, „3 pont”, „2 kör”.
+
+Dodatki z przeglądu: „szansa na furę” — CS „riziko přetažení”, SK „šanca
+prekročiť 21”, HU „túllépés esélye”. Neutralność płciowa dotyczy też innych
+ludzi przy stole (gospodarz, goście): CS/SK bez czasu przeszłego z rodzajem
+(„Už nejsi u stolu — rozhodnutí hostitele”).

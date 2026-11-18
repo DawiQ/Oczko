@@ -10,7 +10,7 @@ export const profile: typeof pl.profile = {
   ranks: ["Devítka", "Desítka", "Kluk", "Dáma", "Král", "Eso", "Dvě esa"],
   /** Badges by id (progress.ts). */
   badges: {
-    persian: { name: "Dvě esa", desc: "Dvě esa v jedné ruce" },
+    persian: { name: "Dvě esa", desc: "Eso a eso v jedné ruce" },
     exact21: { name: "Přesně 21", desc: "Kolo zakončené s 21" },
     fiveCard: { name: "Oczko z pěti karet", desc: "21 z pěti nebo více karet" },
     edge: { name: "Na hraně", desc: "Výhra s 21 po „Ještě“ na 17 nebo víc" },
