@@ -52,6 +52,16 @@ describe("history record", () => {
     expect(frames.length).toBe(rec.decisions.length + rec.rounds);
   });
 
+  it("a record from before version 1.1 (two aces as a boolean) replays the same", async () => {
+    const rec = await playedRecord({ ...DEFAULT_RULES, target: 3 });
+    const old = JSON.parse(JSON.stringify(rec));
+    old.setup.rules.persian = true;
+    const kv = memoryKV({ [HISTORY_KEY]: JSON.stringify({ v: 1, records: [old] }) });
+    const [back] = await loadHistory(kv);
+    expect(back.setup.rules.persian).toBe("wins");
+    expect(replayMatches(back)).toBe(true);
+  });
+
   it("checks the analysis entries", async () => {
     const rec = await playedRecord({ ...DEFAULT_RULES, target: 2 });
     expect(looksLikeRecord({ ...rec, analysis: [{ index: 0, grade: "good", standWin: 0.4, hitWin: 0.3 }] })).toBe(true);

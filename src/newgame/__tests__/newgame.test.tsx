@@ -60,6 +60,12 @@ describe("rules in words", () => {
     expect([rules.values[11], rules.values[12], rules.values[13]]).toEqual([1, 1, 2]);
     pick("Wygrywają");
     expect(rules.persian).toBe("wins");
+    // The bank passing on two aces only with the rule where they win.
+    pick("Po perskim");
+    expect(rules.bankRotation).toBe("onPersian");
+    pick("Liczą 21");
+    expect(rules).toMatchObject({ persian: "is21", bankRotation: "everyRound" });
+    expect(r.root.findAll((n) => n.props.accessibilityLabel === "Po perskim")).toHaveLength(0);
     expect(textOf(r)).toContain("Własne");
     act(() => r.unmount());
   });

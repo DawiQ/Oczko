@@ -98,7 +98,8 @@ export function RulesEditor({
       <Segmented
         label={t.twoAces}
         value={rules.persian}
-        onChange={(persian) => set({ persian })}
+        // The bank passing on two aces needs the rule where they win.
+        onChange={(persian) => set({ persian, ...(persian !== "wins" && rules.bankRotation === "onPersian" ? { bankRotation: "everyRound" as const } : {}) })}
         options={(["wins", "is21", "off"] as const).map((value) => ({ value, label: t.twoAcesOptions[value] }))}
       />
       <Label>{t.ace}</Label>
@@ -176,9 +177,9 @@ export function RulesEditor({
                 value={rules.bankRotation}
                 onChange={(bankRotation) => set({ bankRotation })}
                 options={[
-                  { value: "everyRound", label: t.bankRotationOptions.everyRound },
-                  { value: "onPersian", label: t.bankRotationOptions.onPersian },
-                  { value: "fixed", label: t.bankRotationOptions.fixed },
+                  { value: "everyRound" as const, label: t.bankRotationOptions.everyRound },
+                  ...(rules.persian === "wins" ? [{ value: "onPersian" as const, label: t.bankRotationOptions.onPersian }] : []),
+                  { value: "fixed" as const, label: t.bankRotationOptions.fixed },
                 ]}
               />
               <SwitchRow
