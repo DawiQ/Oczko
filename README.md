@@ -127,6 +127,9 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - Rywale na łuku nad stołem (od mojej lewej), mniejsze portrety przy 6–7
   rywalach; ich karty zakryte do odsłonięcia (ujawniona fura od razu).
 - Na koniec rundy ręce odsłaniają się po kolei, potem panel z wynikiem.
+- Stemple „Fura!” i „Perskie oczko!” są rysowane w kodzie (`src/table/Effects.tsx`,
+  tekst Fraunces + `Animated`), więc skalują się bez bitmap; portrety, sukno,
+  bandy, ikony i grafiki sklepu — z `tools/render-*.js`.
 - Dźwięki (dobranie, Starczy, fura, perskie oczko, wygrana, koniec partii)
   i haptyka; animacje przez `Animated` z native driverem, przy „ogranicz
   ruch” — bez ruchu.
