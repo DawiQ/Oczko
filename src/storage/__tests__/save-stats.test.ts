@@ -63,6 +63,16 @@ describe("saved game", () => {
     expect(isResumable(s)).toBe(false);
   });
 
+  it("a save from before version 1.1 (two aces as a boolean) reads with the rule as it was", async () => {
+    const s = saved();
+    const old = JSON.parse(JSON.stringify(s));
+    for (const r of [old.setup.rules, old.match.rules, old.match.round.rules, old.roundStart.rules, old.roundStart.round.rules]) r.persian = true;
+    const kv = memoryKV({ [SAVE_KEY]: JSON.stringify(old) });
+    const back = (await loadSavedGame(kv))!;
+    expect(back).toEqual(s);
+    expect(back.match.round.rules.persian).toBe("wins");
+  });
+
   it("corrupt JSON reads as nothing", async () => {
     expect(await loadSavedGame(memoryKV({ [SAVE_KEY]: "{" }))).toBeNull();
   });

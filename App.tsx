@@ -31,7 +31,8 @@ import { FREE_SEATS, NewGameScreen } from "./src/newgame/NewGameScreen";
 import { summaryLines } from "./src/newgame/rulesText";
 import { TutorialScreen } from "./src/onboarding/TutorialScreen";
 import { Welcome } from "./src/onboarding/Welcome";
-import { loadHouseRules, saveHouseRules } from "./src/storage/houseRules";
+import { presetForLocales, withPreset } from "./src/engine/presets";
+import { loadHouseRulesOrNull, saveHouseRules } from "./src/storage/houseRules";
 import { deviceKV, type KV } from "./src/storage/kv";
 import { DEFAULT_CHOICES, loadChoices, saveChoices, type NewGameChoices } from "./src/storage/newGame";
 import { loadOnboardingDone, saveOnboardingDone } from "./src/storage/onboarding";
@@ -194,9 +195,9 @@ function applySettings(s: Settings): void {
 }
 
 async function loadAll(kv: KV): Promise<Stored> {
-  const [saved, rules, choices, settings, done, stats] = await Promise.all([
+  const [saved, savedRules, choices, settings, done, stats] = await Promise.all([
     loadSavedGame(kv),
-    loadHouseRules(kv),
+    loadHouseRulesOrNull(kv),
     loadChoices(kv),
     loadSettings(kv),
     loadOnboardingDone(kv),
@@ -204,6 +205,9 @@ async function loadAll(kv: KV): Promise<Stored> {
   ]);
   // Anyone who has played already skips the onboarding.
   const onboarded = done || stats.rounds > 0 || saved !== null;
+  // No house rules yet: a fresh install gets the set of the phone's country
+  // (PLAN.md §13); someone who played before keeps the app's defaults.
+  const rules = savedRules ?? (onboarded ? DEFAULT_RULES : withPreset(DEFAULT_RULES, presetForLocales(deviceLocales())));
   return { stats, saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
 }
 

@@ -49,5 +49,9 @@ export function suggestPreset(region: string | null | undefined, lang: string | 
   return (region && BY_REGION[region.toUpperCase()]) || (lang && BY_LANG[lang.toLowerCase()]) || "oczko";
 }
 
+/** The set for the phone's preferred locale. */
+export const presetForLocales = (locales: readonly { languageCode?: string | null; regionCode?: string | null }[]): PresetId =>
+  suggestPreset(locales[0]?.regionCode, locales[0]?.languageCode);
+
 /** The rules for a fresh install in a country (the app's defaults plus the set). */
 export const suggestedRules = (region: string | null | undefined, lang: string | null | undefined): Rules => withPreset(DEFAULT_RULES, suggestPreset(region, lang));

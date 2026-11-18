@@ -22,6 +22,8 @@ const ALIASES: Record<string, string> = { bs: "sh", hr: "sh", sr: "sh", cnr: "sh
 
 export interface LocaleLike {
   languageCode?: string | null;
+  /** The phone's country (ISO 3166), when known. */
+  regionCode?: string | null;
 }
 
 /** The phone's preferred language the app speaks (locales in order of

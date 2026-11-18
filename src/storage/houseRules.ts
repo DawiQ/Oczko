@@ -7,5 +7,7 @@ export const HOUSE_RULES_KEY = "oczko.rules.v1";
 
 const looksLikeRules = (x: unknown): x is Rules => validateRules(x) !== null;
 
-export const loadHouseRules = async (kv: KV): Promise<Rules> => validateRules(await readJSON(kv, HOUSE_RULES_KEY, looksLikeRules)) ?? DEFAULT_RULES;
+/** The saved house rules, or null when none were chosen yet. */
+export const loadHouseRulesOrNull = async (kv: KV): Promise<Rules | null> => validateRules(await readJSON(kv, HOUSE_RULES_KEY, looksLikeRules));
+export const loadHouseRules = async (kv: KV): Promise<Rules> => (await loadHouseRulesOrNull(kv)) ?? DEFAULT_RULES;
 export const saveHouseRules = (kv: KV, r: Rules) => writeJSON(kv, HOUSE_RULES_KEY, r);

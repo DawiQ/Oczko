@@ -50,6 +50,21 @@ describe("P(fura) is exact", () => {
     expect(evaluate(ace, { samples: 10, rng: { state: 1 }, opponentModel: model }).bustIfHit).toBe(0);
     const noPersian = viewFor(table({ ...DEFAULT_RULES, persian: "off" }, ["5♥", "A♥"]), 1);
     expect(evaluate(noPersian, { samples: 10, rng: { state: 1 }, opponentModel: model }).bustIfHit).toBeCloseTo(3 / 51, 12);
+    // Czech/Slovak "fojer": the second ace makes 21, not a fura.
+    const is21 = viewFor(table({ ...DEFAULT_RULES, persian: "is21" }, ["5♥", "A♥"]), 1);
+    expect(evaluate(is21, { samples: 10, rng: { state: 1 }, opponentModel: model }).bustIfHit).toBe(0);
+  });
+
+  it("two aces as 21 are a 21 in the playout (not a fura, not a win over everything)", () => {
+    // Seat 0 stood (14, hidden: assumed 17+); my A♥ — standing on 11 loses,
+    // one more card wins with an ace (two aces = 21) or a 10.
+    const rules = { ...DEFAULT_RULES, persian: "is21" as const };
+    const m = play(table(rules, ["10♥", "A♥"], "K♣", 1), "hit", "stand");
+    const v = viewFor(m, 1);
+    expect(v.myValue.total).toBe(11);
+    const e = evaluate(v, { samples: 4000, rng: { state: 3 }, opponentModel: model, continueAt: 0 });
+    expect(e.winIfStand).toBe(0);
+    expect(e.winIfHit).toBeGreaterThan(0);
   });
 });
 

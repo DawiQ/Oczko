@@ -3,16 +3,14 @@
 import { StyleSheet, Text, View } from "react-native";
 
 import type { DeckSize } from "../engine/cards";
-import { presetOf, PRESET_IDS, withPreset, type PresetId } from "../engine/presets";
+import { presetForLocales, presetOf, PRESET_IDS, withPreset, type PresetId } from "../engine/presets";
 import { type Rules } from "../engine/rules";
-import { useStrings } from "../i18n";
+import { deviceLocales, useStrings } from "../i18n";
 import { Counter, Label, Segmented, SwitchRow } from "../ui/controls";
 import { P } from "../ui/palette";
 import { FACES, facesPreset, withFaces, type FacesPreset } from "./rulesText";
 
 const DECKS: DeckSize[] = [52, 32, 24];
-/** The onboarding skips the 32-card deck. */
-const DECKS_BASIC: DeckSize[] = [52, 24];
 
 export function RulesEditor({
   rules,
@@ -36,7 +34,7 @@ export function RulesEditor({
     if (p === "custom") onChange(withFaces(rules, rules.values[11], rules.values[12], rules.values[13] === 4 ? 5 : rules.values[13]));
     else onChange(withFaces(rules, ...FACES[p]));
   };
-  const regional = presetOf(rules, preferPreset);
+  const regional = presetOf(rules, preferPreset ?? presetForLocales(deviceLocales()));
   return (
     <View>
       <Label>{t.preset}</Label>
@@ -94,7 +92,7 @@ export function RulesEditor({
         label={t.deck}
         value={rules.deck}
         onChange={(deck) => set({ deck })}
-        options={(basic ? DECKS_BASIC : DECKS).map((value) => ({ value, ...t.deckOptions[value] }))}
+        options={DECKS.map((value) => ({ value, ...t.deckOptions[value] }))}
       />
       <Label>{t.twoAces}</Label>
       <Segmented

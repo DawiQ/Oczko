@@ -171,6 +171,28 @@ describe.each(LANGS.filter((l) => l !== "pl").map((l) => [l]))("the app in %s", 
   });
 });
 
+describe("rule sets", () => {
+  it("a fresh install in Czechia starts with Oko bere", async () => {
+    const spy = jest.spyOn(jest.requireMock("expo-localization") as { getLocales: () => unknown[] }, "getLocales").mockReturnValue([{ languageCode: "cs", regionCode: "CZ" }]);
+    const cs = DICTIONARIES.cs;
+    const kv = memoryKV();
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} pace={INSTANT} sleep={() => Promise.resolve()} />);
+    });
+    await settle();
+    expect(shown(r)).toContain(cs.onboarding.welcome.title);
+    const selected = r.root.findAll((n) => n.props.accessibilityState?.checked && typeof n.props.onPress === "function").map((n) => n.props.accessibilityLabel as string);
+    expect(selected.some((l) => l.startsWith(cs.rules.editor.presets.okoBere.name))).toBe(true);
+    await act(async () => button(r, cs.onboarding.welcome.done).props.onPress());
+    await settle();
+    const rules = JSON.parse((await kv.get("oczko.rules.v1"))!);
+    expect(rules).toMatchObject({ deck: 32, persian: "is21", mode: "bank" });
+    act(() => r.unmount());
+    spy.mockRestore();
+  });
+});
+
 describe("changing the language", () => {
   const de = DICTIONARIES.de;
   const pl = DICTIONARIES.pl;

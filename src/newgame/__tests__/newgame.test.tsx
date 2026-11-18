@@ -21,6 +21,7 @@ describe("rules in words", () => {
     expect(facesPreset(DEFAULT_RULES)).toBe("234");
     expect(facesPreset(withFaces(DEFAULT_RULES, 3, 4, 5))).toBe("345");
     expect(facesPreset(withFaces(DEFAULT_RULES, 2, 2, 2))).toBe("custom");
+    expect(facesPreset(withFaces(DEFAULT_RULES, 1, 1, 2))).toBe("112");
     expect(withFaces(DEFAULT_RULES, 3, 4, 5).values[10]).toBe(10);
   });
 
@@ -32,6 +33,35 @@ describe("rules in words", () => {
     ]);
     for (const r of [DEFAULT_RULES, PRESETS.bank, { ...PRESETS.bank, bankTie: "nobody" as const }]) expect(preview(r)).not.toMatch(/(łeś|łaś)/);
     expect(preview({ ...PRESETS.bank, bankTie: "nobody" })).not.toContain("remisy");
+    expect(summaryLines({ ...DEFAULT_RULES, persian: "is21" })[1]).toBe("Dwa asy = 21 · As za 11");
+    expect(preview({ ...DEFAULT_RULES, persian: "is21" })).toContain("Dwa asy liczą się jak 21.");
+  });
+
+  it("the editor picks a rule set; a change makes the rules custom", () => {
+    /* eslint-disable @typescript-eslint/no-require-imports */
+    const { RulesEditor } = require("../RulesEditor") as typeof import("../RulesEditor");
+    /* eslint-enable @typescript-eslint/no-require-imports */
+    let rules = DEFAULT_RULES;
+    let r!: ReactTestRenderer;
+    const render = () => act(() => {
+      const el = <RulesEditor rules={rules} onChange={(x) => (rules = x)} />;
+      if (r) r.update(el);
+      else r = create(el);
+    });
+    render();
+    const pick = (label: string) => {
+      const b = r.root.findAll((n) => n.props.accessibilityLabel?.startsWith?.(label) && typeof n.props.onPress === "function")[0];
+      act(() => b.props.onPress());
+      render();
+    };
+    expect(textOf(r)).not.toContain("Własne · ");
+    pick("Oko bere");
+    expect(rules).toMatchObject({ deck: 32, persian: "is21", mode: "bank" });
+    expect([rules.values[11], rules.values[12], rules.values[13]]).toEqual([1, 1, 2]);
+    pick("Wygrywają");
+    expect(rules.persian).toBe("wins");
+    expect(textOf(r)).toContain("Własne");
+    act(() => r.unmount());
   });
 });
 
