@@ -34,6 +34,7 @@ Ten sam turniej na kartach zestawu (2000 rozdań na tryb). Ajnc ma karty
 | 17 und 4 | 30.3% | 38.8% | 33.5% | 39.4% | 40.5% | 40.8% | 42.2% | 42.6% | NIE |
 | Oko bere | 30.3% | 42.2% | 35.9% | 42.2% | 41.8% | 41.8% | 43.0% | 43.3% | NIE |
 | Очко | 31.7% | 38.4% | 36.0% | 41.0% | 41.1% | 41.9% | 41.9% | 42.8% | NIE |
+| Pontoon | 29.3% | 36.6% | 36.1% | 39.7% | 41.2% | 41.8% | 41.8% | 42.4% | NIE |
 
 Siła zwykłego progu („staje przy t”) na kartach zestawu:
 
@@ -42,11 +43,14 @@ Siła zwykłego progu („staje przy t”) na kartach zestawu:
 | 17 und 4 | 34.8% | 37.0% | 38.8% | 39.6% | 39.4% | 40.5% | 40.8% | 39.5% | 33.5% |
 | Oko bere | 37.0% | 40.3% | 42.2% | 42.6% | 42.2% | 41.8% | 41.0% | 39.4% | 35.9% |
 | Очко | 34.5% | 36.2% | 38.4% | 39.9% | 41.0% | 41.1% | 41.6% | 40.7% | 36.0% |
+| Pontoon | 34.2% | 35.4% | 36.6% | 37.9% | 39.7% | 41.2% | 41.4% | 40.4% | 36.1% |
 
 Na taliach 32 i 36 kart (bez kart 2–6 / 2–5) progi 14–18 dają prawie tę samą siłę —
 środkowe poziomy (Kuba, Hela, Ola, Marek) różnią się o ok. 1–2 pkt proc.,
 a samymi progami nie da się ich rozsunąć. Witek (ciągnie do 20) jest tu
-słabszy niż na 52 kartach (Очко: bank dobiera do 17). Decyzja (PLAN.md §13): postacie bez zmian —
+słabszy niż na 52 kartach (Очко: bank dobiera do 17). W Pontoonie (figury
+po 10) krzywa rośnie do 17–18 jak w Oczku, poziomy od Heli rosną, a Kuba
+i Witek są blisko siebie (różnica w granicach szumu). Decyzja (PLAN.md §13): postacie bez zmian —
 ich styl i opisy („staje przy 14”) zostają prawdziwe; kolejność poziomów
 obowiązuje dla domyślnego Oczka.
 

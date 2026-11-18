@@ -1,6 +1,7 @@
 import { makeDeck, type Card } from "../../engine/cards";
 import { matchApply, newMatch, type MatchState } from "../../engine/match";
 import { dealRound } from "../../engine/round";
+import { withPreset } from "../../engine/presets";
 import { DEFAULT_RULES, PRESETS, type Rules } from "../../engine/rules";
 import { handValue } from "../../engine/score";
 import { c, cards, stockFor } from "../../engine/testUtils";
@@ -65,6 +66,35 @@ describe("P(fura) is exact", () => {
     const e = evaluate(v, { samples: 4000, rng: { state: 3 }, opponentModel: model, continueAt: 0 });
     expect(e.winIfStand).toBe(0);
     expect(e.winIfHit).toBeGreaterThan(0);
+  });
+});
+
+describe("Pontoon's hands", () => {
+  // Family game, Pontoon cards, no hand limit; I (seat 0) hold five low cards = 14.
+  const pontoon: Rules = { ...withPreset(DEFAULT_RULES, "pontoon"), mode: "family", maxCards: null };
+  const standOn14 = (rules: Rules) => {
+    const m = play(table(rules, ["2♥", "9♣"], "3♠ 2♣ 3♦ 4♥", 1), "hit", "hit", "hit", "hit");
+    const v = viewFor(m, 0);
+    expect(v.myValue.total).toBe(14);
+    return evaluate(v, { samples: 4000, rng: { state: 5 }, opponentModel: model, continueAt: 0 }).winIfStand;
+  };
+
+  it("five cards beat any total: standing on a five-card 14 nearly always scores", () => {
+    expect(standOn14(pontoon)).toBeGreaterThan(0.9);
+    expect(standOn14({ ...pontoon, fiveCardTrick: false })).toBeLessThan(0.6);
+  });
+
+  it("a pontoon is not beaten by a 21 of three cards", () => {
+    const rules = { ...pontoon, familyTie: "noneScore" as const };
+    const m = play(table(rules, ["A♥", "9♣"], "K♠", 1), "hit");
+    const v = viewFor(m, 0);
+    expect(v.myValue).toMatchObject({ total: 21, special: "pontoon" });
+    const e = (r: Rules) => evaluate(viewFor(play(table(r, ["A♥", "9♣"], "K♠", 1), "hit"), 0), { samples: 4000, rng: { state: 5 }, opponentModel: model, continueAt: 0 }).winIfStand;
+    // Only another pontoon ties (no point with "noneScore"); without the rule any 21 ties.
+    const on = e(rules);
+    const off = e({ ...rules, pontoon: false });
+    expect(on).toBeGreaterThan(0.9);
+    expect(on - off).toBeGreaterThan(0.05);
   });
 });
 

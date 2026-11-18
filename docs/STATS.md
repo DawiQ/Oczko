@@ -19,6 +19,7 @@ wszyscy jednakowi (próg 17).
 | 17 und 4 / Ajnc (32, z bankierem) | 4 | 1,98 | 31.3% | 58.1% | 57.4% |
 | Oko bere (32, 1 · 1 · 2, dwa asy = 21) | 4 | 2,26 | 27.7% | 57.9% | 57.0% |
 | Очко (36, z bankierem, bank do 17) | 4 | 2,01 | 30.3% | 59.9% | 60.5% |
+| Pontoon (figury 10, as 1/11, pontoon, 5 kart) | 4 | 1,86 | 27.5% | 57.3% | 56.8% |
 
 ## Sprawiedliwość trybu z bankierem
 
@@ -78,6 +79,6 @@ blokowania UI.
 
 | Tryb | Graczy | Czas |
 |---|---|---|
-| Rodzinne | 4 | 5,6 ms |
-| Rodzinne | 8 | 8,8 ms |
-| Z bankierem | 4 | 8,0 ms |
+| Rodzinne | 4 | 6,9 ms |
+| Rodzinne | 8 | 9,3 ms |
+| Z bankierem | 4 | 8,5 ms |

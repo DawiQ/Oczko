@@ -25,9 +25,10 @@ export function withFaces(r: Rules, w: number, d: number, k: number): Rules {
 /** Two short lines for the lobby. */
 export function summaryLines(r: Rules, s: Strings = pl): [string, string] {
   const t = s.rules.summary;
+  const specials = [r.pontoon && s.table.specials.pontoon, r.fiveCardTrick && s.table.specials.fiveCard].filter((x): x is string => !!x);
   return [
     `${s.rules.modes[r.mode]} · ${t.faces(r.values[11], r.values[12], r.values[13])} · ${t.deck(r.deck)}`,
-    `${r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : t.noPersian} · ${t.ace[r.ace]}`,
+    [r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : t.noPersian, t.ace[r.ace], ...specials].join(" · "),
   ];
 }
 

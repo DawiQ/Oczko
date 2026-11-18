@@ -1,6 +1,7 @@
 import { act, create, type ReactTestRenderer } from "react-test-renderer";
 import { Text } from "react-native";
 
+import { withPreset } from "../../engine/presets";
 import { DEFAULT_RULES, PRESETS } from "../../engine/rules";
 import { DEFAULT_CHOICES } from "../../storage/newGame";
 import { botsFrom, counts, maxSeats, NewGameScreen } from "../NewGameScreen";
@@ -34,6 +35,7 @@ describe("rules in words", () => {
     for (const r of [DEFAULT_RULES, PRESETS.bank, { ...PRESETS.bank, bankTie: "nobody" as const }]) expect(preview(r)).not.toMatch(/(łeś|łaś)/);
     expect(preview({ ...PRESETS.bank, bankTie: "nobody" })).not.toContain("remisy");
     expect(summaryLines({ ...DEFAULT_RULES, persian: "is21" })[1]).toBe("Dwa asy = 21 · As za 11");
+    expect(summaryLines(withPreset(DEFAULT_RULES, "pontoon"))[1]).toBe("Bez perskiego oczka · As za 1 lub 11 · Pontoon · Pięć kart");
     expect(preview({ ...DEFAULT_RULES, persian: "is21" })).toContain("Dwa asy liczą się jak 21.");
   });
 

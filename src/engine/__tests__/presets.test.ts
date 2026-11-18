@@ -140,6 +140,8 @@ describe("Pontoon", () => {
     expect(v("2♥ 3♠ 4♣ 2♦ 5♥")).toMatchObject({ total: 16, special: "fiveCard" });
     expect(v("A♥ A♠")).toMatchObject({ total: 12, special: null, persian: false });
     expect(v("10♥ 9♠ 2♣ 3♦ 4♥")).toMatchObject({ bust: true, special: null });
+    // Two aces as 21 ("fojer") are no pontoon.
+    expect(handValue(cards("A♥ A♠"), { ...rules, persian: "is21" })).toMatchObject({ total: 21, special: null });
     // Without the rules: plain totals.
     expect(handValue(cards("A♥ K♠"), { ...rules, pontoon: false }).special).toBeNull();
   });

@@ -19,7 +19,7 @@ Wi‑Fi.
 
 ## Keywords — App Store (100, comma-separated, no spaces)
 
-oczko,21,card game,cards,family,friends,wifi,house rules,two aces,coach
+oczko,21,pontoon,card game,cards,family,friends,wifi,house rules,coach
 
 ## Full description (4000)
 
@@ -31,6 +31,8 @@ You play for points: each round won is a point, a match goes to 5, 10 or 15.
 No money, no prizes — just cards and a good time.
 
 YOUR HOUSE RULES
+• Ready rule sets, among them Pontoon: face cards 10, the ace 1 or 11,
+  a pontoon beats any 21 and five cards beat any total.
 • Family game (everyone against everyone) or with a banker.
 • Face card values (J 2, Q 3, K 4 or your own), a deck of 52, 32 or 24 cards.
 • Two aces on or off, the ace as 11 or as 1 or 11, one or two starting

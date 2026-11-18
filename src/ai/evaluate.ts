@@ -406,7 +406,8 @@ function myShare(acc: Accumulator, sum: Int16Array, aces: Int8Array, n: Int8Arra
     if (bust[s]) return -1;
     if (pers[s]) return 300;
     const t = total(s);
-    if (rules.pontoon && n[s] === 2 && aces[s] > 0 && t === 21) return 200;
+    // One ace: two aces as 21 ("is21") are no pontoon.
+    if (rules.pontoon && n[s] === 2 && aces[s] === 1 && t === 21) return 200;
     if (rules.fiveCardTrick && n[s] >= 5) return 100;
     return t;
   };

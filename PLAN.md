@@ -602,7 +602,7 @@ Szczegóły i decyzje: §13.
   niejednolite; ewentualnie później jako opcje.
 - **Gotowe, gdy:** jak Etap 16.
 
-### Etap 18 — Pontoon (Wielka Brytania, Irlandia, Australia)
+### Etap 18 — Pontoon (Wielka Brytania, Irlandia, Australia) ✅
 - Silnik: wartości figur 10 (już możliwe), as 1 lub 11 (już możliwe);
   nowe układy z kolejnością: Pontoon (as + karta za 10 w dwóch kartach) >
   Five Card Trick (5 kart ≤ 21) > 21 > reszta; remis dla banku. Opcje
@@ -758,3 +758,6 @@ same reguły, nie zestaw.
   14–18 jest prawie równa (krzywa płaska), więc środkowe poziomy różnią się
   o 1–2 pkt proc., a Witek (do 20) jest słabszy. Postacie zostają bez zmian
   (styl i opisy prawdziwe); kolejność poziomów obowiązuje dla Oczka.
+- Pontoon (Etap 18): krzywa progów rośnie do 17–18 (jak w Oczku); poziomy od
+  Heli w górę rosną, Kuba i Witek w granicach szumu (36,6% / 36,1%). Bank
+  wygrywa 57% pojedynków (`docs/STATS.md`). Postacie bez zmian.

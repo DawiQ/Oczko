@@ -59,7 +59,7 @@ export function handValue(hand: readonly Card[], rules: Rules): HandValue {
   const bust = !persian && total > 21;
   let special: Special | null = null;
   if (!persian && !bust) {
-    if (rules.pontoon && hand.length === 2 && total === 21 && aces > 0) special = "pontoon";
+    if (rules.pontoon && hand.length === 2 && total === 21 && aces === 1) special = "pontoon";
     else if (rules.fiveCardTrick && hand.length >= 5) special = "fiveCard";
   }
   return { total, soft, bust, persian, special };

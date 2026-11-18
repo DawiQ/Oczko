@@ -25,7 +25,7 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 15 | Ukraiński, rosyjski, BCMS (łacinka); czcionka dla cyrylicy | gotowe |
 | 16 | Zestawy reguł: Oczko, 17 und 4, Oko bere/berie, Ajnc; dwa asy w trzech wariantach | gotowe |
 | 17 | Talia 36 kart, „bank dobiera do 17”, zestaw Очко | gotowe |
-| 18 | Pontoon | plan (`PLAN.md` §13) |
+| 18 | Pontoon (pontoon, pięć kart) | gotowe |
 
 ## Uruchomienie
 
@@ -222,11 +222,17 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 ## Zestawy zasad
 
 - `src/engine/presets.ts`: Oczko (PL), 17 und 4 (DE/AT), Oko bere/berie
-  (CZ/SK), Ajnc (Bałkany), Очко (UA/KZ/MD: talia 36, bank dobiera do 17) — talia, wartości figur, as, dwa asy, tryb
+  (CZ/SK), Ajnc (Bałkany), Очко (UA/KZ/MD: talia 36, bank dobiera do 17),
+  Pontoon (GB/IE/AU/NZ: figury 10, as 1 lub 11, najwyżej 5 kart) — talia,
+  wartości figur, as, dwa asy, tryb
   (`PLAN.md` §13). Nazwy w słownikach.
 - Dwa asy: „wygrywają” (perskie oczko), „liczą 21” (czeskie „fojer”),
-  „bez reguły”. Stare zapisy (reguła jako `true`/`false`) wczytywane bez
-  zmiany przebiegu; Wi‑Fi protokół v3.
+  „bez reguły”.
+- Układy Pontoonu (opcje `pontoon`, `fiveCardTrick`): pontoon (as + karta
+  za 10) > pięć kart bez fury > 21 > reszta; remis dla banku (`handRank`).
+  Bez „kupowania kart” — tylko „Dobieram” i „Starczy”. Wi‑Fi protokół v5.
+- Stare zapisy (reguła jako `true`/`false`) wczytywane bez
+  zmiany przebiegu; Wi‑Fi protokół v3 (36 kart: v4).
 - Pierwsze uruchomienie: zestaw kraju telefonu (`regionCode`, potem język);
   edytor reguł z wyborem zestawu i figurami 1 · 1 · 2. Makieta:
   `docs/mockups/oczko-zestawy.html`.
