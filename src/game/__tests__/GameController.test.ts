@@ -182,6 +182,72 @@ describe("GameController", () => {
   });
 });
 
+describe("leaving during the showdown", () => {
+  const flush = () => new Promise<void>((r) => setTimeout(r, 0));
+  // The hands are being shown: the reveal's wait never ends (the app is closed there).
+  const hangingPace = { ...INSTANT, revealDelayMs: 5 };
+  /** The reveal's wait never ends once `when` holds (the app is closed there). */
+  const hanging = (when: () => boolean) => (ms: number) => (ms === 5 && when() ? new Promise<void>(() => {}) : Promise.resolve());
+
+  /** Stands every time until the hands are being shown. */
+  async function untilShowdown(game: GameController): Promise<GameSnapshot> {
+    for (let i = 0; i < 5000; i++) {
+      await flush();
+      const s = game.getSnapshot();
+      if (s.phase === "showdown") return s;
+      if (s.phase === "myTurn") game.stand();
+      else if (s.phase === "roundEnd") game.nextRound();
+    }
+    throw new Error("no showdown");
+  }
+
+  it.each([
+    ["a round", false],
+    ["the match's last round", true],
+  ])("%s is recorded on resume", async (_n, last) => {
+    const box: { game?: GameController } = {};
+    const when = () => !last || box.game?.saved().match.winner != null;
+    const a = controller({ ...DEFAULT_RULES, target: last ? 2 : 10 }, "match", { sleep: hanging(when), pace: hangingPace });
+    box.game = a.game;
+    await untilShowdown(a.game);
+    a.game.dispose();
+    const saved: SavedGame = JSON.parse(JSON.stringify(a.saves[a.saves.length - 1]));
+    expect(saved.match.round.result).not.toBeNull();
+    expect(saved.shown).toBe(false);
+    const before = a.rounds.length;
+    const rounds: RoundEndInfo[] = [];
+    const matches: RoundEndInfo[] = [];
+    const saves: SavedGame[] = [];
+    const b = new GameController(saved.setup, { ...a.deps, sleep: () => Promise.resolve(), onRoundEnd: (i) => rounds.push(i), onMatchEnd: (i) => matches.push(i), onSave: (x) => saves.push(x) }, saved);
+    await b.idle();
+    expect(rounds).toHaveLength(1);
+    expect(rounds[0].match.roundNo).toBe(saved.match.roundNo);
+    expect(matches).toHaveLength(last ? 1 : 0);
+    expect(saves[saves.length - 1].shown).toBe(true);
+    expect(before + rounds.length).toBe(saved.match.roundNo);
+  });
+});
+
+describe("a Wi‑Fi guest's table", () => {
+  it("sees the host's hand once the hands are shown", async () => {
+    const base = makeSetup({ ...DEFAULT_RULES, target: 10 }, ["ola", "marek"], "match", 5);
+    const setup = { ...base, seats: base.seats.map((x, i) => (i === 1 ? { kind: "remote" as const, name: "Gość" } : x)) };
+    const game = new GameController(setup, { sleep: () => Promise.resolve(), pace: INSTANT, decide });
+    for (let i = 0; i < 50; i++) {
+      await game.idle();
+      const s = game.getSnapshot();
+      if (s.phase === "roundEnd" || s.phase === "matchEnd") break;
+      if (s.phase === "myTurn") game.stand();
+      else if (game.saved().match.round.turn === 1) game.act(1, "stand");
+    }
+    const host = game.getSnapshot();
+    expect(host.phase).toMatch(/roundEnd|matchEnd/);
+    const guest = game.snapshotFor(1);
+    expect(guest.seats[0].hand).toEqual(host.view.myHand);
+    expect(guest.view.others.find((o) => o.seat === 0)?.hand).toEqual(host.view.myHand);
+  });
+});
+
 describe("with the real bots", () => {
   it("plays a round against Profesor and Hrabia (chunked evaluator)", async () => {
     const setup = makeSetup({ ...DEFAULT_RULES, target: 1 }, ["profesor", "hrabia"], "single", 3);

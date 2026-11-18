@@ -41,6 +41,14 @@ export function buildRecord(info: RoundEndInfo, date: number): HistoryRecord {
 
 const isNat = (x: unknown) => Number.isInteger(x) && (x as number) >= 0;
 
+const GRADES = ["best", "good", "risky", "mistake"];
+const isShare = (x: unknown) => typeof x === "number" && x >= 0 && x <= 1;
+const isAnalysed = (a: unknown): boolean => {
+  if (typeof a !== "object" || a === null) return false;
+  const x = a as { index: unknown; grade: unknown; standWin: unknown; hitWin: unknown };
+  return isNat(x.index) && GRADES.includes(x.grade as string) && isShare(x.standWin) && isShare(x.hitWin);
+};
+
 export function looksLikeRecord(x: unknown): x is HistoryRecord {
   if (typeof x !== "object" || x === null) return false;
   const r = x as HistoryRecord;
@@ -52,7 +60,7 @@ export function looksLikeRecord(x: unknown): x is HistoryRecord {
   if (!Array.isArray(r.scores) || r.scores.length !== n || !r.scores.every(isNat)) return false;
   if (r.winner !== null && !(Number.isInteger(r.winner) && r.winner >= 0 && r.winner < n)) return false;
   if (!isNat(r.rounds)) return false;
-  if (r.analysis !== undefined && !Array.isArray(r.analysis)) return false;
+  if (r.analysis !== undefined && !(Array.isArray(r.analysis) && r.analysis.every(isAnalysed))) return false;
   return true;
 }
 

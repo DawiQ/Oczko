@@ -39,6 +39,12 @@ describe("saved game", () => {
     ["a bad decision", (s) => s.decisions.push({ round: 1, seat: 9, action: "hit" })],
     ["a bad status", (s) => ((s.match.round.status as string[])[0] = "sleeping")],
     ["version 2", (s) => ((s as { v: number }).v = 2)],
+    ["another engine", (s) => (s.engineVersion += 1)],
+    ["no 'shown'", (s) => delete (s as { shown?: boolean }).shown],
+    ["nobody's turn in a round not over", (s) => (s.match.round.turn = null)],
+    ["the turn of a seat not playing", (s) => (s.match.round.status[s.match.round.turn!] = "stood")],
+    ["a bank in the family game", (s) => (s.match.bank = 0)],
+    ["rules other than the setup's", (s) => (s.match = { ...s.match, rules: { ...s.match.rules, target: 99 }, round: { ...s.match.round, rules: { ...s.match.round.rules, target: 99 } } })],
   ];
   it.each(spoil)("rejects %s", async (_n, f) => {
     const s = saved();
@@ -46,6 +52,15 @@ describe("saved game", () => {
     expect(looksLikeSavedGame(s)).toBe(false);
     const kv = memoryKV({ [SAVE_KEY]: JSON.stringify(s) });
     expect(await loadSavedGame(kv)).toBeNull();
+  });
+
+  it("a finished match is resumable until its last round was shown", () => {
+    const s = saved();
+    s.match = { ...s.match, winner: 0 };
+    s.shown = false;
+    expect(isResumable(s)).toBe(true);
+    s.shown = true;
+    expect(isResumable(s)).toBe(false);
   });
 
   it("corrupt JSON reads as nothing", async () => {

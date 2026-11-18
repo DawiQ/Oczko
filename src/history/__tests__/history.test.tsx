@@ -52,6 +52,14 @@ describe("history record", () => {
     expect(frames.length).toBe(rec.decisions.length + rec.rounds);
   });
 
+  it("checks the analysis entries", async () => {
+    const rec = await playedRecord({ ...DEFAULT_RULES, target: 2 });
+    expect(looksLikeRecord({ ...rec, analysis: [{ index: 0, grade: "good", standWin: 0.4, hitWin: 0.3 }] })).toBe(true);
+    expect(looksLikeRecord({ ...rec, analysis: [null] })).toBe(false);
+    expect(looksLikeRecord({ ...rec, analysis: [{ index: 0, grade: "great", standWin: 0.4, hitWin: 0.3 }] })).toBe(false);
+    expect(looksLikeRecord({ ...rec, analysis: [{ index: 0, grade: "good", standWin: 2, hitWin: 0.3 }] })).toBe(false);
+  });
+
   it("refuses another engine version and a broken decision", async () => {
     const rec = await playedRecord({ ...DEFAULT_RULES, target: 2 });
     expect(replay({ ...rec, engineVersion: ENGINE_VERSION + 1 })).toEqual({ error: "engine-version" });

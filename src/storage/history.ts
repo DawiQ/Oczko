@@ -35,7 +35,7 @@ function update(kv: KV, f: (r: HistoryRecord[]) => HistoryRecord[]): Promise<His
 
 export const addRecord = (kv: KV, rec: HistoryRecord) => update(kv, (r) => [rec, ...r.filter((x) => x.id !== rec.id)]);
 export const updateRecord = (kv: KV, rec: HistoryRecord) => update(kv, (r) => r.map((x) => (x.id === rec.id ? rec : x)));
-export const clearHistory = (kv: KV) => save(kv, []);
+export const clearHistory = (kv: KV) => update(kv, () => []);
 
 /** The history as a JSON file's text (export). */
 export const exportHistory = (records: readonly HistoryRecord[]) => JSON.stringify({ app: "oczko", v: 1, records }, null, 1);

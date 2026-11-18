@@ -29,7 +29,8 @@ export function createGame(source: GameSource, opts: UseGameOptions): GameContro
     pace: opts.pace,
     sleep: opts.sleep,
     decide: opts.decide,
-    onSave: (s) => void (s.match.winner === null ? saveGame(kv, s) : clearSavedGame(kv)),
+    // A finished match stays saved until its last round is shown and recorded.
+    onSave: (s) => void (s.match.winner === null || !s.shown ? saveGame(kv, s) : clearSavedGame(kv)),
     onRoundEnd: (info) => {
       void updateStats(kv, (st) => recordRound(st, info.match, info.me));
       opts.onRoundEnd?.(info);

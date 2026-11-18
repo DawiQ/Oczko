@@ -12,6 +12,7 @@ import { handValue } from "../engine/score";
 import { eventsFor, viewFor, type OtherSeat, type SeatView } from "../engine/view";
 import { PACES, type Pace } from "./pace";
 import type { GameError, GameSnapshot, Phase, SeatInfo, TableGame } from "./TableGame";
+import { ENGINE_VERSION } from "../engine/version";
 import type { GameSetup } from "./setup";
 
 export interface Decision {
@@ -29,6 +30,11 @@ export interface SavedGame {
   decisions: Decision[];
   /** The bots' generator state. */
   botRng: number;
+  /** The engine that played it (another version cannot continue it). */
+  engineVersion: number;
+  /** The current round's end was shown and recorded (statistics, history);
+   *  false: on resume the showdown runs again and records it. */
+  shown: boolean;
 }
 
 export interface RoundEndInfo {
@@ -105,7 +111,7 @@ export class GameController implements TableGame {
       this.decisions = saved.decisions.slice();
       this.botRng = makeRng(saved.botRng);
       this.visible = saved.match.round.revealed.slice();
-      this.showdownDone = saved.match.round.result !== null;
+      this.showdownDone = saved.match.round.result !== null && saved.shown;
     } else this.begin();
     this.snapshot = this.build(this.me);
     if (!saved) this.save(); // a game just started can be resumed too
@@ -197,7 +203,16 @@ export class GameController implements TableGame {
 
   /** The state to save (also what `deps.onSave` receives). */
   saved(): SavedGame {
-    return { v: 1, setup: this.setup, match: this.match, roundStart: this.roundStart, decisions: this.decisions.slice(), botRng: this.botRng.state };
+    return {
+      v: 1,
+      setup: this.setup,
+      match: this.match,
+      roundStart: this.roundStart,
+      decisions: this.decisions.slice(),
+      botRng: this.botRng.state,
+      engineVersion: ENGINE_VERSION,
+      shown: this.showdownDone,
+    };
   }
 
   /** Resolves once the bots have nothing more to do (tests, "Pokaż wynik"). */
@@ -304,6 +319,8 @@ export class GameController implements TableGame {
   /** Shows the others' hands one by one; false when interrupted. */
   private async showdown(g: number): Promise<boolean> {
     const r = this.match.round;
+    // My own hand: Wi‑Fi guests see it from now on too.
+    this.visible[this.me] = true;
     for (const seat of r.order) {
       if (seat === this.me || this.visible[seat]) continue;
       this.visible[seat] = true;
