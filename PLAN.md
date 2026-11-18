@@ -560,7 +560,7 @@ Zestawy reguł regionalnych (talia 36 kart, inne wartości figur, Pontoon)
 — Etapy 16–18 i §13. Język nie zmienia reguł; zestaw tylko podpowiada się
 przy pierwszym uruchomieniu według kraju telefonu.
 
-### Etap 16 — Zestawy reguł: Niemcy/Austria, Czechy/Słowacja, Bałkany
+### Etap 16 — Zestawy reguł: Niemcy/Austria, Czechy/Słowacja, Bałkany ✅
 Szczegóły i decyzje: §13.
 - Silnik: opcja dwóch asów z trzema wartościami zamiast `persian: boolean`
   — `"wins"` (perskie oczko / Feuer / suvi ajnc: wygrywa wszystko), `"is21"`
@@ -754,3 +754,7 @@ same reguły, nie zestaw.
 - Tryb domyślny zestawu to tylko podpowiedź; rodzinny jest dostępny zawsze.
 - Boty: progi postaci (14–20) dobrane dla wartości 2/3/4; dla zestawów
   z innymi wartościami (1/1/2, figury 10, talia 36) decyduje pomiar turnieju.
+- Wynik pomiaru (Etap 16, `docs/BOTS.md`): na talii 32 kart siła progów
+  14–18 jest prawie równa (krzywa płaska), więc środkowe poziomy różnią się
+  o 1–2 pkt proc., a Witek (do 20) jest słabszy. Postacie zostają bez zmian
+  (styl i opisy prawdziwe); kolejność poziomów obowiązuje dla Oczka.

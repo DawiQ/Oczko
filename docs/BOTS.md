@@ -24,5 +24,15 @@ rozdania dla każdej postaci — porównanie parami).
 Poziomy rosną monotonicznie: **tak**. Sąsiednie
 poziomy różnią się istotnie: **tak**.
 
+## Zestawy zasad (PLAN.md §13)
+
+Ten sam turniej na kartach zestawu (2000 rozdań na tryb). Ajnc ma karty
+17 und 4.
+
+| Zestaw | Zosia | Kuba | Witek | Hela | Ola | Marek | Profesor | Hrabia | Rosną monotonicznie |
+|---|---|---|---|---|---|---|---|---|---|
+| 17 und 4 | 30.3% | 38.8% | 33.5% | 39.4% | 40.5% | 40.8% | 42.2% | 42.6% | NIE |
+| Oko bere | 30.3% | 42.2% | 35.9% | 42.2% | 41.8% | 41.8% | 43.0% | 43.3% | NIE |
+
 Dla odniesienia: przy 4 równych graczach udział rund z punktem w trybie
 rodzinnym wynosi ok. 25% (+ remisy), a w banku 1:1 ok. 50%.

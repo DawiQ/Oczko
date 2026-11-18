@@ -23,7 +23,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 13 | Angielski i niemiecki: cała aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 14 | Czeski, słowacki, węgierski: aplikacja, opisy sklepu, grafiki, komunikaty uprawnień | gotowe |
 | 15 | Ukraiński, rosyjski, BCMS (łacinka); czcionka dla cyrylicy | gotowe |
-| 16–18 | Zestawy reguł regionalnych: 17 und 4, Oko bere, Ajnc; talia 36 i Очко; Pontoon | plan (`PLAN.md` §13) |
+| 16 | Zestawy reguł: Oczko, 17 und 4, Oko bere/berie, Ajnc; dwa asy w trzech wariantach | gotowe |
+| 17–18 | Talia 36 i Очко; Pontoon | plan (`PLAN.md` §13) |
 
 ## Uruchomienie
 
@@ -216,6 +217,20 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - `storeTexts.test.ts` — dla każdego języka: limity znaków w opisie sklepu
   (nazwa 30, krótki opis 80, tekst promocyjny 170, słowa kluczowe 100,
   pełny opis 4000), komunikaty uprawnień iOS, grafika do Google Play.
+
+## Zestawy zasad
+
+- `src/engine/presets.ts`: Oczko (PL), 17 und 4 (DE/AT), Oko bere/berie
+  (CZ/SK), Ajnc (Bałkany) — talia, wartości figur, as, dwa asy, tryb
+  (`PLAN.md` §13). Nazwy w słownikach.
+- Dwa asy: „wygrywają” (perskie oczko), „liczą 21” (czeskie „fojer”),
+  „bez reguły”. Stare zapisy (reguła jako `true`/`false`) wczytywane bez
+  zmiany przebiegu; Wi‑Fi protokół v3.
+- Pierwsze uruchomienie: zestaw kraju telefonu (`regionCode`, potem język);
+  edytor reguł z wyborem zestawu i figurami 1 · 1 · 2. Makieta:
+  `docs/mockups/oczko-zestawy.html`.
+- Pomiary: `docs/STATS.md` (fura, przewaga banku na zestawach),
+  `docs/BOTS.md` (postacie i krzywa progów na kartach zestawów).
 
 ## Zgodność: zero hazardu
 

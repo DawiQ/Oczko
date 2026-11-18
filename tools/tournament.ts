@@ -86,14 +86,28 @@ const distinct = rows.every((x) => x.z === null || x.z > 2);
 // Rule sets with other cards (PLAN.md §13): do the characters keep their
 // order? (Fewer deals; Ajnc has the cards of 17 und 4.)
 const SET_IDS: PresetId[] = ["siebzehnUndVier", "okoBere"];
+const THRESHOLDS = [12, 13, 14, 15, 16, 17, 18, 19, 20];
 const SET_N = Math.max(500, Math.round(N / 3));
 const sets = SET_IDS.map((id) => {
   const rules = withPreset(DEFAULT_RULES, id);
   const res = PERSONAS.map((p) => run(p.id, { ...rules, mode: "family" }, { ...rules, mode: "bank" }, SET_N));
   const strengths = res.map((r) => mean(combined(r)));
   const mono = strengths.every((x, i) => i === 0 || x > strengths[i - 1]);
+  // Strength of a plain threshold 12..20 on the set's cards (how flat the
+  // middle levels are).
+  const curve = THRESHOLDS.map((t) => {
+    const fam = { ...rules, mode: "family" as const };
+    const bnk = { ...rules, mode: "bank" as const };
+    let s = 0;
+    for (let i = 0; i < SET_N; i++) {
+      const seed = splitmix32(i);
+      s += playRound(fam, [threshold(t), ...FIELD], seed, i % 4, { state: seed ^ 0x5bd1e995 }).match.round.result!.points[0];
+      s += playRound(bnk, [threshold(t), BANK_REF], seed, i % 2 === 0 ? 0 : 1, { state: seed ^ 0x27d4eb2f }).match.round.result!.points[0];
+    }
+    return s / (2 * SET_N);
+  });
   console.log(`${id}: ${strengths.map(pct).join(" ")} monotonic: ${mono}`);
-  return { id, strengths, mono };
+  return { id, strengths, mono, curve };
 });
 
 const md = `# Boty — kalibracja poziomów
@@ -128,6 +142,19 @@ Ten sam turniej na kartach zestawu (${SET_N} rozdań na tryb). Ajnc ma karty
 | Zestaw | ${PERSONAS.map((p) => pl.personas[p.id].name).join(" | ")} | Rosną monotonicznie |
 |---|${PERSONAS.map(() => "---|").join("")}---|
 ${sets.map((x) => `| ${pl.rules.editor.presets[x.id].name} | ${x.strengths.map(pct).join(" | ")} | ${x.mono ? "tak" : "NIE"} |`).join("\n")}
+
+Siła zwykłego progu („staje przy t”) na kartach zestawu:
+
+| Zestaw | ${THRESHOLDS.join(" | ")} |
+|---|${THRESHOLDS.map(() => "---|").join("")}
+${sets.map((x) => `| ${pl.rules.editor.presets[x.id].name} | ${x.curve.map(pct).join(" | ")} |`).join("\n")}
+
+Na talii 32 kart (bez kart 2–6) progi 14–18 dają prawie tę samą siłę —
+środkowe poziomy (Kuba, Hela, Ola, Marek) różnią się o ok. 1–2 pkt proc.,
+a samymi progami nie da się ich rozsunąć. Witek (ciągnie do 20) jest tu
+słabszy niż na 52 kartach. Decyzja (PLAN.md §13): postacie bez zmian —
+ich styl i opisy („staje przy 14”) zostają prawdziwe; kolejność poziomów
+obowiązuje dla domyślnego Oczka.
 
 Dla odniesienia: przy 4 równych graczach udział rund z punktem w trybie
 rodzinnym wynosi ok. 25% (+ remisy), a w banku 1:1 ok. 50%.
