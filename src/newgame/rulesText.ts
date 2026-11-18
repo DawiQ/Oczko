@@ -41,5 +41,7 @@ export function preview(r: Rules, s: Strings = pl): string {
   const persian = r.persian === "wins" ? t.persian : r.persian === "is21" ? t.is21 : "";
   const aceTxt = r.ace === "oneOrEleven" ? t.oneOrEleven : "";
   const bank17 = r.mode === "bank" && r.bankTo17 ? t.bankTo17 : "";
-  return start + persian + aceTxt + bank17;
+  const e = s.rules.editor;
+  const specials = (r.pontoon ? ` ${e.pontoonSub}.` : "") + (r.fiveCardTrick ? ` ${e.fiveCardTrickSub}.` : "");
+  return start + persian + aceTxt + bank17 + specials;
 }

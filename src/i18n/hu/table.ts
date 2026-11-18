@@ -1,7 +1,7 @@
 // Hungarian: texts of the table (statuses, captions, headlines, hints,
 // panels, effects, the trainer). Names inserted by functions never take a
 // suffix ("Név: …", or the name as the subject).
-import type { HandValue } from "../../engine/score";
+import type { HandValue, Special } from "../../engine/score";
 import type { HintId } from "../../table/hints";
 import type { pl } from "../pl";
 import { common } from "./common";
@@ -27,6 +27,8 @@ export const table: typeof pl.table = {
   },
   /** A hand in words: "Olga: 19", "Hella: túl sok (24)". */
   hand: {
+    /** Pontoon / five cards: "Ola: Pontoon". */
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name}: ${common.cards(n)}`,
     persian: (name: string) => `${name}: két ász`,
     bust: (name: string, total: number) => `${name}: túl sok (${total})`,
@@ -34,6 +36,7 @@ export const table: typeof pl.table = {
   },
   /** A shown hand: "Olga: 19 (felfordítva)" — no suffix on the name. */
   reveal: {
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name}: ${common.cards(n)} (felfordítva)`,
     persian: (name: string) => `${name}: két ász (felfordítva)`,
     bust: (name: string, total: number) => `${name}: túl sok, ${total} (felfordítva)`,
@@ -142,6 +145,8 @@ export const table: typeof pl.table = {
   },
   /** Two aces, in short (a hand's total). */
   persianShort: "AA",
+  /** Pontoon's special hands. */
+  specials: { pontoon: "Pontoon", fiveCard: "Öt lap" } as Record<Special, string>,
   roundEnd: {
     bust: "Túl sok",
     draw: "döntetlen",

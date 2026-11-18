@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Češka, Slovačka" },
       ajnc: { name: "Ajnc", sub: "Balkan" },
       ochko: { name: "Očko", sub: "Ukrajina, Kazahstan" },
+      pontoon: { name: "Pontoon", sub: "Britanija, Irska, Australija" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Vrijednost asa",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "Karte s tropom otvaraju se odmah",
     bankTo17: "Bank vuče do 17",
     bankTo17Sub: "Ispod 17 mora vući, od 17 staje",
+    pontoon: "Pontoon (as + 10)",
+    pontoonSub: "As i karta od 10 u dvije karte pobjeđuju svaki 21",
+    fiveCardTrick: "Pet karata",
+    fiveCardTrickSub: "Pet karata bez trope pobjeđuje svaki rezultat (osim pontoona)",
   },
 
   /** The lobby's / settings' short lines. */

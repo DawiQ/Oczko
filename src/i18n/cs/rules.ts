@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Česko, Slovensko" },
       ajnc: { name: "Ajnc", sub: "Balkán" },
       ochko: { name: "Očko", sub: "Ukrajina, Kazachstán" },
+      pontoon: { name: "Pontoon", sub: "Británie, Irsko, Austrálie" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Eso",
     aceA11y: "Hodnota esa",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "Přetažené ruce se odkryjí okamžitě",
     bankTo17: "Bank bere do 17",
     bankTo17Sub: "Pod 17 musí brát, od 17 stojí",
+    pontoon: "Pontoon (eso + 10)",
+    pontoonSub: "Eso a karta za 10 ve dvou kartách porazí každou 21",
+    fiveCardTrick: "Pět karet",
+    fiveCardTrickSub: "Pět karet bez přetažení porazí každý součet (kromě pontoonu)",
   },
 
   /** The lobby's / settings' short lines. */

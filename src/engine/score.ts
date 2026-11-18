@@ -11,6 +11,21 @@ export interface HandValue {
   bust: boolean;
   /** Exactly two aces with the perskie oczko rule on ("wins"). */
   persian: boolean;
+  /** A special hand of the Pontoon rules (null: none). */
+  special: Special | null;
+}
+
+/** Pontoon's hands: an ace and a ten-card in two cards; five cards without a fura. */
+export type Special = "pontoon" | "fiveCard";
+
+/** How strong a hand is, for comparing (higher wins; equal = a tie): perskie
+ *  oczko > pontoon > five-card trick > total; a fura is -1. */
+export function handRank(v: { total: number; bust: boolean; persian: boolean; special: Special | null }): number {
+  if (v.bust) return -1;
+  if (v.persian) return 300;
+  if (v.special === "pontoon") return 200;
+  if (v.special === "fiveCard") return 100;
+  return v.total;
 }
 
 export const ACE = 14;
@@ -39,7 +54,13 @@ export function handValue(hand: readonly Card[], rules: Rules): HandValue {
     }
   }
   // Czech/Slovak "fojer": two aces are 21.
-  if (rules.persian === "is21" && twoAces(hand)) return { total: 21, soft: false, bust: false, persian: false };
+  if (rules.persian === "is21" && twoAces(hand)) return { total: 21, soft: false, bust: false, persian: false, special: null };
   const persian = isPersian(hand, rules);
-  return { total, soft, bust: !persian && total > 21, persian };
+  const bust = !persian && total > 21;
+  let special: Special | null = null;
+  if (!persian && !bust) {
+    if (rules.pontoon && hand.length === 2 && total === 21 && aces > 0) special = "pontoon";
+    else if (rules.fiveCardTrick && hand.length >= 5) special = "fiveCard";
+  }
+  return { total, soft, bust, persian, special };
 }

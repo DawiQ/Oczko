@@ -48,7 +48,7 @@ export function Hand({ cards, value, reduceMotion, highlight }: { cards: Card[];
           {value.persian ? str.table.persianShort : value.total}
         </Text>
         <Text style={s.totalLabel} numberOfLines={1}>
-          {value.persian ? t.persian : value.bust ? t.bust : value.soft ? t.soft : str.common.you}
+          {value.persian ? t.persian : value.special ? str.table.specials[value.special] : value.bust ? t.bust : value.soft ? t.soft : str.common.you}
         </Text>
       </View>
     </View>

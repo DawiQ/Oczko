@@ -401,22 +401,21 @@ function myShare(acc: Accumulator, sum: Int16Array, aces: Int8Array, n: Int8Arra
   const st = acc.st;
   const { rules, eleven, me } = st;
   const total = (s: number) => totalOf(sum[s], aces[s], eleven, st.rules.persian === "is21", n[s]);
+  // As the engine's handRank: perskie oczko > pontoon > five cards > total; fura -1.
+  const rank = (s: number): number => {
+    if (bust[s]) return -1;
+    if (pers[s]) return 300;
+    const t = total(s);
+    if (rules.pontoon && n[s] === 2 && aces[s] > 0 && t === 21) return 200;
+    if (rules.fiveCardTrick && n[s] >= 5) return 100;
+    return t;
+  };
   if (rules.mode === "family") {
-    let anyPers = false;
-    for (let s = 0; s < st.seats; s++) if (pers[s]) anyPers = true;
+    let best = -1;
+    for (let s = 0; s < st.seats; s++) best = Math.max(best, rank(s));
+    if (best < 0 || rank(me) !== best) return 0;
     let winners = 0;
-    let iWin = false;
-    if (anyPers) {
-      for (let s = 0; s < st.seats; s++) if (pers[s]) winners++;
-      iWin = pers[me] === 1;
-    } else {
-      let best = -1;
-      for (let s = 0; s < st.seats; s++) if (!bust[s] && total(s) > best) best = total(s);
-      if (best < 0) return 0;
-      for (let s = 0; s < st.seats; s++) if (!bust[s] && total(s) === best) winners++;
-      iWin = !bust[me] && total(me) === best;
-    }
-    if (!iWin) return 0;
+    for (let s = 0; s < st.seats; s++) if (rank(s) === best) winners++;
     return winners > 1 && rules.familyTie === "noneScore" ? 0 : 1;
   }
   const bank = st.order[st.order.length - 1];
@@ -424,11 +423,7 @@ function myShare(acc: Accumulator, sum: Int16Array, aces: Int8Array, n: Int8Arra
     // 1 player, -1 bank, 0 nobody
     if (bust[p]) return bust[bank] && !rules.playerBustLoses ? 0 : -1;
     if (bust[bank]) return 1;
-    let r: number;
-    if (pers[p] && pers[bank]) r = 0;
-    else if (pers[p]) r = 1;
-    else if (pers[bank]) r = -1;
-    else r = Math.sign(total(p) - total(bank));
+    const r = Math.sign(rank(p) - rank(bank));
     return r === 0 ? (rules.bankTie === "bankWins" ? -1 : 0) : r;
   };
   if (me !== bank) return duel(me) === 1 ? 1 : 0;

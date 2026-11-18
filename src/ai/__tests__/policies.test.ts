@@ -76,7 +76,7 @@ describe("contextual", () => {
   it("aims higher against more live rivals", () => {
     const m = newMatch(DEFAULT_RULES, 6, 3, 5);
     const v = viewFor(m, 0);
-    const at17: SeatView = { ...v, myValue: { total: 17, soft: false, bust: false, persian: false } };
+    const at17: SeatView = { ...v, myValue: { total: 17, soft: false, bust: false, persian: false, special: null } };
     expect(contextual(17)(at17, rng).action).toBe("hit"); // 5 live rivals → aims at 20
     expect(threshold(17)(at17, rng).action).toBe("stand");
   });

@@ -26,15 +26,16 @@ export function statusLabel(seat: SeatInfo, s: Strings = pl): string | null {
 
 const nameOf = (snap: GameSnapshot, seat: number) => snap.seats[seat]?.name ?? "";
 
-function handIn(words: Strings["table"]["hand"], seat: SeatInfo): string {
+function handIn(words: Strings["table"]["hand"], seat: SeatInfo, s: Strings): string {
   if (!seat.value) return words.cards(seat.name, seat.cards);
   if (seat.value.persian) return words.persian(seat.name);
+  if (seat.value.special) return words.special(seat.name, s.table.specials[seat.value.special]);
   if (seat.value.bust) return words.bust(seat.name, seat.value.total);
   return words.total(seat.name, seat.value.total);
 }
 
 /** "Ola: 19", "Hela: fura (24)", "Kuba: perskie oczko". */
-export const handText = (seat: SeatInfo, s: Strings = pl): string => handIn(s.table.hand, seat);
+export const handText = (seat: SeatInfo, s: Strings = pl): string => handIn(s.table.hand, seat, s);
 
 /** One event in words, from the person's point of view. */
 export function eventText(e: RoundEvent, snap: GameSnapshot, s: Strings = pl): string | null {
@@ -57,7 +58,7 @@ export function eventText(e: RoundEvent, snap: GameSnapshot, s: Strings = pl): s
       return e.seat === me ? t.myMaxed : t.maxed(nameOf(snap, e.seat));
     case "reveal": {
       const seat = snap.seats[e.seat];
-      return seat ? handIn(s.table.reveal, seat) : null;
+      return seat ? handIn(s.table.reveal, seat, s) : null;
     }
     case "result":
       return headline(snap, s).title;
@@ -108,7 +109,7 @@ export function headline(snap: GameSnapshot, s: Strings = pl): { title: string; 
     return { title: t.nobody, sub: allBust ? t.allBust : t.draw };
   }
   const best = values[winners[0]];
-  const how = best.persian ? t.persian : `${best.total}`;
+  const how = best.persian ? t.persian : best.special ? s.table.specials[best.special] : `${best.total}`;
   if (winners.length === 1 && winners[0] === me) return { title: t.mine, sub: t.mineSub(how) };
   const names = winners.map((w) => (w === me ? s.common.you : nameOf(snap, w)));
   return winners.length === 1 ? { title: t.one(names[0]), sub: t.oneSub(names[0], how) } : { title: t.many(names), sub: t.tieSub(how) };

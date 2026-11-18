@@ -1,6 +1,6 @@
 // Regional rule sets and the two-aces rule variants.
 import { makeDeck, rankOf } from "../cards";
-import { apply, bankForced, legal, newRound } from "../round";
+import { apply, bankForced, legal, newRound, scoreRound } from "../round";
 import { cards } from "../testUtils";
 import { PRESET_IDS, PRESETS_BY_ID, presetOf, suggestedRules, suggestPreset, withPreset } from "../presets";
 import { DEFAULT_RULES, validateRules } from "../rules";
@@ -118,5 +118,52 @@ describe("Очко: 36 cards and the bank drawing to 17", () => {
     const rules = { ...withPreset(DEFAULT_RULES, "ochko"), bankTo17: false };
     expect(legal(newRound(rules, 3, 5, 0, 0)).length).toBeLessThanOrEqual(2);
     expect(bankForced(newRound({ ...rules, bankTo17: true, mode: "family" }, 3, 5, 0, null))).toBeNull();
+  });
+});
+
+describe("Pontoon", () => {
+  const rules = withPreset(DEFAULT_RULES, "pontoon");
+  const v = (hand: string) => handValue(cards(hand), rules);
+
+  it("the set: face cards 10, ace 1 or 11, five cards at most, with a bank; suggested in the UK", () => {
+    expect(rules).toMatchObject({ deck: 52, ace: "oneOrEleven", persian: "off", mode: "bank", pontoon: true, fiveCardTrick: true, maxCards: 5 });
+    expect([rules.values[11], rules.values[12], rules.values[13]]).toEqual([10, 10, 10]);
+    expect(suggestPreset("GB", "en")).toBe("pontoon");
+    expect(suggestPreset("AU", "en")).toBe("pontoon");
+    expect(suggestPreset("US", "en")).toBe("oczko");
+  });
+
+  it("names the special hands", () => {
+    expect(v("A♥ K♠")).toMatchObject({ total: 21, special: "pontoon" });
+    expect(v("A♥ 10♠")).toMatchObject({ total: 21, special: "pontoon" });
+    expect(v("10♥ 6♠ 5♣")).toMatchObject({ total: 21, special: null });
+    expect(v("2♥ 3♠ 4♣ 2♦ 5♥")).toMatchObject({ total: 16, special: "fiveCard" });
+    expect(v("A♥ A♠")).toMatchObject({ total: 12, special: null, persian: false });
+    expect(v("10♥ 9♠ 2♣ 3♦ 4♥")).toMatchObject({ bust: true, special: null });
+    // Without the rules: plain totals.
+    expect(handValue(cards("A♥ K♠"), { ...rules, pontoon: false }).special).toBeNull();
+  });
+
+  it("ranks pontoon > five cards > 21 > lower; the bank wins ties", () => {
+    const score = (player: string, bank: string) => scoreRound(rules, [cards(bank), cards(player)], 0).duels![0].winner;
+    expect(score("A♥ K♠", "10♣ 6♦ 5♥")).toBe("player");
+    expect(score("10♣ 6♦ 5♥", "A♥ K♠")).toBe("bank");
+    expect(score("2♥ 3♠ 4♣ 2♦ 5♥", "10♣ 6♦ 5♥")).toBe("player");
+    expect(score("A♥ K♠", "2♥ 3♠ 4♣ 2♦ 5♥")).toBe("player");
+    expect(score("A♥ K♠", "A♣ D♦")).toBe("bank");
+    expect(score("10♣ 9♦", "10♥ 9♠")).toBe("bank");
+  });
+
+  it("the family game: the strongest hand scores", () => {
+    const fam = { ...rules, mode: "family" as const };
+    const r = scoreRound(fam, [cards("10♣ 6♦ 5♥"), cards("2♥ 3♠ 4♣ 2♦ 5♥"), cards("9♥ 8♠")], null);
+    expect(r.points).toEqual([0, 1, 0]);
+  });
+
+  it("rules saved before Pontoon read with it off", () => {
+    const old: Record<string, unknown> = JSON.parse(JSON.stringify(DEFAULT_RULES));
+    delete old.pontoon;
+    delete old.fiveCardTrick;
+    expect(validateRules(old)).toEqual(DEFAULT_RULES);
   });
 });

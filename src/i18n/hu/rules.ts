@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Csehország, Szlovákia" },
       ajnc: { name: "Ajnc", sub: "Balkán" },
       ochko: { name: "Ocsko", sub: "Ukrajna, Kazahsztán" },
+      pontoon: { name: "Pontoon", sub: "Egyesült Királyság, Írország, Ausztrália" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ász",
     aceA11y: "Az ász értéke",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "A 21 fölötti kéz lapjai azonnal felfordulnak",
     bankTo17: "A bank 17-ig húz",
     bankTo17Sub: "17 alatt húznia kell, 17-től megáll",
+    pontoon: "Pontoon (ász + 10)",
+    pontoonSub: "Ász és tízes két lapból minden 21-et üt",
+    fiveCardTrick: "Öt lap",
+    fiveCardTrickSub: "Öt lap túllépés nélkül minden összeget üt (a pontoont nem)",
   },
 
   /** The lobby's / settings' short lines. */

@@ -32,6 +32,6 @@ const rows: Row[] = [
 
 describe("handValue", () => {
   it.each(rows)("%s", (_name, rules, hand, expected) => {
-    expect(handValue(cards(hand), rules)).toEqual(expected);
+    expect(handValue(cards(hand), rules)).toEqual({ special: null, ...expected });
   });
 });

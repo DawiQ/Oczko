@@ -27,8 +27,8 @@ describe("family", () => {
   it("reports the values", () => {
     const r = scoreRound(family, [cards("A♥ A♠"), cards("10♥ 9♥ 5♥")], null);
     expect(r.values).toEqual([
-      { seat: 0, total: 22, bust: false, persian: true },
-      { seat: 1, total: 24, bust: true, persian: false },
+      { seat: 0, total: 22, bust: false, persian: true, special: null },
+      { seat: 1, total: 24, bust: true, persian: false, special: null },
     ]);
   });
 });

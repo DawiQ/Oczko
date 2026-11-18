@@ -72,6 +72,7 @@ for (const [name, rules, seats] of [
   ["17 und 4 / Ajnc (32, z bankierem)", withPreset(DEFAULT_RULES, "siebzehnUndVier"), 4],
   ["Oko bere (32, 1 · 1 · 2, dwa asy = 21)", withPreset(DEFAULT_RULES, "okoBere"), 4],
   ["Очко (36, z bankierem, bank do 17)", withPreset(DEFAULT_RULES, "ochko"), 4],
+  ["Pontoon (figury 10, as 1/11, pontoon, 5 kart)", withPreset(DEFAULT_RULES, "pontoon"), 4],
 ] as const) {
   const s = roundStats(rules, seats, mixed(seats), 20000);
   presetRows.push(

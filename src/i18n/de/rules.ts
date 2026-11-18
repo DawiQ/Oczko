@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Tschechien, Slowakei" },
       ajnc: { name: "Ajnc", sub: "Balkan" },
       ochko: { name: "Ochko", sub: "Ukraine, Kasachstan" },
+      pontoon: { name: "Pontoon", sub: "Großbritannien, Irland, Australien" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ass",
     aceA11y: "Wert des Asses",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "Überkaufte Hände werden gleich aufgedeckt",
     bankTo17: "Bank zieht bis 17",
     bankTo17Sub: "Unter 17 muss sie ziehen, ab 17 hört sie auf",
+    pontoon: "Pontoon (Ass + 10)",
+    pontoonSub: "Ass und Zehnerkarte mit zwei Karten schlagen jede 21",
+    fiveCardTrick: "Fünf Karten",
+    fiveCardTrickSub: "Fünf Karten ohne Überkaufen schlagen jede Summe (außer Pontoon)",
   },
 
   /** The lobby's / settings' short lines. */

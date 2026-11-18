@@ -85,7 +85,7 @@ const distinct = rows.every((x) => x.z === null || x.z > 2);
 
 // Rule sets with other cards (PLAN.md §13): do the characters keep their
 // order? (Fewer deals; Ajnc has the cards of 17 und 4.)
-const SET_IDS: PresetId[] = ["siebzehnUndVier", "okoBere", "ochko"];
+const SET_IDS: PresetId[] = ["siebzehnUndVier", "okoBere", "ochko", "pontoon"];
 const THRESHOLDS = [12, 13, 14, 15, 16, 17, 18, 19, 20];
 const SET_N = Math.max(500, Math.round(N / 3));
 const sets = SET_IDS.map((id) => {

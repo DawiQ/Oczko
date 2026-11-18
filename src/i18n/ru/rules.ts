@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Чехия, Словакия" },
       ajnc: { name: "Ajnc", sub: "Балканы" },
       ochko: { name: "Двадцать одно", sub: "Украина, Казахстан" },
+      pontoon: { name: "Pontoon", sub: "Британия, Ирландия, Австралия" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Туз",
     aceA11y: "Стоимость туза",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "Карты с перебором открываются сразу",
     bankTo17: "Банк берёт до 17",
     bankTo17Sub: "Ниже 17 обязан брать, с 17 останавливается",
+    pontoon: "Pontoon (туз + 10)",
+    pontoonSub: "Туз и карта за 10 в двух картах бьют любые 21",
+    fiveCardTrick: "Пять карт",
+    fiveCardTrickSub: "Пять карт без перебора бьют любую сумму (кроме pontoon)",
   },
 
   /** The lobby's / settings' short lines. */

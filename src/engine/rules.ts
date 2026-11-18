@@ -34,6 +34,12 @@ export interface Rules {
   /** Bank mode: the bank draws below 17 and stands from 17 (Russian/Ukrainian
    *  Очко). Missing in rules saved before version 1.2 (false). */
   bankTo17: boolean;
+  /** Pontoon: an ace and a ten-card in two cards beat any other 21. Missing
+   *  in rules saved before version 1.3 (false). */
+  pontoon: boolean;
+  /** Five Card Trick: five cards without a fura beat any total (but not a
+   *  pontoon). Missing before version 1.3 (false). */
+  fiveCardTrick: boolean;
   /** Points that win the match. */
   target: number;
 }
@@ -61,6 +67,8 @@ export const DEFAULT_RULES: Rules = {
   bustRevealed: true,
   target: 10,
   bankTo17: false,
+  pontoon: false,
+  fiveCardTrick: false,
 };
 
 export const PRESETS: Record<"family" | "bank" | "small24", Rules> = {
@@ -80,10 +88,10 @@ export const MAX_CARDS_LIMIT = 12;
 
 const KEYS: (keyof Rules)[] = [
   "deck", "values", "ace", "persian", "startCards", "maxCards", "mode", "familyTie",
-  "bankTie", "bankScoring", "bankRotation", "playerBustLoses", "bustRevealed", "target", "bankTo17",
+  "bankTie", "bankScoring", "bankRotation", "playerBustLoses", "bustRevealed", "target", "bankTo17", "pontoon", "fiveCardTrick",
 ];
 /** Keys added later: rules saved before them are read with a default. */
-const LATER_KEYS: (keyof Rules)[] = ["bankTo17"];
+const LATER_KEYS: (keyof Rules)[] = ["bankTo17", "pontoon", "fiveCardTrick"];
 
 const isInt = (x: unknown, min: number, max: number): x is number =>
   typeof x === "number" && Number.isInteger(x) && x >= min && x <= max;
@@ -116,8 +124,11 @@ export function validateRules(r: unknown): Rules | null {
   if (!oneOf(o.bankRotation, ["everyRound", "onPersian", "fixed"] as const)) return null;
   if (typeof o.playerBustLoses !== "boolean" || typeof o.bustRevealed !== "boolean") return null;
   if (!isInt(o.target, 1, MAX_TARGET)) return null;
-  const bankTo17 = o.bankTo17 === undefined ? false : o.bankTo17;
-  if (typeof bankTo17 !== "boolean") return null;
+  const later = (k: string) => (o[k] === undefined ? false : o[k]);
+  const bankTo17 = later("bankTo17");
+  const pontoon = later("pontoon");
+  const fiveCardTrick = later("fiveCardTrick");
+  if (typeof bankTo17 !== "boolean" || typeof pontoon !== "boolean" || typeof fiveCardTrick !== "boolean") return null;
 
   const values = {} as Record<FaceRank, number>;
   for (const k of FACE_RANKS) values[k] = (v as Record<string, number>)[k];
@@ -137,5 +148,7 @@ export function validateRules(r: unknown): Rules | null {
     bustRevealed: o.bustRevealed,
     target: o.target,
     bankTo17,
+    pontoon,
+    fiveCardTrick,
   };
 }

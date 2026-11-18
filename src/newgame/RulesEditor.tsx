@@ -193,6 +193,14 @@ export function RulesEditor({
                 ]}
               />
               <SwitchRow label={t.bankTo17} sub={t.bankTo17Sub} value={rules.bankTo17} onChange={(bankTo17) => set({ bankTo17 })} />
+              <SwitchRow label={t.pontoon} sub={t.pontoonSub} value={rules.pontoon} onChange={(pontoon) => set({ pontoon })} />
+              <SwitchRow
+                label={t.fiveCardTrick}
+                sub={t.fiveCardTrickSub}
+                value={rules.fiveCardTrick}
+                // Five cards make the trick: the hand stops there.
+                onChange={(fiveCardTrick) => set({ fiveCardTrick, maxCards: fiveCardTrick ? 5 : rules.maxCards })}
+              />
               <SwitchRow
                 label={t.playerBustLoses}
                 sub={t.playerBustLosesSub}

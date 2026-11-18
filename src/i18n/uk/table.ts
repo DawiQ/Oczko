@@ -1,6 +1,6 @@
 // Ukrainian: texts of the table (statuses, captions, headlines, hints,
 // panels, effects, the trainer). Gender-neutral (present tense, "ти", names).
-import type { HandValue } from "../../engine/score";
+import type { HandValue, Special } from "../../engine/score";
 import type { HintId } from "../../table/hints";
 import type { pl } from "../pl";
 import { eastSlavicForm } from "../plural";
@@ -27,6 +27,8 @@ export const table: typeof pl.table = {
   },
   /** A hand in words: "Оля: 19", "Галя: перебір (24)". */
   hand: {
+    /** Pontoon / five cards: "Ola: Pontoon". */
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name}: ${common.cards(n)}`,
     persian: (name: string) => `${name}: два тузи`,
     bust: (name: string, total: number) => `${name}: перебір (${total})`,
@@ -34,6 +36,7 @@ export const table: typeof pl.table = {
   },
   /** A shown hand: "Оля має 19", "Галя має перебір (24)". */
   reveal: {
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name} має ${common.cards(n)}`,
     persian: (name: string) => `${name} має два тузи`,
     bust: (name: string, total: number) => `${name} має перебір (${total})`,
@@ -141,6 +144,8 @@ export const table: typeof pl.table = {
   },
   /** Two aces, in short (a hand's total). */
   persianShort: "ТТ",
+  /** Pontoon's special hands. */
+  specials: { pontoon: "Pontoon", fiveCard: "П'ять карт" } as Record<Special, string>,
   roundEnd: {
     bust: "Перебір",
     draw: "нічия",

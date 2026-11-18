@@ -1,6 +1,6 @@
 // German: texts of the table (statuses, captions, headlines, hints, panels,
 // effects, the trainer). Gender-neutral ("du", names).
-import type { HandValue } from "../../engine/score";
+import type { HandValue, Special } from "../../engine/score";
 import type { HintId } from "../../table/hints";
 import type { pl } from "../pl";
 import { germanicForm } from "../plural";
@@ -27,6 +27,8 @@ export const table: typeof pl.table = {
   },
   /** A hand in words: "Ella: 19", "Helga: überkauft (24)". */
   hand: {
+    /** Pontoon / five cards: "Ola: Pontoon". */
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name}: ${common.cards(n)}`,
     persian: (name: string) => `${name}: Feuer`,
     bust: (name: string, total: number) => `${name}: überkauft (${total})`,
@@ -34,6 +36,7 @@ export const table: typeof pl.table = {
   },
   /** A shown hand: "Ella hat 19", "Helga ist überkauft (24)". */
   reveal: {
+    special: (name: string, label: string) => `${name} hat ${label}`,
     cards: (name: string, n: number) => `${name} hat ${common.cards(n)}`,
     persian: (name: string) => `${name} hat Feuer`,
     bust: (name: string, total: number) => `${name} ist überkauft (${total})`,
@@ -141,6 +144,8 @@ export const table: typeof pl.table = {
   },
   /** Two aces, in short (a hand's total). */
   persianShort: "AA",
+  /** Pontoon's special hands. */
+  specials: { pontoon: "Pontoon", fiveCard: "Fünf Karten" } as Record<Special, string>,
   roundEnd: {
     bust: "Überkauft",
     draw: "unentschieden",

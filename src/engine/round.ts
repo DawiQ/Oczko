@@ -5,7 +5,7 @@
 import { makeDeck, type Card } from "./cards";
 import { shuffle } from "./rng";
 import { MAX_SEATS, MIN_SEATS, type Rules } from "./rules";
-import { handValue, isPersian } from "./score";
+import { handRank, handValue, isPersian, type Special } from "./score";
 
 export type Action = "hit" | "stand";
 export type SeatStatus = "waiting" | "playing" | "stood" | "bust" | "maxed";
@@ -27,6 +27,8 @@ export interface SeatValue {
   total: number;
   bust: boolean;
   persian: boolean;
+  /** Pontoon / five-card trick (with those rules). */
+  special: Special | null;
 }
 
 export interface Duel {
@@ -221,17 +223,14 @@ function next(d: RoundState, ev: RoundEvent[]): void {
 export function scoreRound(rules: Rules, hands: readonly (readonly Card[])[], bank: number | null): RoundResult {
   const values: SeatValue[] = hands.map((h, seat) => {
     const v = handValue(h, rules);
-    return { seat, total: v.total, bust: v.bust, persian: v.persian };
+    return { seat, total: v.total, bust: v.bust, persian: v.persian, special: v.special };
   });
   const points = hands.map(() => 0);
 
   if (rules.mode === "family" || bank === null) {
-    let winners = values.filter((v) => v.persian);
-    if (winners.length === 0) {
-      const alive = values.filter((v) => !v.bust);
-      const best = Math.max(...alive.map((v) => v.total));
-      winners = alive.filter((v) => v.total === best);
-    }
+    // The strongest hand (perskie oczko > pontoon > five cards > total); a fura never scores.
+    const best = Math.max(...values.map(handRank));
+    let winners = best < 0 ? [] : values.filter((v) => handRank(v) === best);
     if (winners.length > 1 && rules.familyTie === "noneScore") winners = [];
     for (const w of winners) points[w.seat] = 1;
     return { values, points };
@@ -255,8 +254,7 @@ export function scoreRound(rules: Rules, hands: readonly (readonly Card[])[], ba
 function duel(p: SeatValue, b: SeatValue, rules: Rules): Duel["winner"] | "tie" {
   if (p.bust) return b.bust && !rules.playerBustLoses ? "none" : "bank";
   if (b.bust) return "player";
-  if (p.persian && b.persian) return "tie";
-  if (p.persian) return "player";
-  if (b.persian) return "bank";
-  return p.total > b.total ? "player" : p.total < b.total ? "bank" : "tie";
+  const pr = handRank(p);
+  const br = handRank(b);
+  return pr > br ? "player" : pr < br ? "bank" : "tie";
 }

@@ -41,6 +41,7 @@ export const rules = {
       okoBere: { name: "Oko bere", sub: "Czechy, Słowacja" },
       ajnc: { name: "Ajnc", sub: "Bałkany" },
       ochko: { name: "Очко", sub: "Ukraina, Kazachstan" },
+      pontoon: { name: "Pontoon", sub: "Wielka Brytania, Irlandia, Australia" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "As",
     aceA11y: "Wartość asa",
@@ -68,6 +69,10 @@ export const rules = {
     bustRevealedSub: "Karty z furą odkrywane natychmiast",
     bankTo17: "Bank dobiera do 17",
     bankTo17Sub: "Poniżej 17 musi dobierać, od 17 staje",
+    pontoon: "Pontoon (as + 10)",
+    pontoonSub: "As z kartą za 10 w dwóch kartach bije każde 21",
+    fiveCardTrick: "Pięć kart",
+    fiveCardTrickSub: "Pięć kart bez fury bije każdą sumę (poza pontoonem)",
   },
 
   /** The lobby's / settings' short lines. */

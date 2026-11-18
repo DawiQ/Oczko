@@ -1,6 +1,6 @@
 // Czech: texts of the table (statuses, captions, headlines, hints, panels,
 // effects, the trainer). Gender-neutral (present tense, "ty", names).
-import type { HandValue } from "../../engine/score";
+import type { HandValue, Special } from "../../engine/score";
 import type { HintId } from "../../table/hints";
 import type { pl } from "../pl";
 import { common, toPoints } from "./common";
@@ -26,6 +26,8 @@ export const table: typeof pl.table = {
   },
   /** A hand in words: "Olina: 19", "Hela: přes (24)". */
   hand: {
+    /** Pontoon / five cards: "Ola: Pontoon". */
+    special: (name: string, label: string) => `${name}: ${label}`,
     cards: (name: string, n: number) => `${name}: ${common.cards(n)}`,
     persian: (name: string) => `${name}: dvě esa`,
     bust: (name: string, total: number) => `${name}: přes (${total})`,
@@ -33,6 +35,7 @@ export const table: typeof pl.table = {
   },
   /** A shown hand: "Olina má 19", "Hela má přes (24)". */
   reveal: {
+    special: (name: string, label: string) => `${name} má ${label}`,
     cards: (name: string, n: number) => `${name} má ${common.cards(n)}`,
     persian: (name: string) => `${name} má dvě esa`,
     bust: (name: string, total: number) => `${name} má přes (${total})`,
@@ -140,6 +143,8 @@ export const table: typeof pl.table = {
   },
   /** Two aces, in short (a hand's total). */
   persianShort: "AA",
+  /** Pontoon's special hands. */
+  specials: { pontoon: "Pontoon", fiveCard: "Pět karet" } as Record<Special, string>,
   roundEnd: {
     bust: "Přes",
     draw: "remíza",

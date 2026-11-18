@@ -240,7 +240,9 @@ describe("Wi‑Fi table — edges", () => {
 
   it("drops a link that never says hello, and lets a guest react once a second", async () => {
     const net = new MemoryNet();
-    const host = makeHost(net, DEFAULT_RULES, { checkEveryMs: 10, silentMs: 30 });
+    // A clock of its own: on a slow machine real time would also silence the guest.
+    let clock = 0;
+    const host = makeHost(net, DEFAULT_RULES, { checkEveryMs: 10, silentMs: 30, now: () => clock });
     const port = await host.open();
     const stranger = await net.dialer()("x", port);
     let closed = false;
@@ -254,6 +256,7 @@ describe("Wi‑Fi table — edges", () => {
     g.react("oops");
     await flush();
     expect(host.lan!.reaction).toMatchObject({ id: "bravo" });
+    clock = 100;
     await wait(80);
     expect(closed).toBe(true);
     host.close();

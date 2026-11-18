@@ -42,6 +42,7 @@ export const rules: typeof pl.rules = {
       okoBere: { name: "Oko bere", sub: "Czechia, Slovakia" },
       ajnc: { name: "Ajnc", sub: "Balkans" },
       ochko: { name: "Ochko", sub: "Ukraine, Kazakhstan" },
+      pontoon: { name: "Pontoon", sub: "UK, Ireland, Australia" },
     } as Record<PresetId, { name: string; sub: string }>,
     ace: "Ace",
     aceA11y: "Ace value",
@@ -69,6 +70,10 @@ export const rules: typeof pl.rules = {
     bustRevealedSub: "A bust hand is turned face up right away",
     bankTo17: "Bank draws to 17",
     bankTo17Sub: "Below 17 it must draw, from 17 it stays",
+    pontoon: "Pontoon (ace + 10)",
+    pontoonSub: "An ace and a ten-card in two cards beat any 21",
+    fiveCardTrick: "Five Card Trick",
+    fiveCardTrickSub: "Five cards without going bust beat any total (not a pontoon)",
   },
 
   /** The lobby's / settings' short lines. */
