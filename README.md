@@ -119,8 +119,12 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 - „Wstecz” na Androidzie: ekran → zakładka, z której go otwarto; zakładka
   Profil/Zasady → Graj; lobby → wyjście z aplikacji. Otwarte BottomSheety
   obsługują „wstecz” pierwsze.
-- Grafiki tylko własne, generowane skryptami z `tools/`. Plakietka „21”
-  na ikonie jest prostokątna (nie przypomina żetonu).
+- Grafiki tylko własne, generowane skryptami z `tools/`. Ikona: dwa asy
+  na miedzianym tle i zielona, prostokątna plakietka „21” (nie przypomina
+  żetonu); ciemne krawędzie kart dla czytelności w wynikach sklepów i w skali
+  szarości. Android: warstwa adaptacyjna w bezpiecznej strefie, tło
+  `assets/adaptive-icon-bg.png`. Splash: ciemne tło aplikacji, te same asy
+  z miedzianą plakietką i napis „Oczko”, w okręgu Androida 12+.
 
 ## Stół
 
