@@ -71,7 +71,7 @@ export const rules: typeof pl.rules = {
   preview: {
     bank: (bankWinsTies: boolean) =>
       `Každý hrá proti banku: berie karty a povie „Stačí“, bank odpovedá na konci${bankWinsTies ? " a vyhráva remízy" : ""}.`,
-    family: "Každý berie karty a povie „Stačí“, keď chce. Bod získa súčet najbližšie k 21, ktorý neprekročí 21.",
+    family: "Každý berie karty a povie „Stačí“, keď chce. Bod získa súčet najbližšie k 21 — ale nie vyšší.",
     persian: " Dve esá porazia všetko.",
     oneOrEleven: " Eso platí za 1 alebo 11.",
   },
@@ -86,19 +86,19 @@ export const rules: typeof pl.rules = {
       "Oczko je poľská hra 21, blízka príbuzná našej hry Oko berie. Získaj súčet čo najbližšie k 21, ale nie viac. Každý postupne hovorí „Ešte“ (berie kartu) alebo „Stačí“ (končí).",
     flow: "Priebeh",
     flowTexts: [
-      "Každý dostane kartu na začiatok. Hrá sa postupne, zľava od toho, kto rozdáva. Na konci kola všetci odkryjú karty.",
-      "Bod získa súčet najbližšie k 21, ktorý neprekročí 21; dve esá porazia všetko. Pri remíze podľa nastavení: bod pre každého alebo pre nikoho.",
+      "Každý dostane kartu na začiatok. Hrá sa postupne, začína sa naľavo od toho, kto rozdáva. Na konci kola všetci odkryjú karty.",
+      "Bod získa súčet najbližšie k 21 — ale nie vyšší; dve esá porazia všetko. Pri remíze podľa nastavení: bod pre každého alebo pre nikoho.",
     ],
     banker: "Bankár",
     bankerTexts: [
       "Jedna osoba je bank. Všetci ostatní hrajú súboj iba s bankom; bank ide posledný a vidí, kto má cez.",
-      "Vyšší súčet vyhráva súboj (+1). Kto má cez, vždy prehráva; bank s cez prehráva s každým, kto cez nemá. Remíza — zvyčajne pre bank.",
+      "Vyšší súčet vyhráva súboj (+1). Kto má cez, vždy prehráva; keď má cez bank, prehrá s každým, kto cez nemá. Remíza zvyčajne patrí banku.",
       "Bank získa bod, keď vyhrá viac súbojov, ako prehrá (alebo — podľa nastavení — bod za každý vyhraný súboj). Bank prechádza každé kolo na ďalšiu osobu.",
     ],
     houseVariants: "Domáce varianty",
     houseVariantsTexts: [
       "Hodnoty figúr (J, Q, K), balíček s 52, 32 alebo 24 kartami, eso za 11 alebo za 1 či 11, dve esá áno alebo nie, jedna alebo dve karty na začiatok, limit kariet v ruke, pravidlá remíz a banku.",
-      "Všetko nastavíš v „Tvoje domáce pravidlá“ a pri každej novej hre.",
+      "Všetko nastavíš v časti „Tvoje domáce pravidlá“ a pri každej novej hre.",
     ],
     examples: {
       persian: { title: "Dve esá", text: "Porazia všetko." },
@@ -112,7 +112,7 @@ export const rules: typeof pl.rules = {
     byPips: "podľa čísla",
     aceShort: { eleven: "11", oneOrEleven: "1/11" } as Record<Rules["ace"], string>,
     valueA11y: (card: string, value: string) => `${card}: ${value}`,
-    yourSettings: "Tvoje nastavenia — zmeníš ich v „Tvoje domáce pravidlá“.",
+    yourSettings: "Tvoje nastavenia — zmeníš ich v časti „Tvoje domáce pravidlá“.",
     showExample: "Ukáž mi príklad",
   },
 };

@@ -40,8 +40,8 @@ export const home: typeof pl.home = {
     normal: "Normálne",
     fast: "Rýchle",
     houseRules: "Tvoje domáce pravidlá",
-    resetTips: "Znova ukázať rady",
-    resetTipsSub: "Nápovedy, keď sa niečo stane prvýkrát",
+    resetTips: "Znova zobraziť rady",
+    resetTipsSub: "Krátke rady pri prvých situáciách v hre",
     language: "Jazyk",
     /** "Automaticky (Slovenčina)": the phone's language. */
     languageAuto: (current: string) => `Automaticky (${current})`,

@@ -27,7 +27,7 @@ hrá doma v rodine. Každý postupne hovorí „Ešte“ alebo „Stačí“. Kt
 najbližšie k 21, vyhráva kolo — kto 21 prekročí, má cez. Dve esá? Najlepšia
 ruka zo všetkých!
 
-Hrá sa o body: každé vyhraté kolo je bod, partia sa hrá do 5, 10 alebo
+Hrá sa o body: každé vyhrané kolo je bod, partia sa hrá do 5, 10 alebo
 15 bodov. Žiadne peniaze, žiadne ceny — len karty a dobrá zábava.
 
 TVOJE DOMÁCE PRAVIDLÁ

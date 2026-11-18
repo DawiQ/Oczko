@@ -16,7 +16,7 @@ export const profile: typeof pl.profile = {
     fiveCard: { name: "21 z piatich kariet", desc: "21 z piatich alebo viacerých kariet" },
     edge: { name: "Na hrane", desc: "Výhra s 21 po ďalšej karte pri 17 a viac" },
     ironBank: { name: "Železný bank", desc: "Bank vyhrá všetky súboje (2+ hráčov)" },
-    streak: { name: "Séria", desc: "5 vyhratých kôl za sebou" },
+    streak: { name: "Séria", desc: "5 vyhraných kôl za sebou" },
     veteran: { name: "Veterán", desc: "100 odohraných partií" },
   },
 

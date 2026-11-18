@@ -19,7 +19,7 @@ export const premium: typeof pl.premium = {
   pro: "Oczko Pro",
   /** The tag next to a locked option. */
   tag: "PRO",
-  wait: "Moment…",
+  wait: "Chvíľku…",
   adFailed: "Reklama nie je dostupná — skús to o chvíľu.",
   restore: "Obnoviť nákupy",
 
@@ -123,7 +123,7 @@ export const premium: typeof pl.premium = {
     fine: "Kód funguje raz a iba na jednom účte obchodu. Na inom zariadení obnovíš Oczko Pro z kódu cez „Obnoviť nákupy“.",
     openFailed: "Obchod sa nepodarilo otvoriť. Skús to znova.",
     finishIn: (store: string) => `Dokonči ${inStore(store)}`,
-    stepOpened: (store: string) => `${store} je otvorený`,
+    stepOpened: (store: string) => `Otvorili sme ${store}`,
     stepConfirm: "Potvrď kód v obchode",
     stepBack: "Vráť sa sem — skontrolujeme to sami",
     checkNow: "Skontrolovať teraz",

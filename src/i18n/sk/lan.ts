@@ -38,7 +38,7 @@ export const lan: typeof pl.lan = {
     note: (pro: boolean, free: number, max: number) =>
       `Bez internetu: telefóny sa spoja v miestnej sieti. ${pro ? `Pri stole najviac ${people(max)} (Oczko Pro).` : `Pri stole najviac ${people(free)} (${max}, ak má hostiteľ Oczko Pro).`}`,
     stats: (matchesWon: number, matches: number, roundsWon: number, rounds: number) =>
-      `Cez Wi‑Fi: vyhraté ${matchesWon} z ${matches} ${matches === 1 ? "partie" : "partií"} · ${roundsWon}/${rounds} kôl s bodom`,
+      `Cez Wi‑Fi: vyhrané partie ${matchesWon} z ${matches} · ${roundsWon}/${rounds} kôl s bodom`,
   },
   host: {
     subtitle: "Tvoj stôl — priatelia sa pripájajú",

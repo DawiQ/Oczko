@@ -44,7 +44,7 @@ export const history: typeof pl.history = {
 
   replay: {
     title: "Záznam",
-    cannot: "Túto partiu sa v tejto verzii aplikácie nedá prehrať.",
+    cannot: "Záznam tejto partie sa v tejto verzii aplikácie nedá prehrať.",
     round: (n: number) => `Kolo ${n}`,
     deal: (n: number) => `Kolo ${n} — rozdanie`,
     stand: (who: string) => `${who}: Stačí`,
@@ -56,7 +56,7 @@ export const history: typeof pl.history = {
     decision: (g: Grade, standPct: number, hitPct: number) => `Rozhodnutie: ${grades[g]} · Stačí ${standPct} % / Ešte ${hitPct} %`,
     prev: "Predchádzajúci ťah",
     next: "Ďalší ťah",
-    pause: "Zastaviť",
+    pause: "Pozastaviť",
     play: "Prehrať",
     move: (i: number, n: number) => `Ťah ${i} z ${n}`,
     summary: (x: Record<Grade, number>) =>
