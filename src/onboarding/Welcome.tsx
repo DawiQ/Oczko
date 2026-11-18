@@ -6,6 +6,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { Rules } from "../engine/rules";
+import { useStrings } from "../i18n";
 import { RulesEditor } from "../newgame/RulesEditor";
 import { preview } from "../newgame/rulesText";
 import { Button3D } from "../ui/Button3D";
@@ -14,26 +15,29 @@ import { P } from "../ui/palette";
 
 export function Welcome({ initial, onDone, onTutorial }: { initial: Rules; onDone: (r: Rules) => void; onTutorial: (r: Rules) => void }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
+  const t = str.onboarding.welcome;
   const [rules, setRules] = useState(initial);
+  const short = preview(rules, str);
   return (
     <View style={[s.screen, { paddingTop: insets.top + 8 }]}>
       <ScrollView contentContainerStyle={s.content}>
         <Text style={s.title} accessibilityRole="header">
-          Jak grasz u siebie?
+          {t.title}
         </Text>
-        <Text style={s.sub}>Każdy dom ma swoje Oczko. Ustaw zasady raz — można je zmienić w każdej chwili.</Text>
+        <Text style={s.sub}>{t.sub}</Text>
         <RulesEditor rules={rules} onChange={setRules} basic />
-        <View style={s.preview} accessible accessibilityLabel={`W skrócie: ${preview(rules)}`}>
+        <View style={s.preview} accessible accessibilityLabel={t.inShortA11y(short)}>
           <Text style={s.previewText}>
-            <Text style={{ color: P.text, fontWeight: "700" }}>W skrócie: </Text>
-            {preview(rules)}
+            <Text style={{ color: P.text, fontWeight: "700" }}>{t.inShort}</Text>
+            {short}
           </Text>
         </View>
       </ScrollView>
       <View style={[s.footer, { paddingBottom: insets.bottom + 12 }]}>
-        <Button3D label="Gotowe" big onPress={() => onDone(rules)} testID="welcome-done" />
-        <Pressable onPress={() => onTutorial(rules)} style={s.link} accessibilityRole="button" accessibilityLabel="Pokaż mi zasady na przykładzie">
-          <Text style={s.linkText}>Pokaż mi zasady na przykładzie</Text>
+        <Button3D label={t.done} big onPress={() => onDone(rules)} testID="welcome-done" />
+        <Pressable onPress={() => onTutorial(rules)} style={s.link} accessibilityRole="button" accessibilityLabel={t.tutorial}>
+          <Text style={s.linkText}>{t.tutorial}</Text>
         </Pressable>
       </View>
     </View>

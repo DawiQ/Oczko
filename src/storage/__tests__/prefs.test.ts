@@ -3,7 +3,7 @@ import { HOUSE_RULES_KEY, loadHouseRules, saveHouseRules } from "../houseRules";
 import { memoryKV } from "../kv";
 import { DEFAULT_CHOICES, loadChoices, looksLikeChoices, NEW_GAME_KEY, saveChoices } from "../newGame";
 import { loadOnboardingDone, ONBOARDING_KEY, saveOnboardingDone } from "../onboarding";
-import { DEFAULT_SETTINGS, loadSettings, looksLikeSettings, saveSettings, SETTINGS_KEY } from "../settings";
+import { DEFAULT_SETTINGS, loadSettings, looksLikeSettings, saveSettings, SETTINGS_KEY, SETTINGS_KEY_V1 } from "../settings";
 
 describe("preferences in storage", () => {
   it("settings", async () => {
@@ -13,6 +13,17 @@ describe("preferences in storage", () => {
     expect((await loadSettings(kv)).pace).toBe("fast");
     expect(looksLikeSettings({ ...DEFAULT_SETTINGS, pace: "turbo" })).toBe(false);
     expect(await loadSettings(memoryKV({ [SETTINGS_KEY]: "{" }))).toEqual(DEFAULT_SETTINGS);
+    expect(looksLikeSettings({ ...DEFAULT_SETTINGS, lang: "xx" })).toBe(false);
+    await saveSettings(kv, { ...DEFAULT_SETTINGS, lang: "pl" });
+    expect((await loadSettings(kv)).lang).toBe("pl");
+  });
+
+  it("settings v1 (without the language) are moved over", async () => {
+    const v1 = { v: 1, sound: false, haptics: true, pace: "slow", trainer: true };
+    expect(await loadSettings(memoryKV({ [SETTINGS_KEY_V1]: JSON.stringify(v1) }))).toEqual({ ...v1, v: 2, lang: "auto" });
+    // v2 wins over v1.
+    const kv = memoryKV({ [SETTINGS_KEY_V1]: JSON.stringify(v1), [SETTINGS_KEY]: JSON.stringify({ ...DEFAULT_SETTINGS, pace: "fast" }) });
+    expect((await loadSettings(kv)).pace).toBe("fast");
   });
 
   it("house rules", async () => {

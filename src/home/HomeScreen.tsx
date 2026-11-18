@@ -4,6 +4,7 @@ import { Image, Pressable, ScrollView, StyleSheet, Text, View } from "react-nati
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cardOf } from "../engine/cards";
+import { useStrings } from "../i18n";
 import { ART } from "../ui/art";
 import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
@@ -15,25 +16,24 @@ import { Portrait } from "../ui/Portrait";
 export interface ResumeInfo {
   title: string;
   line: string;
-  seats: { name: string; color: string; score: number }[];
+  /** `persona`: a bot's character (its portrait whatever the name's language). */
+  seats: { name: string; persona?: string | null; color: string; score: number }[];
 }
-
-/** House rules in two short lines (until the rules come from the onboarding). */
-export const DEFAULT_RULES_SUMMARY = ["Rodzinne · W 2, D 3, K 4 · 52 karty", "Perskie oczko · As za 11"];
 
 const ACE_HEARTS = cardOf(14, 0);
 const ACE_SPADES = cardOf(14, 3);
 
 function Logo() {
+  const str = useStrings();
   return (
-    <View style={s.logo} accessible accessibilityRole="header" accessibilityLabel="Oczko — gra w karty do 21">
+    <View style={s.logo} accessible accessibilityRole="header" accessibilityLabel={str.home.logoA11y}>
       <View style={s.logoCards} importantForAccessibility="no-hide-descendants" accessibilityElementsHidden>
         <CardFace card={ACE_HEARTS} size="sm" style={{ position: "absolute", left: 0, top: 4, transform: [{ rotate: "-12deg" }] }} />
         <CardFace card={ACE_SPADES} size="sm" style={{ position: "absolute", left: 14, top: 0, transform: [{ rotate: "8deg" }] }} />
       </View>
       <View>
-        <Text style={s.title}>Oczko</Text>
-        <Text style={s.subtitle}>gra w karty do 21</Text>
+        <Text style={s.title}>{str.home.title}</Text>
+        <Text style={s.subtitle}>{str.home.subtitle}</Text>
       </View>
     </View>
   );
@@ -61,8 +61,9 @@ function Row({
   action?: string;
   onPress: () => void;
 }) {
+  const str = useStrings();
   return (
-    <Pressable style={s.panel} onPress={onPress} accessibilityRole="button" accessibilityLabel={`${title}. ${subtitle}`}>
+    <Pressable style={s.panel} onPress={onPress} accessibilityRole="button" accessibilityLabel={str.home.rowA11y(title, subtitle)}>
       {icon !== undefined && <Image source={icon} style={s.rowIcon} />}
       <View style={{ flex: 1 }}>
         <Text style={s.rowTitle}>{title}</Text>
@@ -74,28 +75,29 @@ function Row({
 }
 
 function ResumeCard({ info, onResume }: { info: ResumeInfo; onResume: () => void }) {
+  const str = useStrings();
   return (
     <View style={[s.card, { borderColor: P.accentDark }]}>
       <View style={s.resumeHead}>
-        <Text style={s.rowTitle}>Wznów partię</Text>
+        <Text style={s.rowTitle}>{str.home.resume.title}</Text>
         <Text style={s.resumeBadge}>{info.title}</Text>
       </View>
       <Text style={s.rowSub}>{info.line}</Text>
-      <View style={s.resumeSeats} accessible accessibilityLabel={`Punkty: ${info.seats.map((x) => `${x.name} ${x.score}`).join(", ")}`}>
+      <View style={s.resumeSeats} accessible accessibilityLabel={str.home.resume.scores(info.seats)}>
         {info.seats.map((x) => (
           <View key={x.name} style={s.resumeSeat}>
-            <Portrait name={x.name} size={28} color={x.color} />
+            <Portrait name={x.name} persona={x.persona} size={28} color={x.color} />
             <Text style={s.resumeScore}>{x.score}</Text>
           </View>
         ))}
       </View>
-      <Button3D label="Wznów" height={46} onPress={onResume} testID="home-resume" />
+      <Button3D label={str.home.resume.button} height={46} onPress={onResume} testID="home-resume" />
     </View>
   );
 }
 
 export function HomeScreen({
-  rulesSummary = DEFAULT_RULES_SUMMARY,
+  rulesSummary,
   resume,
   onResume,
   onNewGame,
@@ -116,34 +118,35 @@ export function HomeScreen({
   onSettings: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: insets.top + 12 }]}>
       <View style={s.top}>
         <Logo />
-        <IconButton icon={ART.iconGear} label="Ustawienia" onPress={onSettings} />
+        <IconButton icon={ART.iconGear} label={str.home.settings} onPress={onSettings} />
       </View>
 
       {resume && onResume && <ResumeCard info={resume} onResume={onResume} />}
 
-      <Button3D label="Nowa gra" big height={64} onPress={onNewGame} testID="home-new-game" />
+      <Button3D label={str.home.newGame} big height={64} onPress={onNewGame} testID="home-new-game" />
 
       <View style={s.pair}>
-        <Button3D tone="dark" height={48} onPress={onFriends} style={{ flex: 1 }} accessibilityLabel="Ze znajomymi przez Wi‑Fi">
+        <Button3D tone="dark" height={48} onPress={onFriends} style={{ flex: 1 }} accessibilityLabel={str.home.friendsA11y}>
           <View style={s.btnInner}>
             <Image source={ART.iconWifi} style={s.btnIcon} />
-            <Text style={s.btnText}>Ze znajomymi</Text>
+            <Text style={s.btnText}>{str.home.friends}</Text>
           </View>
         </Button3D>
-        <Button3D tone="dark" height={48} onPress={onTraining} style={{ flex: 1 }} accessibilityLabel="Trening">
+        <Button3D tone="dark" height={48} onPress={onTraining} style={{ flex: 1 }} accessibilityLabel={str.home.training}>
           <View style={s.btnInner}>
             <Image source={ART.iconTarget} style={s.btnIcon} />
-            <Text style={s.btnText}>Trening</Text>
+            <Text style={s.btnText}>{str.home.training}</Text>
           </View>
         </Button3D>
       </View>
 
-      <Row title="Jak grasz u siebie" subtitle={rulesSummary.join("\n")} action="Zmień" onPress={onHouseRules} />
-      <Row icon={ART.iconHistory} title="Historia" subtitle="Rozegrane partie i powtórki" onPress={onHistory} />
+      <Row title={str.home.houseRules} subtitle={(rulesSummary ?? str.home.defaultRulesSummary).join("\n")} action={str.home.change} onPress={onHouseRules} />
+      <Row icon={ART.iconHistory} title={str.home.history} subtitle={str.home.historySub} onPress={onHistory} />
     </ScrollView>
   );
 }

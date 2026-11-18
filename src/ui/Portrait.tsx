@@ -15,12 +15,15 @@ export function splitCopy(name: string): { base: string; copy: string } {
 
 export function Portrait({
   name,
+  persona,
   size,
   color = P.accent,
   ring,
   style,
 }: {
   name: string;
+  /** A character's id: its portrait whatever the name's language. */
+  persona?: string | null;
   size: number;
   /** Background of the initial when there is no portrait. */
   color?: string;
@@ -30,7 +33,7 @@ export function Portrait({
 }) {
   // "Hrabia II": Hrabia's portrait with a "II" badge (a copy at the table).
   const { base, copy } = splitCopy(name);
-  const src = PORTRAITS[base.toLowerCase()];
+  const src = PORTRAITS[persona ?? base.toLowerCase()];
   const box = { width: size, height: size, borderRadius: size / 2 };
   const badge = Math.max(16, Math.round(size * 0.4));
   return (

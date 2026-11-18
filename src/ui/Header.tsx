@@ -3,6 +3,7 @@ import type { ReactNode } from "react";
 import { Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useStrings } from "../i18n";
 import { DISPLAY } from "./fonts";
 import { P } from "./palette";
 
@@ -19,10 +20,11 @@ export function Header({
   right?: ReactNode;
 }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
   return (
     <View style={[s.header, { paddingTop: insets.top + 8 }]}>
       {onBack ? (
-        <Pressable onPress={onBack} style={s.back} accessibilityRole="button" accessibilityLabel="Wróć" hitSlop={6}>
+        <Pressable onPress={onBack} style={s.back} accessibilityRole="button" accessibilityLabel={str.common.back} hitSlop={6}>
           <Text style={s.backText}>‹</Text>
         </Pressable>
       ) : (

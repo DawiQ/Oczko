@@ -12,7 +12,7 @@ import {
   type HostMsg,
   type LanInfo,
   type LobbySlot,
-  type ReactionText,
+  type Reaction,
   type RefuseReason,
   type TableInfo,
 } from "./protocol";
@@ -92,8 +92,8 @@ export class LanGuest {
     this.stop("left");
   }
 
-  react(text: ReactionText): void {
-    this.send({ t: "react", text });
+  react(id: Reaction): void {
+    this.send({ t: "react", id });
   }
 
   private move(action: "hit" | "stand"): GameError | null {

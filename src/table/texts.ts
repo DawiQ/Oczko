@@ -1,111 +1,115 @@
 // Words of the table: statuses, the live caption (screen readers), the
-// round's headline. Pure; gender-neutral (no "dobrałeś/dobrałaś").
+// round's headline. Pure; the texts come from the dictionary (`s`).
 import type { RoundEvent } from "../engine/round";
 import type { GameSnapshot, SeatInfo } from "../game/TableGame";
+import { pl, type Strings } from "../i18n/pl";
 import { rankSpoken } from "../ui/cards";
-import { plural } from "../ui/plural";
 
 /** The short label under a seat ("Starczy", "Fura!"…), or null. */
-export function statusLabel(seat: SeatInfo): string | null {
-  if (seat.thinking) return "myśli…";
-  if (seat.persian) return "Perskie oczko!";
+export function statusLabel(seat: SeatInfo, s: Strings = pl): string | null {
+  const t = s.table.status;
+  if (seat.thinking) return t.thinking;
+  if (seat.persian) return t.persian;
   switch (seat.status) {
     case "stood":
-      return "Starczy";
+      return t.stood;
     case "bust":
-      return "Fura!";
+      return t.bust;
     case "maxed":
-      return "Komplet kart";
+      return t.maxed;
     case "playing":
-      return "na ruchu";
+      return t.playing;
     default:
       return null;
   }
 }
 
-const nameOf = (s: GameSnapshot, seat: number) => s.seats[seat]?.name ?? "";
+const nameOf = (snap: GameSnapshot, seat: number) => snap.seats[seat]?.name ?? "";
 
-/** "Ola: 19", "Hela: fura (24)", "Kuba: perskie oczko". */
-export function handText(seat: SeatInfo): string {
-  if (!seat.value) return `${seat.name}: ${seat.cards} ${plural(seat.cards, "karta", "karty", "kart")}`;
-  if (seat.value.persian) return `${seat.name}: perskie oczko`;
-  if (seat.value.bust) return `${seat.name}: fura (${seat.value.total})`;
-  return `${seat.name}: ${seat.value.total}`;
+function handIn(words: Strings["table"]["hand"], seat: SeatInfo): string {
+  if (!seat.value) return words.cards(seat.name, seat.cards);
+  if (seat.value.persian) return words.persian(seat.name);
+  if (seat.value.bust) return words.bust(seat.name, seat.value.total);
+  return words.total(seat.name, seat.value.total);
 }
 
+/** "Ola: 19", "Hela: fura (24)", "Kuba: perskie oczko". */
+export const handText = (seat: SeatInfo, s: Strings = pl): string => handIn(s.table.hand, seat);
+
 /** One event in words, from the person's point of view. */
-export function eventText(e: RoundEvent, s: GameSnapshot): string | null {
-  const me = s.me;
-  const total = s.view.myValue.total;
+export function eventText(e: RoundEvent, snap: GameSnapshot, s: Strings = pl): string | null {
+  const me = snap.me;
+  const total = snap.view.myValue.total;
+  const t = s.table.event;
   switch (e.t) {
     case "deal":
       return null;
     case "hit":
-      if (e.seat === me && e.card !== undefined) return `Dobrana karta: ${rankSpoken(e.card)}. Masz ${total}`;
-      return `${nameOf(s, e.seat)} dobiera kartę`;
+      if (e.seat === me && e.card !== undefined) return t.myHit(rankSpoken(e.card, s), total);
+      return t.hit(nameOf(snap, e.seat));
     case "stand":
-      return e.seat === me ? `Starczy przy ${total}` : `${nameOf(s, e.seat)}: Starczy`;
+      return e.seat === me ? t.myStand(total) : t.stand(nameOf(snap, e.seat));
     case "bust":
-      return e.seat === me ? `Fura! Masz ${total}` : `${nameOf(s, e.seat)}: Fura!`;
+      return e.seat === me ? t.myBust(total) : t.bust(nameOf(snap, e.seat));
     case "persian":
-      return e.seat === me ? "Perskie oczko!" : `${nameOf(s, e.seat)}: Perskie oczko!`;
+      return e.seat === me ? t.myPersian : t.persian(nameOf(snap, e.seat));
     case "maxed":
-      return e.seat === me ? "Komplet kart — koniec dobierania" : `${nameOf(s, e.seat)}: komplet kart`;
+      return e.seat === me ? t.myMaxed : t.maxed(nameOf(snap, e.seat));
     case "reveal": {
-      const seat = s.seats[e.seat];
-      return seat ? handText(seat).replace(":", " ma").replace(" ma fura", " ma furę") : null;
+      const seat = snap.seats[e.seat];
+      return seat ? handIn(s.table.reveal, seat) : null;
     }
     case "result":
-      return headline(s).title;
+      return headline(snap, s).title;
   }
 }
 
 /** The live caption under the table (also read by screen readers). */
-export function caption(s: GameSnapshot): string {
-  if (s.phase === "roundEnd" || s.phase === "matchEnd") return headline(s).title;
-  if (s.phase === "dealing") return s.rules.mode === "bank" ? `Rozdanie · bank: ${nameOf(s, s.view.bank!)}` : "Rozdanie";
-  const thinking = s.seats.find((x) => x.thinking);
-  const last = s.lastEvents.length ? eventText(s.lastEvents[s.lastEvents.length - 1].event, s) : null;
-  if (s.phase === "myTurn") {
-    const turn = s.view.myValue.total === 21 ? "Masz 21 — Starczy?" : `Twój ruch · masz ${s.view.myValue.total}`;
-    return last && !last.startsWith("Dobrana") ? `${last} · ${turn}` : last ?? turn;
+export function caption(snap: GameSnapshot, s: Strings = pl): string {
+  const t = s.table.caption;
+  if (snap.phase === "roundEnd" || snap.phase === "matchEnd") return headline(snap, s).title;
+  if (snap.phase === "dealing") return snap.rules.mode === "bank" ? t.dealingBank(nameOf(snap, snap.view.bank!)) : t.dealing;
+  const thinking = snap.seats.find((x) => x.thinking);
+  const lastEvent = snap.lastEvents.length ? snap.lastEvents[snap.lastEvents.length - 1].event : null;
+  const last = lastEvent ? eventText(lastEvent, snap, s) : null;
+  if (snap.phase === "myTurn") {
+    const turn = snap.view.myValue.total === 21 ? t.at21 : t.myTurn(snap.view.myValue.total);
+    // My own new card already tells my total: no turn line after it.
+    const myCard = lastEvent?.t === "hit" && lastEvent.seat === snap.me && lastEvent.card !== undefined;
+    return last && !myCard ? t.then(last, turn) : last ?? turn;
   }
-  if (thinking) return `${thinking.name} myśli…`;
-  return last ?? (s.phase === "showdown" ? "Odsłanianie kart" : "");
+  if (thinking) return t.thinking(thinking.name);
+  return last ?? (snap.phase === "showdown" ? t.showdown : "");
 }
 
-const list = (names: string[]) => names.join(", ");
-
 /** The round's (or match's) outcome: a title and a line under it. */
-export function headline(s: GameSnapshot): { title: string; sub: string } {
-  const r = s.result;
+export function headline(snap: GameSnapshot, s: Strings = pl): { title: string; sub: string } {
+  const t = s.table.headline;
+  const r = snap.result;
   if (!r) return { title: "", sub: "" };
-  const me = s.me;
-  if (s.phase === "matchEnd" && s.winner !== null) {
-    const title = s.winner === me ? "Partia dla Ciebie!" : `Partię wygrywa ${nameOf(s, s.winner)}`;
-    return { title, sub: `${s.scores[s.winner]} ${plural(s.scores[s.winner], "punkt", "punkty", "punktów")} · ${s.roundNo} ${plural(s.roundNo, "runda", "rundy", "rund")}` };
+  const me = snap.me;
+  if (snap.phase === "matchEnd" && snap.winner !== null) {
+    const title = snap.winner === me ? t.matchMine : t.matchWon(nameOf(snap, snap.winner));
+    return { title, sub: t.matchSub(snap.scores[snap.winner], snap.roundNo) };
   }
   if (r.duels) {
-    const bank = s.view.bank!;
+    const bank = snap.view.bank!;
     const won = r.duels.filter((d) => d.winner === "bank").length;
-    const n = r.duels.length;
-    const bankLine = `Bank wygrywa ${won} z ${n} ${plural(n, "pojedynku", "pojedynków", "pojedynków")}`;
-    if (me === bank) return { title: r.points[me] > 0 ? `Punkt dla banku (+${r.points[me]})` : "Bank bez punktu", sub: bankLine };
+    const bankLine = t.bankLine(won, r.duels.length);
+    if (me === bank) return { title: r.points[me] > 0 ? t.bankPoint(r.points[me]) : t.bankNoPoint, sub: bankLine };
     const mine = r.duels.find((d) => d.seat === me)!;
-    const title = mine.winner === "player" ? "Wygrany pojedynek z bankiem" : mine.winner === "bank" ? "Pojedynek dla banku" : "Pojedynek bez rozstrzygnięcia";
+    const title = mine.winner === "player" ? t.duelWon : mine.winner === "bank" ? t.duelLost : t.duelDraw;
     return { title, sub: bankLine };
   }
   const winners = r.points.flatMap((p, i) => (p > 0 ? [i] : []));
   const values = r.values;
   if (winners.length === 0) {
     const allBust = values.every((v) => v.bust);
-    return { title: "Nikt nie punktuje", sub: allBust ? "Wszyscy mają furę" : "Remis — bez punktów" };
+    return { title: t.nobody, sub: allBust ? t.allBust : t.draw };
   }
   const best = values[winners[0]];
-  const how = best.persian ? "perskie oczko" : `${best.total}`;
-  if (winners.length === 1 && winners[0] === me) return { title: "Punkt dla Ciebie", sub: `Najbliżej 21: Ty z ${how}` };
-  const names = winners.map((w) => (w === me ? "Ty" : nameOf(s, w)));
-  return winners.length === 1
-    ? { title: `Punkt dla: ${names[0]}`, sub: `Najbliżej 21: ${names[0]} z ${how}` }
-    : { title: `Punkty dla: ${list(names)}`, sub: `Remis przy ${how}` };
+  const how = best.persian ? t.persian : `${best.total}`;
+  if (winners.length === 1 && winners[0] === me) return { title: t.mine, sub: t.mineSub(how) };
+  const names = winners.map((w) => (w === me ? s.common.you : nameOf(snap, w)));
+  return winners.length === 1 ? { title: t.one(names[0]), sub: t.oneSub(names[0], how) } : { title: t.many(names), sub: t.tieSub(how) };
 }

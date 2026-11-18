@@ -2,32 +2,24 @@
 import { StyleSheet, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
 import { rankOf, suitOf, type Card } from "../engine/cards";
+import { pl, useStrings, type Strings } from "../i18n";
 import type { BackLook, DeckLook } from "../premium/looks";
 import { DISPLAY } from "./fonts";
 import { useLookStyle } from "./lookStyle";
 import { P } from "./palette";
 
-/** Index labels by rank 2..14. */
-const RANK_LABELS: Record<number, string> = {
-  2: "2", 3: "3", 4: "4", 5: "5", 6: "6", 7: "7", 8: "8", 9: "9", 10: "10", 11: "W", 12: "D", 13: "K", 14: "A",
-};
 // U+FE0E (text presentation) stops iOS from drawing the suits as emoji.
 export const SUIT_GLYPHS = ["♥︎", "♦︎", "♣︎", "♠︎"];
-export const SUIT_NAMES = ["kier", "karo", "trefl", "pik"];
-/** Screen-reader names by rank: "dama", "dziewiątka"… */
-const RANK_SPOKEN: Record<number, string> = {
-  2: "dwójka", 3: "trójka", 4: "czwórka", 5: "piątka", 6: "szóstka", 7: "siódemka", 8: "ósemka",
-  9: "dziewiątka", 10: "dziesiątka", 11: "walet", 12: "dama", 13: "król", 14: "as",
-};
 
-export const rankLabel = (c: Card) => RANK_LABELS[rankOf(c)];
+/** The index label: "7", "D", "A" (face letters from the dictionary). */
+export const rankLabel = (c: Card, s: Strings = pl) => s.cards.rankLetters[rankOf(c)] ?? String(rankOf(c));
 export const isRed = (c: Card) => suitOf(c) < 2;
 /** "D♠︎" */
-export const cardLabel = (c: Card) => `${rankLabel(c)}${SUIT_GLYPHS[suitOf(c)]}`;
+export const cardLabel = (c: Card, s: Strings = pl) => `${rankLabel(c, s)}${SUIT_GLYPHS[suitOf(c)]}`;
 /** "dama pik" */
-export const cardSpoken = (c: Card) => `${RANK_SPOKEN[rankOf(c)]} ${SUIT_NAMES[suitOf(c)]}`;
+export const cardSpoken = (c: Card, s: Strings = pl) => s.cards.spoken(s.cards.ranks[rankOf(c)], s.cards.suits[suitOf(c)]);
 /** The rank alone, for "Dobrana karta: dama". */
-export const rankSpoken = (c: Card) => RANK_SPOKEN[rankOf(c)];
+export const rankSpoken = (c: Card, s: Strings = pl) => s.cards.ranks[rankOf(c)];
 
 export type CardSize = "lg" | "md" | "sm";
 export const CARD_DIM: Record<CardSize, { w: number; h: number; rank: number; suit: number; r: number }> = {
@@ -51,6 +43,7 @@ export function CardFace({
   deck?: DeckLook;
 }) {
   const d = CARD_DIM[size];
+  const str = useStrings();
   const inUse = useLookStyle().deck;
   const deck = deckIn ?? inUse;
   const color = deck.ink[suitOf(card)];
@@ -62,11 +55,11 @@ export function CardFace({
       style={[s.card, { width: d.w, height: d.h, borderRadius: d.r, backgroundColor: deck.face, borderColor: deck.line }, highlight && s.highlight, style]}
       accessible
       accessibilityRole="image"
-      accessibilityLabel={cardSpoken(card)}
+      accessibilityLabel={cardSpoken(card, str)}
     >
       {/* Corner index (rank + suit): the only part visible when cards overlap. */}
       <View style={[s.index, size === "sm" && s.indexSm]}>
-        <Text style={[s.rank, { color, fontSize: Math.round(d.rank * scale), lineHeight: Math.round(d.rank * scale * 1.1) }, font]}>{rankLabel(card)}</Text>
+        <Text style={[s.rank, { color, fontSize: Math.round(d.rank * scale), lineHeight: Math.round(d.rank * scale * 1.1) }, font]}>{rankLabel(card, str)}</Text>
         <Text style={[s.indexSuit, { color, fontSize: Math.round(d.rank * 0.8), lineHeight: Math.round(d.rank * 0.9) }]}>{suit}</Text>
       </View>
       {d.suit > 0 && <Text style={[s.suit, { color, fontSize: d.suit }]}>{suit}</Text>}
@@ -76,6 +69,7 @@ export function CardFace({
 
 export function CardBack({ size = "sm", style, back: backIn }: { size?: CardSize | "xs"; style?: StyleProp<ViewStyle>; /** A back instead of the one in use (a preview). */ back?: BackLook }) {
   const d = size === "xs" ? { w: 22, h: 32, r: 4 } : CARD_DIM[size];
+  const str = useStrings();
   const inUse = useLookStyle().back;
   const back = backIn ?? inUse;
   return (
@@ -83,7 +77,7 @@ export function CardBack({ size = "sm", style, back: backIn }: { size?: CardSize
       style={[s.back, { width: d.w, height: d.h, borderRadius: d.r, borderColor: back.frame }, back.color ? { backgroundColor: back.color } : null, style]}
       accessible
       accessibilityRole="image"
-      accessibilityLabel="zakryta karta"
+      accessibilityLabel={str.cards.faceDown}
     >
       <View style={[s.backInner, { borderRadius: Math.max(2, d.r - 3) }]} />
       {back.color === null && <View style={s.check} />}

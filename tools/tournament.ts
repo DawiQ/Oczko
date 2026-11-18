@@ -12,6 +12,7 @@ import { policyOf, threshold, type Policy } from "../src/ai/policies";
 import { playRound } from "../src/ai/simulate";
 import { splitmix32 } from "../src/engine/rng";
 import { DEFAULT_RULES, PRESETS } from "../src/engine/rules";
+import { pl } from "../src/i18n/pl";
 
 const N = Number(process.argv[2]) || 6000;
 const ROOT = path.join(__dirname, "..");
@@ -68,7 +69,7 @@ const pct = (x: number) => `${(x * 100).toFixed(1)}%`;
 
 const results = PERSONAS.map((p) => {
   const r = run(p.id);
-  console.log(`${p.name.padEnd(9)} family ${pct(mean(r.family))}  bank ${pct(mean(r.bank))}  (${(r.ms / 1000).toFixed(1)} s)`);
+  console.log(`${pl.personas[p.id].name.padEnd(9)} family ${pct(mean(r.family))}  bank ${pct(mean(r.bank))}  (${(r.ms / 1000).toFixed(1)} s)`);
   return r;
 });
 
@@ -98,7 +99,7 @@ rozdania dla każdej postaci — porównanie parami).
 ${rows
   .map(
     (x, i) =>
-      `| ${i + 1} | ${x.p.name} (${x.p.label}) | ${describe(x.p.policy)} | ${pct(mean(x.r.family))} | ${pct(mean(x.r.bank))} | ${pct(x.strength)} | ${x.z === null ? "—" : x.z.toFixed(1)} |`
+      `| ${i + 1} | ${pl.personas[x.p.id].name} (${pl.personas[x.p.id].label}) | ${describe(x.p.policy)} | ${pct(mean(x.r.family))} | ${pct(mean(x.r.bank))} | ${pct(x.strength)} | ${x.z === null ? "—" : x.z.toFixed(1)} |`
   )
   .join("\n")}
 

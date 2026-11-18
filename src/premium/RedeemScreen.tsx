@@ -5,6 +5,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { ActivityIndicator, AppState, BackHandler, Pressable, ScrollView, StyleSheet, Text, TextInput, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { pl, useStrings, type Strings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
@@ -18,16 +19,11 @@ type Phase =
   | { k: "done"; expires: number | null; renews: boolean }
   | { k: "notYet"; offline: boolean };
 
-const MONTHS = ["stycznia", "lutego", "marca", "kwietnia", "maja", "czerwca", "lipca", "sierpnia", "września", "października", "listopada", "grudnia"];
-
-export function plDate(ms: number): string {
-  const d = new Date(ms);
-  return `${d.getDate()} ${MONTHS[d.getMonth()]} ${d.getFullYear()}`;
-}
-
 export function RedeemScreen({ onClose }: { onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const premium = usePremium();
+  const str = useStrings();
+  const t = str.premium.redeem;
   const android = premium.codeFlow === "inApp";
   const [code, setCode] = useState("");
   const [phase, setPhase] = useState<Phase>({ k: "entry", error: null });
@@ -77,7 +73,7 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
   const open = async () => {
     if (android && !clean) return;
     const ok = await premium.redeem(android ? clean : null).catch(() => false);
-    setPhase(ok ? { k: "waiting" } : { k: "entry", error: "Nie udało się otworzyć sklepu. Spróbuj jeszcze raz." });
+    setPhase(ok ? { k: "waiting" } : { k: "entry", error: t.openFailed });
   };
   const restore = async () => {
     setPhase({ k: "checking" });
@@ -86,12 +82,12 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
     else setPhase({ k: "notYet", offline: false });
   };
 
-  const store = android ? "Google Play" : "App Store";
+  const store = android ? t.googlePlay : t.appStore;
 
   return (
     <View style={[s.screen, { paddingTop: insets.top + 8, paddingBottom: insets.bottom + 14 }]} accessibilityViewIsModal>
       <View style={s.top}>
-        <Pressable onPress={onClose} style={s.close} accessibilityRole="button" accessibilityLabel="Zamknij" hitSlop={6}>
+        <Pressable onPress={onClose} style={s.close} accessibilityRole="button" accessibilityLabel={str.common.close} hitSlop={6}>
           <Text style={s.closeText}>×</Text>
         </Pressable>
       </View>
@@ -99,12 +95,10 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
         {phase.k === "entry" && (
           <>
             <Text style={s.title} accessibilityRole="header">
-              Masz kod?
+              {t.title}
             </Text>
             <Text style={s.lead}>
-              {android
-                ? "Wpisz kod Oczko Pro. Potwierdzisz go w Google Play — Oczko Pro włączy się na Twoim koncie sklepu."
-                : "Kody Oczko Pro wpisuje się w okienku App Store. Oczko Pro włączy się na Twoim koncie Apple."}
+              {android ? t.leadAndroid : t.leadIos}
             </Text>
             {android && (
               <TextInput
@@ -115,7 +109,7 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
                   if (phase.error) setPhase({ k: "entry", error: null });
                 }}
                 onSubmitEditing={open}
-                placeholder="NP. PANPRO2026XYZ"
+                placeholder={t.placeholder}
                 placeholderTextColor={P.muted}
                 autoCapitalize="characters"
                 autoCorrect={false}
@@ -123,7 +117,7 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
                 maxLength={48}
                 returnKeyType="go"
                 style={s.input}
-                accessibilityLabel="Kod"
+                accessibilityLabel={t.code}
               />
             )}
             {phase.error && (
@@ -136,30 +130,28 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
                 big
                 height={56}
                 testID="redeem-go"
-                label={android ? "Zrealizuj w Google Play" : "Wpisz kod w App Store"}
+                label={android ? t.goAndroid : t.goIos}
                 disabled={android && !clean}
                 onPress={open}
               />
             </View>
-            <Text style={s.fine}>
-              Kod działa raz i tylko na jednym koncie sklepu. Oczko Pro z kodu przywrócisz na innym urządzeniu przez „Przywróć zakupy”.
-            </Text>
+            <Text style={s.fine}>{t.fine}</Text>
           </>
         )}
 
         {phase.k === "waiting" && (
           <>
             <Text style={s.title} accessibilityRole="header">
-              Dokończ w {store}
+              {t.finishIn(store)}
             </Text>
             <View style={s.steps}>
-              <Step n={1} on text={`Otworzyliśmy ${store}`} />
-              <Step n={2} text="Potwierdź kod w sklepie" />
-              <Step n={3} text="Wróć tutaj — sprawdzimy sami" />
+              <Step n={1} on text={t.stepOpened(store)} />
+              <Step n={2} text={t.stepConfirm} />
+              <Step n={3} text={t.stepBack} />
             </View>
-            <Button3D big height={56} testID="redeem-check" label="Sprawdź teraz" onPress={check} />
+            <Button3D big height={56} testID="redeem-check" label={t.checkNow} onPress={check} />
             <Pressable onPress={() => setPhase({ k: "entry", error: null })} style={s.link} accessibilityRole="button">
-              <Text style={s.linkText}>Wpisz inny kod</Text>
+              <Text style={s.linkText}>{t.otherCode}</Text>
             </Pressable>
           </>
         )}
@@ -167,7 +159,7 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
         {phase.k === "checking" && (
           <View style={s.center}>
             <ActivityIndicator color={P.accent} size="large" />
-            <Text style={s.lead}>Sprawdzam konto sklepu…</Text>
+            <Text style={s.lead}>{t.checking}</Text>
           </View>
         )}
 
@@ -175,15 +167,15 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
           <View style={s.center}>
             <Text style={s.big}>✓</Text>
             <Text style={s.title} accessibilityRole="header">
-              Kod przyjęty!
+              {t.accepted}
             </Text>
             <View style={s.badge}>
-              <Text style={s.badgeText}>PAN PRO AKTYWNE</Text>
+              <Text style={s.badgeText}>{t.active}</Text>
             </View>
-            <Text style={s.lead}>{doneNote(phase.expires, phase.renews)}</Text>
-            <Text style={s.fine}>Podpowiedzi i analizy bez limitu, duże stoły, wszystkie talie i sukna, bez reklam.</Text>
+            <Text style={s.lead}>{doneNote(phase.expires, phase.renews, str)}</Text>
+            <Text style={s.fine}>{t.gives}</Text>
             <View style={{ alignSelf: "stretch", marginTop: 10 }}>
-              <Button3D big height={56} testID="redeem-done" label="Graj" onPress={onClose} />
+              <Button3D big height={56} testID="redeem-done" label={t.play} onPress={onClose} />
             </View>
           </View>
         )}
@@ -191,28 +183,27 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
         {phase.k === "notYet" && (
           <>
             <Text style={s.title} accessibilityRole="header">
-              {phase.offline ? "Brak połączenia" : "Jeszcze nie widać Oczko Pro"}
+              {phase.offline ? t.offline : t.notYet}
             </Text>
             <Text style={s.lead}>
-              {phase.offline
-                ? "Nie udało się połączyć ze sklepem. Sprawdź internet i spróbuj ponownie."
-                : "Sklep nie potwierdził jeszcze kodu na tym koncie. Możliwe, że:"}
+              {phase.offline ? t.offlineLead : t.notYetLead}
             </Text>
             {!phase.offline && (
               <View style={{ gap: 6 }}>
-                <Text style={s.reason}>• realizacja nie została dokończona w {store},</Text>
-                <Text style={s.reason}>• kod został już wykorzystany albo wygasł,</Text>
-                <Text style={s.reason}>• w sklepie jest zalogowane inne konto,</Text>
-                <Text style={s.reason}>• sklep potrzebuje jeszcze chwili.</Text>
+                {t.reasons(store).map((x) => (
+                  <Text key={x} style={s.reason}>
+                    {x}
+                  </Text>
+                ))}
               </View>
             )}
             <View style={{ gap: 10, marginTop: 8 }}>
-              <Button3D big height={56} testID="redeem-retry" label="Sprawdź ponownie" onPress={check} />
+              <Button3D big height={56} testID="redeem-retry" label={t.retry} onPress={check} />
               <Pressable onPress={restore} style={s.link} accessibilityRole="button">
-                <Text style={s.linkText}>Przywróć zakupy</Text>
+                <Text style={s.linkText}>{str.premium.restore}</Text>
               </Pressable>
               <Pressable onPress={() => setPhase({ k: "entry", error: null })} style={s.link} accessibilityRole="button">
-                <Text style={s.linkText}>Wpisz kod jeszcze raz</Text>
+                <Text style={s.linkText}>{t.again}</Text>
               </Pressable>
             </View>
           </>
@@ -222,11 +213,10 @@ export function RedeemScreen({ onClose }: { onClose: () => void }) {
   );
 }
 
-export function doneNote(expires: number | null, renews: boolean): string {
-  if (!expires) return "Bez terminu ważności.";
-  return renews
-    ? `Do ${plDate(expires)}, potem odnowi się w sklepie — możesz to anulować w ustawieniach sklepu.`
-    : `Ważne do ${plDate(expires)}.`;
+export function doneNote(expires: number | null, renews: boolean, s: Strings = pl): string {
+  const t = s.premium.redeem;
+  if (!expires) return t.noExpiry;
+  return renews ? t.renews(expires) : t.validUntil(expires);
 }
 
 function Step({ n, text, on }: { n: number; text: string; on?: boolean }) {

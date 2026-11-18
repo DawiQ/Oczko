@@ -6,20 +6,21 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { cardOf } from "../engine/cards";
+import { useStrings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { CardBack, CardFace } from "../ui/cards";
 import { Header } from "../ui/Header";
 import { Felt, styleOf } from "../ui/lookStyle";
 import { P } from "../ui/palette";
 import { ProTag } from "./LimitSheet";
-import { BACKS, DECKS, FELTS, isFreeLook, lookById, type Look, type LookChoice, type LookKind } from "./looks";
+import { BACKS, DECKS, FELTS, isFreeLook, lookById, lookText, type Look, type LookChoice, type LookKind } from "./looks";
 import { useLooks } from "./LooksProvider";
 import { usePremium } from "./PremiumProvider";
 
-const TABS: { kind: LookKind; label: string; items: Look[] }[] = [
-  { kind: "deck", label: "Talie", items: DECKS },
-  { kind: "felt", label: "Sukna", items: FELTS },
-  { kind: "back", label: "Rewersy", items: BACKS },
+const TABS: { kind: LookKind; items: Look[] }[] = [
+  { kind: "deck", items: DECKS },
+  { kind: "felt", items: FELTS },
+  { kind: "back", items: BACKS },
 ];
 
 const clock = (ms: number) => {
@@ -30,6 +31,9 @@ const clock = (ms: number) => {
 export function LooksScreen({ onBack }: { onBack: () => void }) {
   const insets = useSafeAreaInsets();
   const premium = usePremium();
+  const str = useStrings();
+  const t = str.premium.looks;
+  const name = (id: string) => lookText(id, str).name;
   const { effective, setChoice } = useLooks();
   const [tab, setTab] = useState<LookKind>("deck");
   // What the preview shows: the looks in use, plus the one being looked at.
@@ -59,8 +63,8 @@ export function LooksScreen({ onBack }: { onBack: () => void }) {
 
   return (
     <View style={s.screen}>
-      <Header title="Wygląd" onBack={onBack} />
-      <View style={s.preview} accessible accessibilityLabel={`Podgląd: ${lookById(preview.deck)?.name}, sukno ${lookById(preview.felt)?.name}, rewers ${lookById(preview.back)?.name}`}>
+      <Header title={t.title} onBack={onBack} />
+      <View style={s.preview} accessible accessibilityLabel={t.previewLabel(name(preview.deck), name(preview.felt), name(preview.back))}>
         <Felt look={shown.felt} resizeMode="cover" />
         <CardBack size="lg" back={shown.back} style={{ transform: [{ rotate: "-10deg" }], marginRight: -14 }} />
         <CardFace card={cardOf(14, 3)} size="lg" deck={shown.deck} />
@@ -69,26 +73,27 @@ export function LooksScreen({ onBack }: { onBack: () => void }) {
       </View>
 
       <View style={s.tabs} accessibilityRole="tablist">
-        {TABS.map((t) => (
+        {TABS.map((x) => (
           <Pressable
-            key={t.kind}
-            onPress={() => setTab(t.kind)}
-            style={[s.tab, tab === t.kind && s.tabOn]}
+            key={x.kind}
+            onPress={() => setTab(x.kind)}
+            style={[s.tab, tab === x.kind && s.tabOn]}
             accessibilityRole="tab"
-            accessibilityState={{ selected: tab === t.kind }}
+            accessibilityState={{ selected: tab === x.kind }}
           >
-            <Text style={[s.tabText, tab === t.kind && s.tabTextOn]}>{t.label}</Text>
+            <Text style={[s.tabText, tab === x.kind && s.tabTextOn]}>{t.tabs[x.kind]}</Text>
           </Pressable>
         ))}
       </View>
 
       <ScrollView contentContainerStyle={s.grid}>
-        {TABS.find((t) => t.kind === tab)!.items.map((l) => {
+        {TABS.find((x) => x.kind === tab)!.items.map((l) => {
           const on = preview[l.kind] === l.id;
           const inUse = effective[l.kind] === l.id;
           const free = isFreeLook(l.id);
           const trial = premium.pro ? null : premium.lookTrialEnds(l.id);
           const st = styleOf({ ...preview, [l.kind]: l.id });
+          const text = lookText(l.id, str);
           return (
             <Pressable
               key={l.id}
@@ -96,7 +101,7 @@ export function LooksScreen({ onBack }: { onBack: () => void }) {
               style={[s.item, on && s.itemOn]}
               accessibilityRole="button"
               accessibilityState={{ selected: on }}
-              accessibilityLabel={`${l.name}${inUse ? ", w użyciu" : ""}${!free && !premium.pro ? ", w Oczko Pro" : ""}`}
+              accessibilityLabel={t.itemLabel(text.name, inUse, !free && !premium.pro)}
             >
               <View style={s.thumb}>
                 {l.kind === "felt" ? (
@@ -110,10 +115,10 @@ export function LooksScreen({ onBack }: { onBack: () => void }) {
                 )}
               </View>
               <Text style={s.itemName} numberOfLines={1}>
-                {l.name}
+                {text.name}
               </Text>
               <Text style={s.itemNote} numberOfLines={1}>
-                {inUse ? "w użyciu" : trial ? `do ${clock(trial)}` : l.note || " "}
+                {inUse ? t.inUse : trial ? t.trialUntil(clock(trial)) : text.note || " "}
               </Text>
               {!free && !premium.pro && (
                 <View style={s.tag}>
@@ -127,12 +132,12 @@ export function LooksScreen({ onBack }: { onBack: () => void }) {
 
       {locked && currentLook && (
         <View style={[s.footer, { paddingBottom: insets.bottom + 14 }]}>
-          <Text style={s.footerNote}>{failed ? "Reklama niedostępna — spróbuj za chwilę." : `„${currentLook.name}” · podgląd`}</Text>
+          <Text style={s.footerNote}>{failed ? str.premium.adFailed : t.previewOf(name(currentLook.id))}</Text>
           <View style={{ flexDirection: "row", gap: 10 }}>
             {premium.adsAvailable && (
-              <Button3D tone="dark" style={{ flex: 1 }} label={busy ? "Chwileczkę…" : "▶ Wypróbuj 24 h"} disabled={busy} onPress={tryIt} />
+              <Button3D tone="dark" style={{ flex: 1 }} label={busy ? str.premium.wait : t.tryIt} disabled={busy} onPress={tryIt} />
             )}
-            <Button3D style={{ flex: 1 }} label="Wszystkie w Pro" onPress={() => premium.showPaywall("looks")} />
+            <Button3D style={{ flex: 1 }} label={t.allInPro} onPress={() => premium.showPaywall("looks")} />
           </View>
         </View>
       )}

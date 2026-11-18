@@ -1,6 +1,6 @@
 // Grading my decisions with the evaluator: best / good / risky / mistake by
 // how much of the chance to score was given away. Pure (the evaluator is
-// passed in, so it can run in chunks).
+// passed in, so it can run in chunks). Grade names: the dictionary.
 import type { Evaluation } from "../ai/evaluate";
 import type { Action } from "../engine/round";
 import type { SeatView } from "../engine/view";
@@ -12,13 +12,6 @@ export type Grade = "best" | "good" | "risky" | "mistake";
 /** Loss of the chance to score (0..1) that still counts as "good" / "risky". */
 export const GOOD_LOSS = 0.03;
 export const RISKY_LOSS = 0.1;
-
-export const GRADE_LABEL: Record<Grade, string> = {
-  best: "najlepsza",
-  good: "dobra",
-  risky: "ryzykowna",
-  mistake: "błąd",
-};
 
 export function grade(e: Pick<Evaluation, "winIfStand" | "winIfHit">, action: Action): { grade: Grade; loss: number } {
   const chosen = action === "hit" ? e.winIfHit : e.winIfStand;

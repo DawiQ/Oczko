@@ -6,6 +6,7 @@
 import { createContext, useCallback, useContext, useRef, useState, type ReactNode } from "react";
 import { Modal, Pressable, StyleSheet, Text, View, useWindowDimensions } from "react-native";
 
+import { useStrings } from "../i18n";
 import { DISPLAY } from "./fonts";
 import { P } from "./palette";
 
@@ -30,6 +31,7 @@ export function useConfirm(): Confirm {
 
 export function DialogProvider({ children }: { children: ReactNode }) {
   const [open, setOpen] = useState<ConfirmOptions | null>(null);
+  const str = useStrings();
   const { width } = useWindowDimensions();
   const resolver = useRef<((ok: boolean) => void) | null>(null);
 
@@ -63,7 +65,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
       >
         {open && (
           <View style={s.backdrop}>
-            <Pressable style={StyleSheet.absoluteFill} onPress={() => close(false)} accessibilityLabel="Zamknij" />
+            <Pressable style={StyleSheet.absoluteFill} onPress={() => close(false)} accessibilityLabel={str.common.close} />
             <View
               style={[s.panel, { width: Math.min(380, width - 2 * PADDING) }]}
               accessibilityViewIsModal
@@ -73,7 +75,7 @@ export function DialogProvider({ children }: { children: ReactNode }) {
               {open.message ? <Text style={s.message}>{open.message}</Text> : null}
               <View style={s.actions}>
                 <Pressable style={[s.btn, s.cancel]} onPress={() => close(false)} accessibilityRole="button">
-                  <Text style={s.cancelText}>{open.cancelText ?? "Anuluj"}</Text>
+                  <Text style={s.cancelText}>{open.cancelText ?? str.common.cancel}</Text>
                 </Pressable>
                 <Pressable
                   style={[s.btn, open.destructive ? s.danger : s.primary]}

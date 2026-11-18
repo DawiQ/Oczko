@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PERSONAS, personaById, type PersonaId } from "../ai/personas";
 import type { Rules } from "../engine/rules";
+import { useStrings } from "../i18n";
 import type { Pace } from "../game/pace";
 import type { GameSnapshot, TableGame } from "../game/TableGame";
 import { summaryLine } from "../newgame/rulesText";
@@ -24,13 +25,12 @@ import { useConfirm } from "../ui/Dialog";
 import { DISPLAY } from "../ui/fonts";
 import { Header } from "../ui/Header";
 import { P } from "../ui/palette";
-import { plural } from "../ui/plural";
 import { Portrait } from "../ui/Portrait";
 import { joinLink, parseJoinLink, parseTableCode, tableCode } from "./code";
 import { advertise, useTables, type FoundTable } from "./discovery";
 import { LanGuest } from "./guest";
 import { LanHost } from "./host";
-import { cleanName, FREE_LAN_SEATS, MAX_LAN_SEATS, REACTION_TEXTS, type LanInfo, type LobbySlot, type TableInfo } from "./protocol";
+import { cleanName, FREE_LAN_SEATS, MAX_LAN_SEATS, REACTIONS, type LanInfo, type LobbySlot, type Reaction, type TableInfo } from "./protocol";
 import { QrView } from "./QrView";
 import { tcpDial, tcpServer } from "./tcp";
 import type { Dialer, Server } from "./transport";
@@ -69,6 +69,7 @@ export function LanScreen({
   const [stats, setStats] = useState<LanStats | null>(null);
   const [error, setError] = useState<string | null>(null);
   const confirm = useConfirm();
+  const str = useStrings();
 
   useEffect(() => {
     let alive = true;
@@ -94,7 +95,7 @@ export function LanScreen({
 
   const leave = async () => {
     if (step.name === "host") {
-      if (step.host.state.phase === "playing" && !(await confirm({ title: "Zamknąć stół?", message: "Gra skończy się dla wszystkich przy stole.", confirmText: "Zamknij", destructive: true })))
+      if (step.host.state.phase === "playing" && !(await confirm({ title: str.lan.closeConfirm.title, message: str.lan.closeConfirm.message, confirmText: str.common.close, destructive: true })))
         return;
       step.host.close();
     }
@@ -135,9 +136,10 @@ export function LanScreen({
     busy.current = true;
     saveName();
     setError(null);
-    const table: TableInfo = { name: `Stół: ${name || "Gospodarz"}`, rules, mode: "match", ...(pro && looks ? { looks } : {}) };
+    const table: TableInfo = { name: str.lan.tableName(name || str.lan.defaultHost), rules, mode: "match", ...(pro && looks ? { looks } : {}) };
     const host = new LanHost({
-      name: name || "Gospodarz",
+      name: name || str.lan.defaultHost,
+      strings: str,
       table,
       server: (deps.server ?? tcpServer)(),
       deps: deps.hostDeps ?? { pace, onRoundEnd: () => queueMicrotask(() => host.controller && recordRound(host.controller.getSnapshot())) },
@@ -153,7 +155,7 @@ export function LanScreen({
       } catch {
         // never listened
       }
-      if (alive.current) setError("Nie udało się otworzyć stołu. Sprawdź połączenie z Wi‑Fi.");
+      if (alive.current) setError(str.lan.errors.openFailed);
     } finally {
       busy.current = false;
     }
@@ -164,14 +166,14 @@ export function LanScreen({
     busy.current = true;
     saveName();
     setError(null);
-    const guest = new LanGuest({ dial: deps.dial ?? tcpDial, host: target.host, port: target.port, name: name || "Gość", onRoundEnd: recordRound });
+    const guest = new LanGuest({ dial: deps.dial ?? tcpDial, host: target.host, port: target.port, name: name || str.lan.defaultGuest, onRoundEnd: recordRound });
     try {
       await guest.connect();
       if (!alive.current || current.current.name !== "join") guest.leave();
       else setStep({ name: "guest", guest });
     } catch {
       guest.leave();
-      if (alive.current) setError("Nie udało się połączyć ze stołem.");
+      if (alive.current) setError(str.lan.errors.joinFailed);
     } finally {
       busy.current = false;
     }
@@ -185,28 +187,26 @@ export function LanScreen({
 
   return (
     <View style={s.screen}>
-      <Header title="Ze znajomymi" subtitle="Każdy na swoim telefonie, w tej samej sieci Wi‑Fi" onBack={onExit} />
+      <Header title={str.lan.menu.title} subtitle={str.lan.menu.subtitle} onBack={onExit} />
       <ScrollView contentContainerStyle={s.content}>
-        <Label>Twoje imię przy stole</Label>
+        <Label>{str.lan.menu.nameLabel}</Label>
         <TextInput
           value={stats.name}
           onChangeText={setName}
           onBlur={saveName}
-          placeholder="np. Ola"
+          placeholder={str.lan.menu.namePlaceholder}
           placeholderTextColor={P.muted}
           style={s.input}
           maxLength={16}
-          accessibilityLabel="Twoje imię przy stole"
+          accessibilityLabel={str.lan.menu.nameLabel}
         />
         <View style={{ height: 14 }} />
-        <Button3D label="Załóż stół" big onPress={() => void startHost()} testID="lan-host" />
-        <Button3D label="Dołącz do stołu" tone="dark" height={52} onPress={() => setStep({ name: "join" })} style={{ marginTop: 10 }} testID="lan-join" />
+        <Button3D label={str.lan.menu.host} big onPress={() => void startHost()} testID="lan-host" />
+        <Button3D label={str.lan.menu.join} tone="dark" height={52} onPress={() => setStep({ name: "join" })} style={{ marginTop: 10 }} testID="lan-join" />
         {error && <Text style={s.error}>{error}</Text>}
-        <Text style={s.note}>
-          {`Bez internetu: telefony łączą się w lokalnej sieci. ${pro ? "Do 8 osób przy stole (Oczko Pro)." : `Do ${FREE_LAN_SEATS} osób przy stole (8 z Oczko Pro gospodarza).`}`}
-        </Text>
+        <Text style={s.note}>{str.lan.menu.note(pro, FREE_LAN_SEATS, MAX_LAN_SEATS)}</Text>
         {stats.matches + stats.rounds > 0 && (
-          <Text style={s.note}>{`Przez Wi‑Fi: ${stats.matchesWon} z ${stats.matches} ${plural(stats.matches, "partii", "partii", "partii")} wygranych · ${stats.roundsWon}/${stats.rounds} rund z punktem`}</Text>
+          <Text style={s.note}>{str.lan.menu.stats(stats.matchesWon, stats.matches, stats.roundsWon, stats.rounds)}</Text>
         )}
       </ScrollView>
     </View>
@@ -216,6 +216,7 @@ export function LanScreen({
 // ---- host ---------------------------------------------------------------------
 
 function HostFlow({ host, kv, onLeave, getIp }: { host: LanHost; kv: KV; onLeave: () => void; getIp: () => Promise<string | null> }) {
+  const str = useStrings();
   const view = useSyncExternalStore(
     (fn) => host.subscribe(fn),
     () => host.state
@@ -255,62 +256,63 @@ function HostFlow({ host, kv, onLeave, getIp }: { host: LanHost; kv: KV; onLeave
   const t = host.table;
   return (
     <View style={s.screen}>
-      <Header title={t.name} subtitle="Twój stół — znajomi dołączają" onBack={onLeave} />
+      <Header title={t.name} subtitle={str.lan.host.subtitle} onBack={onLeave} />
       <ScrollView contentContainerStyle={s.content}>
         <View style={s.codeCard}>
           {code ? (
             <>
-              <Text style={s.small}>Kod stołu</Text>
-              <Text style={s.code} accessibilityLabel={`Kod stołu: ${code.split("").join(" ")}`}>
+              <Text style={s.small}>{str.lan.host.code}</Text>
+              <Text style={s.code} accessibilityLabel={str.lan.host.codeA11y(code.split("").join(" "))}>
                 {code}
               </Text>
-              {ip && <QrView text={joinLink(ip, view.port)} size={150} label="Kod QR stołu — zeskanuj w aplikacji Oczko" />}
+              {ip && <QrView text={joinLink(ip, view.port)} size={150} label={str.lan.host.qr} />}
             </>
           ) : (
-            <Text style={s.small}>Połącz telefon z Wi‑Fi, żeby pokazać kod stołu.</Text>
+            <Text style={s.small}>{str.lan.host.noWifi}</Text>
           )}
         </View>
-        <Label>{`Przy stole · ${view.slots.length} z ${view.maxSeats}`}</Label>
+        <Label>{str.lan.host.seats(view.slots.length, view.maxSeats)}</Label>
         <View style={s.panel}>
           {view.slots.map((slot, i) => (
             <SlotRow key={i} slot={slot} index={i} host={host} />
           ))}
         </View>
         {view.slots.length < view.maxSeats && (
-          <Button3D label="Dodaj miejsce" tone="dark" height={44} onPress={() => host.addSeat()} style={{ marginTop: 10 }} />
+          <Button3D label={str.lan.host.addSeat} tone="dark" height={44} onPress={() => host.addSeat()} style={{ marginTop: 10 }} />
         )}
-        <Label>Tryb</Label>
+        <Label>{str.lan.host.mode}</Label>
         <Segmented
-          label="Tryb gry"
+          label={str.lan.host.modeA11y}
           value={t.rules.mode}
           onChange={(mode) => host.setTable({ ...t, rules: { ...t.rules, mode } })}
           options={[
-            { value: "family", label: "Rodzinne" },
-            { value: "bank", label: "Z bankierem" },
+            { value: "family", label: str.lan.host.family },
+            { value: "bank", label: str.lan.host.bank },
           ]}
         />
-        <Label>Do ilu punktów</Label>
+        <Label>{str.lan.host.target}</Label>
         <Segmented
-          label="Długość partii"
+          label={str.lan.host.targetA11y}
           value={t.mode === "single" ? 1 : t.rules.target}
           onChange={(v) => host.setTable({ ...t, mode: v === 1 ? "single" : "match", rules: { ...t.rules, target: v === 1 ? 1 : v } })}
           options={[
             { value: 5, label: "5" },
             { value: 10, label: "10" },
             { value: 15, label: "15" },
-            { value: 1, label: "1 runda" },
+            { value: 1, label: str.lan.host.oneRound },
           ]}
         />
-        <Text style={s.note}>{summaryLine(t.rules)}</Text>
+        <Text style={s.note}>{summaryLine(t.rules, str)}</Text>
       </ScrollView>
       <View style={s.footer}>
-        <Button3D label="Rozdaj karty" big disabled={!host.canStart} onPress={() => host.start()} testID="lan-start" />
+        <Button3D label={str.lan.host.deal} big disabled={!host.canStart} onPress={() => host.start()} testID="lan-start" />
       </View>
     </View>
   );
 }
 
 function SlotRow({ slot, index, host }: { slot: LobbySlot; index: number; host: LanHost }) {
+  const str = useStrings();
   const nextBot = (cur?: PersonaId): PersonaId => {
     const i = cur ? PERSONAS.findIndex((p) => p.id === cur) : -1;
     return PERSONAS[(i + 1) % PERSONAS.length].id;
@@ -320,7 +322,7 @@ function SlotRow({ slot, index, host }: { slot: LobbySlot; index: number; host: 
       return (
         <View style={s.slot}>
           <Portrait name={slot.name} size={32} color={P.accent} />
-          <Text style={s.slotName}>{`${slot.name} (Ty)`}</Text>
+          <Text style={s.slotName}>{str.lan.slot.me(slot.name)}</Text>
         </View>
       );
     case "guest":
@@ -328,20 +330,20 @@ function SlotRow({ slot, index, host }: { slot: LobbySlot; index: number; host: 
         <View style={s.slot}>
           <Portrait name={slot.name} size={32} color="#8FD3FF" />
           <Text style={s.slotName}>{slot.name}</Text>
-          <Text style={[s.small, { color: slot.online ? P.ok : P.muted }]}>{slot.online ? "połączony" : "rozłączony"}</Text>
-          <SmallBtn label="Usuń" onPress={() => host.remove(index)} a11y={`Usuń: ${slot.name}`} />
+          <Text style={[s.small, { color: slot.online ? P.ok : P.muted }]}>{slot.online ? str.lan.slot.online : str.lan.slot.offline}</Text>
+          <SmallBtn label={str.lan.slot.remove} onPress={() => host.remove(index)} a11y={str.lan.slot.removeA11y(slot.name)} />
         </View>
       );
     case "bot": {
       const p = personaById(slot.persona)!;
       return (
         <View style={s.slot}>
-          <Portrait name={slot.name} size={32} color={p.color} />
-          <Pressable style={{ flex: 1 }} onPress={() => host.setBot(index, nextBot(slot.persona))} accessibilityRole="button" accessibilityLabel={`Bot: ${slot.name}, ${p.label}. Zmień postać`}>
+          <Portrait name={slot.name} persona={p.id} size={32} color={p.color} />
+          <Pressable style={{ flex: 1 }} onPress={() => host.setBot(index, nextBot(slot.persona))} accessibilityRole="button" accessibilityLabel={str.lan.slot.botA11y(slot.name, str.personas[p.id].label)}>
             <Text style={s.slotName}>{slot.name}</Text>
-            <Text style={s.small}>{`${p.label} · stuknij, by zmienić`}</Text>
+            <Text style={s.small}>{str.lan.slot.botSub(str.personas[p.id].label)}</Text>
           </Pressable>
-          <SmallBtn label="Wolne" onPress={() => host.setOpen(index)} a11y={`Zwolnij miejsce: ${slot.name}`} />
+          <SmallBtn label={str.lan.slot.free} onPress={() => host.setOpen(index)} a11y={str.lan.slot.freeA11y(slot.name)} />
         </View>
       );
     }
@@ -349,9 +351,9 @@ function SlotRow({ slot, index, host }: { slot: LobbySlot; index: number; host: 
       return (
         <View style={s.slot}>
           <View style={s.emptySeat} />
-          <Text style={[s.slotName, { color: P.muted }]}>Czeka na gościa…</Text>
-          <SmallBtn label="Bot" onPress={() => host.setBot(index, "ola")} a11y="Posadź bota" />
-          <SmallBtn label="×" onPress={() => host.removeSeat(index)} a11y="Usuń miejsce" />
+          <Text style={[s.slotName, { color: P.muted }]}>{str.lan.slot.waiting}</Text>
+          <SmallBtn label={str.lan.slot.bot} onPress={() => host.setBot(index, "ola")} a11y={str.lan.slot.botA11yAdd} />
+          <SmallBtn label="×" onPress={() => host.removeSeat(index)} a11y={str.lan.slot.removeSeat} />
         </View>
       );
   }
@@ -373,6 +375,7 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
   const [bad, setBad] = useState(false);
   const [scan, setScan] = useState(false);
   const [perm, requestPerm] = useCameraPermissions();
+  const str = useStrings();
   const byCode = async () => {
     const t = parseTableCode(code, await getIp());
     if (t) onJoin(t);
@@ -381,7 +384,7 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
   if (scan)
     return (
       <View style={s.screen}>
-        <Header title="Skanuj kod QR" onBack={() => setScan(false)} />
+        <Header title={str.lan.join.scanTitle} onBack={() => setScan(false)} />
         {perm?.granted ? (
           <CameraView
             style={{ flex: 1 }}
@@ -396,19 +399,19 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
           />
         ) : (
           <View style={s.content}>
-            <Text style={s.note}>Aparat jest potrzebny tylko do zeskanowania kodu stołu.</Text>
-            <Button3D label="Zezwól na aparat" tone="dark" height={48} onPress={() => void requestPerm()} />
+            <Text style={s.note}>{str.lan.join.cameraNote}</Text>
+            <Button3D label={str.lan.join.allowCamera} tone="dark" height={48} onPress={() => void requestPerm()} />
           </View>
         )}
       </View>
     );
   return (
     <View style={s.screen}>
-      <Header title="Dołącz do stołu" onBack={onBack} />
+      <Header title={str.lan.join.title} onBack={onBack} />
       <ScrollView contentContainerStyle={s.content}>
-        <Label>Stoły w tej sieci</Label>
+        <Label>{str.lan.join.found}</Label>
         {tables.length === 0 ? (
-          <Text style={s.note}>Szukam… Jeśli stołu nie widać, wpisz kod albo zeskanuj QR z telefonu gospodarza.</Text>
+          <Text style={s.note}>{str.lan.join.searching}</Text>
         ) : (
           tables.map((t: FoundTable) => (
             <Pressable
@@ -417,30 +420,30 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
               disabled={!t.ad}
               onPress={() => onJoin(t)}
               accessibilityRole="button"
-              accessibilityLabel={`${t.name}${t.ad ? `, wolne miejsca: ${t.ad.open}` : ", inna wersja aplikacji"}`}
+              accessibilityLabel={str.lan.join.tableA11y(t.name, t.ad ? t.ad.open : null)}
             >
               <Text style={s.slotName}>{t.name}</Text>
-              <Text style={s.small}>{t.ad ? `${t.ad.mode === "bank" ? "Z bankierem" : "Rodzinne"} · wolne: ${t.ad.open}${t.ad.playing ? " · gra trwa" : ""}` : "Inna wersja aplikacji"}</Text>
+              <Text style={s.small}>{t.ad ? str.lan.join.tableLine(t.ad.mode === "bank", t.ad.open, t.ad.playing) : str.lan.join.otherVersion}</Text>
             </Pressable>
           ))
         )}
-        <Label>Kod stołu</Label>
+        <Label>{str.lan.join.code}</Label>
         <TextInput
           value={code}
           onChangeText={(c) => {
             setCode(c.toUpperCase().slice(0, 5));
             setBad(false);
           }}
-          placeholder="np. K7 4Q"
+          placeholder={str.lan.join.codePlaceholder}
           placeholderTextColor={P.muted}
           autoCapitalize="characters"
           style={[s.input, s.codeInput]}
-          accessibilityLabel="Kod stołu"
+          accessibilityLabel={str.lan.join.code}
         />
-        {bad && <Text style={s.error}>Nie znam takiego kodu w tej sieci.</Text>}
+        {bad && <Text style={s.error}>{str.lan.errors.badCode}</Text>}
         {error && <Text style={s.error}>{error}</Text>}
-        <Button3D label="Dołącz" big disabled={code.replace(/\s/g, "").length < 4} onPress={() => void byCode()} style={{ marginTop: 10 }} />
-        <Button3D label="Skanuj kod QR" tone="dark" height={48} onPress={() => setScan(true)} style={{ marginTop: 10 }} />
+        <Button3D label={str.lan.join.join} big disabled={code.replace(/\s/g, "").length < 4} onPress={() => void byCode()} style={{ marginTop: 10 }} />
+        <Button3D label={str.lan.join.scan} tone="dark" height={48} onPress={() => setScan(true)} style={{ marginTop: 10 }} />
       </ScrollView>
     </View>
   );
@@ -450,18 +453,19 @@ function JoinScreen({ onBack, onJoin, getIp, error }: { onBack: () => void; onJo
 
 function GuestFlow({ guest, kv, onLeave }: { guest: LanGuest; kv: KV; onLeave: () => void }) {
   const view = useSyncExternalStore(guest.subscribe, () => guest.state);
+  const str = useStrings();
   if (view.phase === "playing" && guest.snapshot)
     return (
       <LookOverride choice={view.table?.looks ?? null}>
         <LanTable game={guest.game} kv={kv} lan={() => guest.state.lan} subscribeLan={guest.subscribe} onExit={onLeave} onReact={(t) => guest.react(t)} guest offline={view.offline} />
       </LookOverride>
     );
-  const title = view.table?.name ?? "Stół";
-  let line = "Łączę…";
-  if (view.phase === "lobby") line = "Czekamy, aż gospodarz rozda karty.";
-  if (view.phase === "refused")
-    line = view.refused === "full" ? "Przy stole nie ma wolnych miejsc." : view.refused === "version" ? "Inna wersja aplikacji — zaktualizujcie Oczko." : "Gra przy tym stole już trwa.";
-  if (view.phase === "closed") line = view.closed === "removed" ? "Gospodarz usunął Cię ze stołu." : "Gospodarz zamknął stół.";
+  const g = str.lan.guest;
+  const title = view.table?.name ?? g.table;
+  let line = g.connecting;
+  if (view.phase === "lobby") line = g.lobby;
+  if (view.phase === "refused") line = view.refused === "full" ? g.full : view.refused === "version" ? g.version : g.started;
+  if (view.phase === "closed") line = view.closed === "removed" ? g.removed : g.hostLeft;
   return (
     <View style={s.screen}>
       <Header title={title} onBack={onLeave} />
@@ -469,20 +473,20 @@ function GuestFlow({ guest, kv, onLeave }: { guest: LanGuest; kv: KV; onLeave: (
         <Text style={s.big} accessibilityLiveRegion="polite">
           {line}
         </Text>
-        {view.offline && <Text style={s.error}>Brak połączenia — łączę ponownie…</Text>}
+        {view.offline && <Text style={s.error}>{g.offline}</Text>}
         {view.phase === "lobby" && (
           <View style={s.panel}>
             {view.slots.map((slot, i) => (
               <View key={i} style={s.slot}>
-                {slot.kind === "open" ? <View style={s.emptySeat} /> : <Portrait name={slot.name} size={30} color={slot.kind === "bot" ? personaById(slot.persona)?.color ?? P.muted : P.accent} />}
+                {slot.kind === "open" ? <View style={s.emptySeat} /> : <Portrait name={slot.name} persona={slot.kind === "bot" ? slot.persona : null} size={30} color={slot.kind === "bot" ? personaById(slot.persona)?.color ?? P.muted : P.accent} />}
                 <Text style={[s.slotName, slot.kind === "open" && { color: P.muted }]}>
-                  {slot.kind === "open" ? "Wolne miejsce" : `${slot.name}${i === view.you ? " (Ty)" : ""}`}
+                  {slot.kind === "open" ? g.freeSeat : i === view.you ? str.lan.slot.me(slot.name) : slot.name}
                 </Text>
               </View>
             ))}
           </View>
         )}
-        {view.table && <Text style={s.note}>{summaryLine(view.table.rules)}</Text>}
+        {view.table && <Text style={s.note}>{summaryLine(view.table.rules, str)}</Text>}
       </ScrollView>
     </View>
   );
@@ -508,7 +512,7 @@ function LanTable({
   lan: () => LanInfo | null;
   subscribeLan: (fn: () => void) => () => void;
   onExit: () => void;
-  onReact: (t: (typeof REACTION_TEXTS)[number]) => void;
+  onReact: (id: Reaction) => void;
   guest?: boolean;
   offline?: boolean;
   away?: { seat: number; name: string; deadline: number }[];
@@ -518,6 +522,8 @@ function LanTable({
   const info = useSyncExternalStore(subscribeLan, lan);
   const snap = useSyncExternalStore(game.subscribe, game.getSnapshot);
   const insets = useSafeAreaInsets();
+  const str = useStrings();
+  const tx = str.lan.table;
   const reaction = info?.reaction;
   const [shownReaction, setShownReaction] = useState(0);
   useEffect(() => {
@@ -527,14 +533,14 @@ function LanTable({
   }, [reaction]);
   const banners = useMemo(() => {
     const out: { key: string; text: string; seat?: number }[] = [];
-    if (offline) out.push({ key: "off", text: "Brak połączenia ze stołem — łączę ponownie…" });
-    for (const a of away) out.push({ key: `away${a.seat}`, text: `${a.name} — rozłączenie. Za chwilę zagra bot.`, seat: a.seat });
+    if (offline) out.push({ key: "off", text: tx.offline });
+    for (const a of away) out.push({ key: `away${a.seat}`, text: tx.away(a.name), seat: a.seat });
     if (info?.moveDeadline !== null && info?.moveDeadline !== undefined && snap.view.turn !== null && snap.phase !== "myTurn")
-      out.push({ key: "time", text: `${snap.seats[snap.view.turn].name}: ${info.moveDeadline} s na ruch` });
-    if (info?.moveDeadline !== null && info?.moveDeadline !== undefined && snap.phase === "myTurn") out.push({ key: "mine", text: `Twój ruch: ${info.moveDeadline} s, potem „Starczy”` });
-    if (reaction && reaction.seq !== shownReaction) out.push({ key: `r${reaction.seq}`, text: `${snap.seats[reaction.seat]?.name ?? ""}: ${reaction.text}` });
+      out.push({ key: "time", text: tx.moveTime(snap.seats[snap.view.turn].name, info.moveDeadline) });
+    if (info?.moveDeadline !== null && info?.moveDeadline !== undefined && snap.phase === "myTurn") out.push({ key: "mine", text: tx.myMoveTime(info.moveDeadline) });
+    if (reaction && reaction.seq !== shownReaction) out.push({ key: `r${reaction.seq}`, text: tx.reaction(snap.seats[reaction.seat]?.name ?? "", str.lan.reactions[reaction.id]) });
     return out;
-  }, [offline, away, info, snap, reaction, shownReaction]);
+  }, [offline, away, info, snap, reaction, shownReaction, tx, str]);
   const banner = banners.length ? (
     <View style={{ gap: 6 }}>
       {banners.map((b) => (
@@ -542,8 +548,8 @@ function LanTable({
           <Text style={s.bannerText}>{b.text}</Text>
           {b.seat !== undefined && onBotNow && (
             <View style={{ flexDirection: "row", gap: 6 }}>
-              <SmallBtn label="Bot teraz" onPress={() => onBotNow(b.seat!)} a11y="Niech bot zagra teraz" />
-              <SmallBtn label="Czekaj" onPress={() => onWaitLonger?.(b.seat!)} a11y="Poczekaj dłużej" />
+              <SmallBtn label={tx.botNow} onPress={() => onBotNow(b.seat!)} a11y={tx.botNowA11y} />
+              <SmallBtn label={tx.wait} onPress={() => onWaitLonger?.(b.seat!)} a11y={tx.waitA11y} />
             </View>
           )}
         </View>
@@ -552,10 +558,10 @@ function LanTable({
   ) : null;
   const menuExtra = (
     <View style={[s.reactions, { paddingBottom: insets.bottom ? 0 : 4 }]}>
-      <Text style={s.small}>Szybka reakcja</Text>
+      <Text style={s.small}>{tx.reactTitle}</Text>
       <View style={s.reactionRow}>
-        {REACTION_TEXTS.map((t) => (
-          <SmallBtn key={t} label={t} onPress={() => onReact(t)} a11y={`Reakcja: ${t}`} />
+        {REACTIONS.map((id) => (
+          <SmallBtn key={id} label={str.lan.reactions[id]} onPress={() => onReact(id)} a11y={tx.reactA11y(str.lan.reactions[id])} />
         ))}
       </View>
     </View>

@@ -5,37 +5,19 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, BackHandler, Linking, Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useStrings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
 import { monetizationLinks } from "./config";
 import { usePremium, type PaywallReason } from "./PremiumProvider";
-import { ctaLabel, days, defaultPlan, finePrint, isSubscription, planNote, planTitle, type Plan } from "./plans";
-
-const HEADLINE: Record<PaywallReason, string> = {
-  hints: "Trener bez limitu",
-  history: "50 ostatnich partii",
-  analysis: "Analiza każdej partii",
-  export: "Eksport historii",
-  bigTable: "Stoły dla 7–8 osób",
-  lanSeats: "Stół Wi‑Fi do 8 osób",
-  looks: "Wszystkie talie, sukna i rewersy",
-  stats: "Rozszerzone statystyki",
-  profile: "Oczko Pro",
-};
-
-/** What Oczko Pro gives (PLAN.md §10). Nothing changes the game itself. */
-export const PRO_PERKS: { title: string; note: string }[] = [
-  { title: "Trener bez limitu", note: "szansa na furę i szanse wygranej przy każdym ruchu" },
-  { title: "Analiza każdej partii", note: "50 ostatnich partii, powtórki, eksport" },
-  { title: "Stoły dla 7–8 osób", note: "przy telefonie i przez Wi‑Fi (wystarczy gospodarz z Pro)" },
-  { title: "Rozszerzone statystyki", note: "tryby, rywale, następny rywal" },
-  { title: "Talie, sukna i rewersy", note: "przy stole Wi‑Fi wygląd gospodarza widzą wszyscy" },
-];
+import { ctaLabel, defaultPlan, finePrint, isSubscription, planNote, planTitle, type Plan } from "./plans";
 
 export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onClose: () => void }) {
   const insets = useSafeAreaInsets();
   const premium = usePremium();
+  const str = useStrings();
+  const t = str.premium.paywall;
   const [plans, setPlans] = useState<Plan[] | null>(() => (premium.storeAvailable ? null : []));
   const [picked, setPicked] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
@@ -79,8 +61,8 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
     setNote(null);
     const r = await premium.purchase(plan.id);
     setBusy(false);
-    if (r === "error") setNote("Zakup się nie udał. Spróbuj jeszcze raz za chwilę.");
-    else if (r === "pending") setNote("Sklep jeszcze potwierdza płatność — Oczko Pro włączy się samo, gdy to zrobi.");
+    if (r === "error") setNote(t.buyFailed);
+    else if (r === "pending") setNote(t.pending);
   };
   const restore = async () => {
     if (busy) return;
@@ -88,31 +70,31 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
     setNote(null);
     const ok = await premium.restore().catch(() => false);
     setBusy(false);
-    setNote(ok ? null : "Nie znaleziono wcześniejszych zakupów Oczko Pro na tym koncie sklepu.");
+    setNote(ok ? null : t.nothingToRestore);
   };
 
   return (
     <View style={[s.screen, { paddingTop: insets.top + 8 }]} accessibilityViewIsModal>
       <View style={s.top}>
-        <Pressable onPress={onClose} style={s.close} accessibilityRole="button" accessibilityLabel="Zamknij" hitSlop={6}>
+        <Pressable onPress={onClose} style={s.close} accessibilityRole="button" accessibilityLabel={str.common.close} hitSlop={6}>
           <Text style={s.closeText}>×</Text>
         </Pressable>
         {premium.storeAvailable && (
           <Pressable onPress={restore} style={s.restore} accessibilityRole="button">
-            <Text style={s.restoreText}>Przywróć zakupy</Text>
+            <Text style={s.restoreText}>{str.premium.restore}</Text>
           </Pressable>
         )}
       </View>
       <ScrollView contentContainerStyle={s.content}>
         <View style={s.badge}>
-          <Text style={s.badgeText}>PRO</Text>
+          <Text style={s.badgeText}>{str.premium.tag}</Text>
         </View>
         <Text style={s.title} accessibilityRole="header">
-          {HEADLINE[reason]}
+          {t.headline[reason]}
         </Text>
-        <Text style={s.lead}>Gra jak dotąd — a trener, analiza i duże stoły bez limitów.</Text>
+        <Text style={s.lead}>{t.lead}</Text>
         <View style={{ gap: 10, marginTop: 4 }}>
-          {PRO_PERKS.map((p) => (
+          {t.perks.map((p) => (
             <View key={p.title} style={s.perk}>
               <Text style={s.check}>✓</Text>
               <View style={{ flex: 1 }}>
@@ -125,16 +107,16 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
 
         {!premium.storeAvailable ? (
           <View style={s.info}>
-            <Text style={s.infoText}>Zakupy nie są jeszcze dostępne w tej wersji aplikacji.</Text>
+            <Text style={s.infoText}>{t.noStore}</Text>
           </View>
         ) : plans === null ? (
           <ActivityIndicator color={P.accent} style={{ marginTop: 20 }} />
         ) : plans.length === 0 ? (
           <View style={s.info}>
-            <Text style={s.infoText}>Nie udało się pobrać cen ze sklepu. Sprawdź połączenie z internetem.</Text>
+            <Text style={s.infoText}>{t.noPrices}</Text>
           </View>
         ) : (
-          <View style={{ gap: 10, marginTop: 6 }} accessibilityRole="radiogroup" accessibilityLabel="Plan">
+          <View style={{ gap: 10, marginTop: 6 }} accessibilityRole="radiogroup" accessibilityLabel={t.plan}>
             {plans.map((p) => {
               const on = p.id === picked;
               return (
@@ -144,15 +126,15 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
                   style={[s.plan, on && s.planOn]}
                   accessibilityRole="radio"
                   accessibilityState={{ selected: on }}
-                  accessibilityLabel={`${planTitle(p)}: ${planNote(p)}`}
+                  accessibilityLabel={t.planLabel(planTitle(p, str), planNote(p, str))}
                 >
                   <View style={{ flex: 1, gap: 2 }}>
-                    <Text style={s.planTitle}>{planTitle(p)}</Text>
-                    <Text style={s.planNote}>{planNote(p)}</Text>
+                    <Text style={s.planTitle}>{planTitle(p, str)}</Text>
+                    <Text style={s.planNote}>{planNote(p, str)}</Text>
                   </View>
                   {p.trialDays && isSubscription(p.kind) ? (
                     <View style={s.trial}>
-                      <Text style={s.trialText}>{days(p.trialDays).toUpperCase()} ZA DARMO</Text>
+                      <Text style={s.trialText}>{str.premium.plans.trialBadge(p.trialDays)}</Text>
                     </View>
                   ) : null}
                 </Pressable>
@@ -168,23 +150,23 @@ export function PaywallScreen({ reason, onClose }: { reason: PaywallReason; onCl
       </ScrollView>
       {premium.storeAvailable && plans && plans.length > 0 && (
         <View style={[s.footer, { paddingBottom: insets.bottom + 14 }]}>
-          <Button3D big height={58} label={busy ? "Chwileczkę…" : ctaLabel(plan)} disabled={busy || !plan} onPress={buy} />
-          <Text style={s.fine}>{finePrint(plan)}</Text>
+          <Button3D big height={58} label={busy ? str.premium.wait : ctaLabel(plan, str)} disabled={busy || !plan} onPress={buy} />
+          <Text style={s.fine}>{finePrint(plan, str)}</Text>
           {(links.terms || links.privacy || premium.codeFlow !== "none") && (
             <View style={s.links}>
               {premium.codeFlow !== "none" ? (
                 <Pressable onPress={premium.showRedeem} accessibilityRole="button" hitSlop={8}>
-                  <Text style={s.link}>Mam kod</Text>
+                  <Text style={s.link}>{t.haveCode}</Text>
                 </Pressable>
               ) : null}
               {links.terms ? (
                 <Pressable onPress={() => void Linking.openURL(links.terms!)} accessibilityRole="link" hitSlop={8}>
-                  <Text style={s.link}>Regulamin</Text>
+                  <Text style={s.link}>{t.terms}</Text>
                 </Pressable>
               ) : null}
               {links.privacy ? (
                 <Pressable onPress={() => void Linking.openURL(links.privacy!)} accessibilityRole="link" hitSlop={8}>
-                  <Text style={s.link}>Prywatność</Text>
+                  <Text style={s.link}>{t.privacy}</Text>
                 </Pressable>
               ) : null}
             </View>

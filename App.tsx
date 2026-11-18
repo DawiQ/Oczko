@@ -19,6 +19,7 @@ import { DEFAULT_RULES, type Rules } from "./src/engine/rules";
 import type { SavedGame } from "./src/game/GameController";
 import { PACES, type Pace } from "./src/game/pace";
 import { freshSeed, makeSetup } from "./src/game/setup";
+import { deviceLang, deviceLocales, I18nProvider, resolveLang, useStrings, type Lang, type Strings } from "./src/i18n";
 import { useGame, type GameSource, type UseGameOptions } from "./src/game/useGame";
 import { HomeScreen, type ResumeInfo } from "./src/home/HomeScreen";
 import { LanScreen, type LanDeps } from "./src/lan/LanScreen";
@@ -38,7 +39,7 @@ import { clearSavedGame, isResumable, loadSavedGame } from "./src/storage/save";
 import { DEFAULT_SETTINGS, loadSettings, saveSettings, type Settings } from "./src/storage/settings";
 import { emptyStats, loadStats, saveStats, type Stats } from "./src/storage/stats";
 import { ProfileScreen } from "./src/profile/ProfileScreen";
-import { BADGES, badgesShownBy, earnedBadges, type BadgeId } from "./src/profile/progress";
+import { badges, badgesShownBy, earnedBadges, type BadgeId } from "./src/profile/progress";
 import type { PersonaId } from "./src/ai/personas";
 import { resetHints } from "./src/table/hints";
 import { TableScreen } from "./src/table/TableScreen";
@@ -96,29 +97,35 @@ interface Stored {
 }
 
 export default function App(props: AppProps) {
+  // The phone's language at once; the saved choice once the settings are read.
+  const [lang, setLang] = useState<Lang>(() => deviceLang(deviceLocales()));
   return (
-    <SafeAreaProvider style={{ backgroundColor: P.bg }}>
-      <StatusBar style="light" />
-      <DialogProvider>
-        <PremiumProvider kv={props.kv ?? deviceKV} store={props.store} ads={props.ads}>
-          <LooksProvider kv={props.kv ?? deviceKV}>
-            <Root {...props} kv={props.kv ?? deviceKV} />
-          </LooksProvider>
-        </PremiumProvider>
-      </DialogProvider>
-    </SafeAreaProvider>
+    <I18nProvider lang={lang}>
+      <SafeAreaProvider style={{ backgroundColor: P.bg }}>
+        <StatusBar style="light" />
+        <DialogProvider>
+          <PremiumProvider kv={props.kv ?? deviceKV} store={props.store} ads={props.ads}>
+            <LooksProvider kv={props.kv ?? deviceKV}>
+              <Root {...props} kv={props.kv ?? deviceKV} onLang={setLang} />
+            </LooksProvider>
+          </PremiumProvider>
+        </DialogProvider>
+      </SafeAreaProvider>
+    </I18nProvider>
   );
 }
 
-function resumeInfo(saved: SavedGame): ResumeInfo {
+function resumeInfo(saved: SavedGame, str: Strings): ResumeInfo {
   const m = saved.match;
-  const mode = saved.setup.rules.mode === "bank" ? "Z bankierem" : "Rodzinne";
-  const kind = saved.setup.mode === "training" ? "trening" : saved.setup.mode === "single" ? "jedna runda" : `do ${saved.setup.rules.target} pkt`;
+  const t = str.app.resume;
+  const mode = saved.setup.rules.mode === "bank" ? t.bank : t.family;
+  const kind = saved.setup.mode === "training" ? t.training : saved.setup.mode === "single" ? t.single : t.target(saved.setup.rules.target);
   return {
-    title: `Runda ${m.roundNo}`,
-    line: `${mode} · ${kind} · ${saved.setup.seats.map((s) => s.name).join(", ")}`,
+    title: t.title(m.roundNo),
+    line: t.line(mode, kind, saved.setup.seats.map((s) => s.name)),
     seats: saved.setup.seats.map((s, i) => ({
       name: s.name,
+      persona: s.kind === "bot" ? s.persona : null,
       color: s.kind === "bot" ? personaById(s.persona)?.color ?? P.muted : P.accent,
       score: m.scores[i],
     })),
@@ -154,6 +161,7 @@ function GameScreen({
   }));
   const { game, snapshot } = useGame(source, gameOpts);
   const premium = usePremium();
+  const str = useStrings();
   const on = trainer || snapshot.mode === "training";
   const ev = useTrainer(snapshot, on, undefined, premium.pro ? undefined : () => premium.spend("hint"));
   return (
@@ -166,7 +174,7 @@ function GameScreen({
       onGiveUp={() => void clearSavedGame(opts.kv)}
       trainer={on ? () => <TrainerPanel evaluation={ev} onMore={() => premium.showPaywall("hints")} /> : undefined}
       recommend={on && ev && ev !== "locked" ? ev.best : null}
-      newBadges={BADGES.filter((b) => fresh.includes(b.id))}
+      newBadges={badges(str).filter((b) => fresh.includes(b.id))}
     />
   );
 }
@@ -195,7 +203,8 @@ async function loadAll(kv: KV): Promise<Stored> {
   return { stats, saved: isResumable(saved) ? saved : null, rules, choices, settings, onboarded };
 }
 
-function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
+function Root({ kv, pace, decide, sleep, lanDeps, onLang }: AppProps & { kv: KV; onLang: (l: Lang) => void }) {
+  const str = useStrings();
   const confirm = useConfirm();
   const [screen, setScreen] = useState<Screen>({ name: "home", tab: "play" });
   const [stored, setStored] = useState<Stored | null>(null);
@@ -216,13 +225,14 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
     loadAll(kv).then((s) => {
       if (!alive) return;
       applySettings(s.settings);
+      onLang(resolveLang(s.settings.lang, deviceLocales()));
       setStored(s);
     });
     void initSounds();
     return () => {
       alive = false;
     };
-  }, [kv]);
+  }, [kv, onLang]);
 
   const reload = useCallback(
     () =>
@@ -306,15 +316,15 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
       void saveChoices(kv, choices);
       void clearSavedGame(kv);
       const mode = training ? "training" : choices.length === "single" ? "single" : "match";
-      const setup = makeSetup(rules, choices.bots, mode, freshSeed());
+      const setup = makeSetup(rules, choices.bots, mode, freshSeed(), str);
       setStored((s) => (s ? { ...s, choices, saved: null } : s));
       setScreen({ name: "game", source: { setup }, key: Date.now() });
     };
     if (stored.saved)
       void confirm({
-        title: "Masz niedokończoną partię",
-        message: "Nowa gra zastąpi zapisaną — tamtej nie będzie już można wznowić.",
-        confirmText: "Zacznij nową",
+        title: str.app.replaceSaved.title,
+        message: str.app.replaceSaved.message,
+        confirmText: str.app.replaceSaved.confirm,
         destructive: true,
       }).then((ok) => ok && go());
     else go();
@@ -432,6 +442,7 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
   const tab = screen.tab;
   const changeSettings = (s: Settings) => {
     applySettings(s);
+    onLang(resolveLang(s.lang, deviceLocales()));
     void saveSettings(kv, s);
     setStored((old) => (old ? { ...old, settings: s } : old));
   };
@@ -458,8 +469,8 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
           <RulesScreen rules={stored.rules} onTutorial={() => setScreen({ name: "tutorial", key: Date.now() })} />
         ) : (
           <HomeScreen
-            rulesSummary={summaryLines(stored.rules)}
-            resume={stored.saved ? resumeInfo(stored.saved) : null}
+            rulesSummary={summaryLines(stored.rules, str)}
+            resume={stored.saved ? resumeInfo(stored.saved, str) : null}
             onResume={() => stored.saved && setScreen({ name: "game", source: { saved: stored.saved }, key: Date.now() })}
             onNewGame={() => setScreen({ name: "newGame", training: false })}
             onFriends={() => setScreen({ name: "lan", key: Date.now() })}
@@ -508,39 +519,24 @@ function Root({ kv, pace, decide, sleep, lanDeps }: AppProps & { kv: KV }) {
   );
 }
 
-const LIMITS: Record<"analysis" | "bigTable" | "hints", { title: string; text: string; reason: "analysis" | "bigTable" | "hints"; proLabel: string; ad: { label: string; reward: Reward } }> = {
-  analysis: {
-    title: "Dzisiejsza analiza wykorzystana",
-    text: "Bez Oczko Pro jedna analiza partii dziennie. Jutro kolejna — albo jeszcze jedna teraz, za reklamę.",
-    reason: "analysis",
-    proLabel: "Analiza bez limitu",
-    ad: { label: "+1 analiza dziś", reward: { kind: "analysis" } },
-  },
-  bigTable: {
-    title: "Stół dla 7–8 osób",
-    text: "Bez Oczko Pro jeden duży stół dziennie. Dziś już był — kolejny za reklamę albo w Oczko Pro.",
-    reason: "bigTable",
-    proLabel: "Duże stoły bez limitu",
-    ad: { label: "+1 duży stół dziś", reward: { kind: "bigTable" } },
-  },
-  hints: {
-    title: "Podpowiedzi trenera",
-    text: "Bez Oczko Pro trzy podpowiedzi dziennie. Kolejną dostaniesz za reklamę — oglądasz ją tylko, gdy chcesz.",
-    reason: "hints",
-    proLabel: "Trener bez limitu",
-    ad: { label: "+1 podpowiedź dziś", reward: { kind: "hints" } },
-  },
+type LimitKind = "analysis" | "bigTable" | "hints";
+/** What each daily limit's ad gives (the texts: `str.app.limits`). */
+const LIMIT_REWARDS: Record<LimitKind, Reward> = {
+  analysis: { kind: "analysis" },
+  bigTable: { kind: "bigTable" },
+  hints: { kind: "hints" },
 };
 
 /** A daily limit reached: a rewarded ad (only on request) or Oczko Pro. */
-function Limit({ kind, onClose }: { kind: keyof typeof LIMITS; onClose: () => void }) {
-  const l = LIMITS[kind];
-  return <LimitSheet title={l.title} text={l.text} reason={l.reason} proLabel={l.proLabel} ad={l.ad} onClose={onClose} />;
+function Limit({ kind, onClose }: { kind: LimitKind; onClose: () => void }) {
+  const l = useStrings().app.limits[kind];
+  return <LimitSheet title={l.title} text={l.text} reason={kind} proLabel={l.proLabel} ad={{ label: l.adLabel, reward: LIMIT_REWARDS[kind] }} onClose={onClose} />;
 }
 
 /** Settings rows of Oczko Pro, looks, ads' privacy and codes. */
 function SettingsExtra({ hintsLeft, onLooks, onMoreHints }: { hintsLeft: number; onLooks: () => void; onMoreHints: () => void }) {
   const premium = usePremium();
+  const t = useStrings().app.extra;
   const row = (label: string, sub: string, onPress: () => void) => (
     <Pressable
       key={label}
@@ -556,13 +552,11 @@ function SettingsExtra({ hintsLeft, onLooks, onMoreHints }: { hintsLeft: number;
   );
   return (
     <>
-      {row("Wygląd", "Talie, sukna i rewersy", onLooks)}
-      {!premium.pro && Number.isFinite(hintsLeft) && row("Podpowiedzi trenera", `Dziś zostało: ${hintsLeft}. Więcej za reklamę albo w Oczko Pro`, onMoreHints)}
-      {premium.pro
-        ? row("Oczko Pro", "Aktywne — zarządzaj subskrypcją", () => void premium.manage())
-        : row("Oczko Pro", "Trener i analiza bez limitu, duże stoły, wygląd", () => premium.showPaywall("profile"))}
-      {premium.codeFlow !== "none" && row("Mam kod", "Kod promocyjny Oczko Pro", () => premium.showRedeem())}
-      {premium.adsAvailable && row("Prywatność reklam", "Zgody na reklamy (UE)", () => void premium.privacyOptions())}
+      {row(t.looks, t.looksSub, onLooks)}
+      {!premium.pro && Number.isFinite(hintsLeft) && row(t.hints, t.hintsSub(hintsLeft), onMoreHints)}
+      {premium.pro ? row(t.pro, t.proActive, () => void premium.manage()) : row(t.pro, t.proSub, () => premium.showPaywall("profile"))}
+      {premium.codeFlow !== "none" && row(t.code, t.codeSub, () => premium.showRedeem())}
+      {premium.adsAvailable && row(t.adsPrivacy, t.adsPrivacySub, () => void premium.privacyOptions())}
     </>
   );
 }

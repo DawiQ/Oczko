@@ -6,6 +6,7 @@
 // player's face-down cards, the stock or the seed. Everything a peer sends is
 // untrusted: every message is parsed and checked here before anyone acts on it.
 import { personaById, type PersonaId } from "../ai/personas";
+import { pl, type Strings } from "../i18n/pl";
 import { cleanChoice, type LookChoice } from "../premium/looks";
 import { isCard } from "../engine/cards";
 import { validateRules, type Rules } from "../engine/rules";
@@ -13,7 +14,7 @@ import type { GameSnapshot } from "../game/TableGame";
 import type { GameMode } from "../game/setup";
 
 /** Bumped on any incompatible change: older and newer apps refuse each other. */
-export const PROTOCOL_VERSION = 1;
+export const PROTOCOL_VERSION = 2;
 /** The port a table listens on (the next ones if taken). */
 export const LAN_PORT = 47676;
 /** A longer line is dropped (and the connection closed): no peer needs it. */
@@ -22,8 +23,10 @@ export const MAX_NAME = 16;
 /** Seats at a Wi‑Fi table (7–8 need the host's Oczko Pro). */
 export const MAX_LAN_SEATS = 8;
 export const FREE_LAN_SEATS = 4;
-export const REACTION_TEXTS = ["Brawo", "Ups", "Szybciej", "Dobra gra"] as const;
-export type ReactionText = (typeof REACTION_TEXTS)[number];
+/** Quick reactions travel as ids; each phone shows them in its own language. */
+export const REACTIONS = ["bravo", "oops", "faster", "goodGame"] as const;
+export type Reaction = (typeof REACTIONS)[number];
+const isReaction = (x: unknown): x is Reaction => REACTIONS.includes(x as Reaction);
 
 /** A seat in the lobby before the deal. */
 export type LobbySlot =
@@ -48,8 +51,8 @@ export type Presence = "here" | "online" | "away" | "bot";
 
 export interface LanInfo {
   presence: Presence[];
-  /** The latest quick reaction ("Brawo"…), with a growing number. */
-  reaction: { seq: number; seat: number; text: ReactionText } | null;
+  /** The latest quick reaction, with a growing number. */
+  reaction: { seq: number; seat: number; id: Reaction } | null;
   /** Seconds left for the seat on the move (a person at the table). */
   moveDeadline: number | null;
 }
@@ -59,7 +62,7 @@ export interface LanInfo {
 export type GuestMsg =
   | { t: "hello"; v: number; name: string; token?: string }
   | { t: "move"; action: "hit" | "stand" }
-  | { t: "react"; text: ReactionText }
+  | { t: "react"; id: Reaction }
   | { t: "leave" }
   | { t: "ping" };
 
@@ -108,7 +111,7 @@ function parseLine(line: string): Record<string, unknown> | null {
 }
 
 /** A name someone typed: printable, trimmed, at most MAX_NAME characters. */
-export function cleanName(raw: unknown, fallback = "Gość"): string {
+export function cleanName(raw: unknown, fallback: string = pl.lan.defaultGuest): string {
   if (typeof raw !== "string") return fallback;
   const s = Array.from(raw.replace(/[\u0000-\u001f\u007f-\u009f\u200b-\u200f\u2028-\u202e\u2066-\u2069]/g, "").trim())
     .slice(0, MAX_NAME)
@@ -117,18 +120,19 @@ export function cleanName(raw: unknown, fallback = "Gość"): string {
   return s || fallback;
 }
 
-/** A guest's message, checked; null = malformed (ignored). */
-export function parseGuestMsg(line: string): GuestMsg | null {
+/** A guest's message, checked; null = malformed (ignored). A guest without
+ *  a name gets the default one in the host's language. */
+export function parseGuestMsg(line: string, s: Strings = pl): GuestMsg | null {
   const m = parseLine(line);
   if (!m) return null;
   switch (m.t) {
     case "hello":
       if (!isInt(m.v)) return null;
-      return { t: "hello", v: m.v, name: cleanName(m.name), ...(typeof m.token === "string" && m.token.length <= 64 ? { token: m.token } : {}) };
+      return { t: "hello", v: m.v, name: cleanName(m.name, s.lan.defaultGuest), ...(typeof m.token === "string" && m.token.length <= 64 ? { token: m.token } : {}) };
     case "move":
       return m.action === "hit" || m.action === "stand" ? { t: "move", action: m.action } : null;
     case "react":
-      return REACTION_TEXTS.includes(m.text as ReactionText) ? { t: "react", text: m.text as ReactionText } : null;
+      return isReaction(m.id) ? { t: "react", id: m.id } : null;
     case "leave":
       return { t: "leave" };
     case "ping":
@@ -176,7 +180,7 @@ function looksLikeLan(x: unknown): x is LanInfo {
   if (!x.presence.every((p) => p === "here" || p === "online" || p === "away" || p === "bot")) return false;
   if (x.moveDeadline !== null && !isInt(x.moveDeadline)) return false;
   const r = x.reaction;
-  return r === null || (isObj(r) && isInt(r.seq) && isInt(r.seat) && REACTION_TEXTS.includes(r.text as ReactionText));
+  return r === null || (isObj(r) && isInt(r.seq) && isInt(r.seat) && isReaction(r.id));
 }
 
 /** Only known look ids reach the table (anything else: the classic one). */

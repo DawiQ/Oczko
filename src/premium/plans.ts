@@ -2,6 +2,7 @@
 // package (its package type, or the product's own period for a custom one)
 // and the paywall's texts for it. Nothing here names a product: the owner
 // sets the products, their order and the offering in RevenueCat.
+import { pl, type Strings } from "../i18n/pl";
 
 export type PlanKind = "weekly" | "monthly" | "twoMonths" | "threeMonths" | "sixMonths" | "yearly" | "lifetime" | "other";
 
@@ -53,61 +54,32 @@ export function planKind(packageType: string, subscriptionPeriod: string | null 
 
 export const isSubscription = (k: PlanKind) => k !== "lifetime" && k !== "other";
 
-const TITLE: Record<PlanKind, string> = {
-  weekly: "Tygodniowo",
-  monthly: "Miesięcznie",
-  twoMonths: "Na 2 miesiące",
-  threeMonths: "Na 3 miesiące",
-  sixMonths: "Na pół roku",
-  yearly: "Rocznie",
-  lifetime: "Na zawsze",
-  other: "Oczko Pro",
-};
+export const days = (n: number, s: Strings = pl) => s.premium.plans.days(n);
 
-/** "/ rok" in the plan's note. */
-const PER: Partial<Record<PlanKind, string>> = {
-  weekly: "tydzień",
-  monthly: "miesiąc",
-  twoMonths: "2 miesiące",
-  threeMonths: "3 miesiące",
-  sixMonths: "pół roku",
-  yearly: "rok",
-};
+export const planTitle = (p: Plan, s: Strings = pl): string => s.premium.plans.title[p.kind];
 
-/** "co rok" in the fine print. */
-const EVERY: Partial<Record<PlanKind, string>> = {
-  weekly: "co tydzień",
-  monthly: "co miesiąc",
-  twoMonths: "co 2 miesiące",
-  threeMonths: "co 3 miesiące",
-  sixMonths: "co pół roku",
-  yearly: "co rok",
-};
-
-export const days = (n: number) => (n === 1 ? "1 dzień" : `${n} dni`);
-
-export const planTitle = (p: Plan): string => TITLE[p.kind];
-
-export function planNote(p: Plan): string {
-  if (p.kind === "lifetime") return `Jednorazowo ${p.price}`;
-  const per = PER[p.kind];
+export function planNote(p: Plan, s: Strings = pl): string {
+  const t = s.premium.plans;
+  if (p.kind === "lifetime") return t.lifetimeNote(p.price);
+  const per = t.per[p.kind];
   if (!per) return p.price;
-  return p.trialDays ? `${days(p.trialDays)} za darmo, potem ${p.price} / ${per}` : `${p.price} / ${per}`;
+  return p.trialDays ? t.trialNote(p.trialDays, p.price, per) : t.note(p.price, per);
 }
 
-export function ctaLabel(p: Plan | undefined): string {
-  if (!p) return "Kup Oczko Pro";
-  if (p.trialDays && isSubscription(p.kind)) return `Wypróbuj ${days(p.trialDays)} za darmo`;
-  return p.kind === "lifetime" ? `Kup na zawsze · ${p.price}` : `Kup · ${p.price}`;
+export function ctaLabel(p: Plan | undefined, s: Strings = pl): string {
+  const t = s.premium.plans;
+  if (!p) return t.buy;
+  if (p.trialDays && isSubscription(p.kind)) return t.tryFree(p.trialDays);
+  return p.kind === "lifetime" ? t.buyLifetime(p.price) : t.buyFor(p.price);
 }
 
-export function finePrint(p: Plan | undefined): string {
+export function finePrint(p: Plan | undefined, s: Strings = pl): string {
   if (!p) return "";
-  if (p.kind === "lifetime") return "Płatność jednorazowa, bez odnowień.";
-  const every = EVERY[p.kind];
-  if (!every) return "Warunki płatności podaje sklep przed zakupem.";
-  const trial = p.trialDays ? `Bez opłaty przez ${days(p.trialDays)}. Potem ` : "";
-  return `${trial}${p.price} ${every}, dopóki nie anulujesz w ustawieniach sklepu — możesz to zrobić w każdej chwili.`;
+  const t = s.premium.plans;
+  if (p.kind === "lifetime") return t.fineLifetime;
+  const every = t.every[p.kind];
+  if (!every) return t.fineOther;
+  return t.fine(p.trialDays, p.price, every);
 }
 
 /** The plan picked at first: the one with a free trial, else the first in the

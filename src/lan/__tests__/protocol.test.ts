@@ -250,10 +250,10 @@ describe("Wi‑Fi table — edges", () => {
     await flush();
     host.start();
     await flush();
-    g.react("Brawo");
-    g.react("Ups");
+    g.react("bravo");
+    g.react("oops");
     await flush();
-    expect(host.lan!.reaction).toMatchObject({ text: "Brawo" });
+    expect(host.lan!.reaction).toMatchObject({ id: "bravo" });
     await wait(80);
     expect(closed).toBe(true);
     host.close();
@@ -268,6 +268,8 @@ describe("protocol parsing", () => {
     expect(parseGuestMsg('{"t":"move","action":"hit"}')).toEqual({ t: "move", action: "hit" });
     expect(parseGuestMsg('{"t":"move","action":"double"}')).toBeNull();
     expect(parseGuestMsg('{"t":"react","text":"Gratulacje!!!"}')).toBeNull();
+    expect(parseGuestMsg('{"t":"react","id":"Brawo"}')).toBeNull();
+    expect(parseGuestMsg('{"t":"react","id":"goodGame"}')).toEqual({ t: "react", id: "goodGame" });
     expect(parseGuestMsg("not json")).toBeNull();
     expect(parseHostMsg('{"t":"state","snap":{"phase":"myTurn"},"lan":{}}')).toBeNull();
     expect(parseHostMsg('{"t":"closed","reason":"bye"}')).toBeNull();

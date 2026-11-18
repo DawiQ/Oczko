@@ -5,6 +5,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { DEFAULT_RULES, type Rules } from "../engine/rules";
+import { useStrings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { Header } from "../ui/Header";
 import { P } from "../ui/palette";
@@ -13,17 +14,19 @@ import { preview } from "./rulesText";
 
 export function HouseRulesScreen({ initial, onSave, onBack }: { initial: Rules; onSave: (r: Rules) => void; onBack: () => void }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
+  const t = str.newgame.houseRules;
   const [rules, setRules] = useState(initial);
   return (
     <View style={s.screen}>
-      <Header title="Jak grasz u siebie" onBack={onBack} />
+      <Header title={t.title} onBack={onBack} />
       <ScrollView contentContainerStyle={s.content}>
         <RulesEditor rules={rules} onChange={setRules} />
-        <Text style={s.preview}>{preview(rules)}</Text>
-        <Button3D label="Przywróć domyślne" tone="dark" height={44} onPress={() => setRules({ ...DEFAULT_RULES, target: rules.target })} />
+        <Text style={s.preview}>{preview(rules, str)}</Text>
+        <Button3D label={t.reset} tone="dark" height={44} onPress={() => setRules({ ...DEFAULT_RULES, target: rules.target })} />
       </ScrollView>
       <View style={[s.footer, { paddingBottom: insets.bottom + 12 }]}>
-        <Button3D label="Zapisz" big onPress={() => onSave(rules)} testID="house-rules-save" />
+        <Button3D label={t.save} big onPress={() => onSave(rules)} testID="house-rules-save" />
       </View>
     </View>
   );

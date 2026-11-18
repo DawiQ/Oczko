@@ -7,26 +7,27 @@ import type { Evaluation } from "../ai/evaluate";
 import { handValue } from "../engine/score";
 import type { SeatView } from "../engine/view";
 import { personaById } from "../ai/personas";
+import { useStrings, type Strings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
 import { Header } from "../ui/Header";
 import { P } from "../ui/palette";
 import { Portrait } from "../ui/Portrait";
-import { analyze, GRADE_LABEL, summarize, type Grade } from "./analysis";
+import { analyze, summarize, type Grade } from "./analysis";
 import { recordTitle } from "./HistoryScreen";
 import { replay, type Frame, type HistoryRecord } from "./record";
 
 const GRADE_COLOR: Record<Grade, string> = { best: P.ok, good: "#B9D86A", risky: "#F0B44C", mistake: P.danger };
 
-function frameText(r: HistoryRecord, f: Frame): string {
+function frameText(r: HistoryRecord, f: Frame, s: Strings): string {
+  const t = s.history.replay;
   const seats = r.setup.seats;
-  if (!f.decision) return `Runda ${f.roundNo} — rozdanie`;
-  const who = f.decision.seat === r.me ? "Ty" : seats[f.decision.seat].name;
-  if (f.decision.action === "stand") return `${who}: Starczy`;
+  if (!f.decision) return t.deal(f.roundNo);
+  const who = f.decision.seat === r.me ? s.common.you : seats[f.decision.seat].name;
+  if (f.decision.action === "stand") return t.stand(who);
   const hand = f.match.round.hands[f.decision.seat];
-  const v = handValue(hand, f.match.rules);
-  return `${who}: Dobieram → ${v.persian ? "perskie oczko" : v.bust ? `fura (${v.total})` : v.total}`;
+  return t.hit(who, handValue(hand, f.match.rules));
 }
 
 export function ReplayScreen({
@@ -46,6 +47,8 @@ export function ReplayScreen({
   spendAnalysis?: () => boolean;
   onAnalyseLocked?: () => void;
 }) {
+  const str = useStrings();
+  const t = str.history.replay;
   const frames = useMemo(() => replay(record), [record]);
   const [i, setI] = useState(0);
   const [playing, setPlaying] = useState(false);
@@ -65,8 +68,8 @@ export function ReplayScreen({
   if (!ok)
     return (
       <View style={s.screen}>
-        <Header title="Powtórka" onBack={onBack} />
-        <Text style={s.empty}>Tej partii nie da się odtworzyć w tej wersji aplikacji.</Text>
+        <Header title={t.title} onBack={onBack} />
+        <Text style={s.empty}>{t.cannot}</Text>
       </View>
     );
 
@@ -93,13 +96,13 @@ export function ReplayScreen({
 
   return (
     <View style={s.screen}>
-      <Header title="Powtórka" subtitle={recordTitle(record)} onBack={onBack} />
+      <Header title={t.title} subtitle={recordTitle(record, str)} onBack={onBack} />
       <ScrollView contentContainerStyle={s.content}>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={s.chips}>
           {roundStarts.map((k, r) => {
             const on = frames[k].roundNo === f.roundNo;
             return (
-              <Pressable key={k} style={[s.chip, on && s.chipOn]} onPress={() => setI(k)} accessibilityRole="button" accessibilityLabel={`Runda ${r + 1}`} accessibilityState={{ selected: on }}>
+              <Pressable key={k} style={[s.chip, on && s.chipOn]} onPress={() => setI(k)} accessibilityRole="button" accessibilityLabel={t.round(r + 1)} accessibilityState={{ selected: on }}>
                 <Text style={[s.chipText, on && { color: P.text }]}>{r + 1}</Text>
               </Pressable>
             );
@@ -112,12 +115,13 @@ export function ReplayScreen({
             const v = handValue(hand, f.match.rules);
             const color = seat.kind === "bot" ? personaById(seat.persona)?.color ?? P.muted : P.accent;
             const acting = f.decision?.seat === k;
+            const name = k === record.me ? str.common.you : seat.name;
             return (
-              <View key={k} style={[s.seat, acting && s.seatActing]} accessible accessibilityLabel={`${k === record.me ? "Ty" : seat.name}: ${v.persian ? "perskie oczko" : v.bust ? `fura ${v.total}` : v.total}`}>
-                <Portrait name={seat.name} size={30} color={color} />
+              <View key={k} style={[s.seat, acting && s.seatActing]} accessible accessibilityLabel={t.seatLabel(name, v)}>
+                <Portrait name={seat.name} persona={seat.kind === "bot" ? seat.persona : null} size={30} color={color} />
                 <Text style={s.name} numberOfLines={1}>
-                  {k === record.me ? "Ty" : seat.name}
-                  {round.bank === k ? " · bank" : ""}
+                  {name}
+                  {round.bank === k ? t.bankMark : ""}
                 </Text>
                 <View style={s.hand}>
                   {hand.map((c, j) => (
@@ -132,27 +136,27 @@ export function ReplayScreen({
         </View>
 
         <View style={s.caption} accessibilityLiveRegion="polite">
-          <Text style={s.captionText}>{frameText(record, f)}</Text>
+          <Text style={s.captionText}>{frameText(record, f, str)}</Text>
           {mine && (
             <Text style={[s.grade, { color: GRADE_COLOR[mine.grade] }]}>
-              {`Decyzja: ${GRADE_LABEL[mine.grade]} · Starczy ${Math.round(mine.standWin * 100)}% / Dobieram ${Math.round(mine.hitWin * 100)}%`}
+              {t.decision(mine.grade, Math.round(mine.standWin * 100), Math.round(mine.hitWin * 100))}
             </Text>
           )}
         </View>
 
-        <SeekBar value={i} max={n - 1} onSeek={seek} />
+        <SeekBar value={i} max={n - 1} label={t.progress} onSeek={seek} />
         <View style={s.controls}>
-          <Ctl label="◀" a11y="Poprzedni ruch" onPress={() => setI(Math.max(0, i - 1))} disabled={i === 0} />
-          <Ctl label={isPlaying ? "❚❚" : "▶︎"} a11y={isPlaying ? "Zatrzymaj" : "Odtwarzaj"} onPress={() => (atEnd ? (setI(0), setPlaying(true)) : setPlaying(!playing))} />
-          <Ctl label="▶︎|" a11y="Następny ruch" onPress={() => setI(Math.min(n - 1, i + 1))} disabled={atEnd} />
+          <Ctl label="◀" a11y={t.prev} onPress={() => setI(Math.max(0, i - 1))} disabled={i === 0} />
+          <Ctl label={isPlaying ? "❚❚" : "▶︎"} a11y={isPlaying ? t.pause : t.play} onPress={() => (atEnd ? (setI(0), setPlaying(true)) : setPlaying(!playing))} />
+          <Ctl label="▶︎|" a11y={t.next} onPress={() => setI(Math.min(n - 1, i + 1))} disabled={atEnd} />
         </View>
-        <Text style={s.counter}>{`Ruch ${i} z ${n - 1}`}</Text>
+        <Text style={s.counter}>{t.move(i, n - 1)}</Text>
 
         <View style={s.analysis}>
           {sum ? (
-            <Text style={s.sumText}>{`Twoje decyzje: ${sum.best} najlepszych, ${sum.good} dobrych, ${sum.risky} ryzykownych, ${sum.mistake} błędów`}</Text>
+            <Text style={s.sumText}>{t.summary(sum)}</Text>
           ) : (
-            <Button3D label={busy ? "Analizuję…" : "Analizuj moje decyzje"} tone="dark" height={46} disabled={busy} onPress={() => void runAnalysis()} />
+            <Button3D label={busy ? t.analysing : t.analyse} tone="dark" height={46} disabled={busy} onPress={() => void runAnalysis()} />
           )}
         </View>
       </ScrollView>
@@ -160,7 +164,7 @@ export function ReplayScreen({
   );
 }
 
-function SeekBar({ value, max, onSeek }: { value: number; max: number; onSeek: (e: GestureResponderEvent, width: number) => void }) {
+function SeekBar({ value, max, label, onSeek }: { value: number; max: number; label: string; onSeek: (e: GestureResponderEvent, width: number) => void }) {
   const [w, setW] = useState(1);
   return (
     <Pressable
@@ -168,7 +172,7 @@ function SeekBar({ value, max, onSeek }: { value: number; max: number; onSeek: (
       onPress={(e) => onSeek(e, w)}
       style={s.seek}
       accessibilityRole="adjustable"
-      accessibilityLabel="Postęp powtórki"
+      accessibilityLabel={label}
       accessibilityValue={{ min: 0, max, now: value }}
     >
       <View style={s.seekTrack}>

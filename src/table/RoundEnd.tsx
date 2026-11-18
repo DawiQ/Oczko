@@ -4,6 +4,7 @@ import { ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import type { GameSnapshot, SeatInfo } from "../game/TableGame";
+import { useStrings, type Strings } from "../i18n";
 import { Button3D } from "../ui/Button3D";
 import { CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
@@ -20,21 +21,22 @@ function Pill({ text, tone }: { text: string; tone: "accent" | "bust" | "muted" 
   );
 }
 
-function outcome(snap: GameSnapshot, seat: SeatInfo): { text: string; tone: "accent" | "bust" | "muted" } {
+function outcome(snap: GameSnapshot, seat: SeatInfo, s: Strings): { text: string; tone: "accent" | "bust" | "muted" } {
   const pts = snap.result?.points[seat.seat] ?? 0;
   if (pts > 0) return { text: `+${pts}`, tone: "accent" };
-  if (seat.value?.bust) return { text: "Fura", tone: "bust" };
+  if (seat.value?.bust) return { text: s.table.roundEnd.bust, tone: "bust" };
   const duel = snap.result?.duels?.find((d) => d.seat === seat.seat);
-  if (duel?.winner === "none") return { text: "remis", tone: "muted" };
+  if (duel?.winner === "none") return { text: s.table.roundEnd.draw, tone: "muted" };
   return { text: "—", tone: "muted" };
 }
 
 /** Points so far as bars towards the target. */
 export function ScoreBars({ snap }: { snap: GameSnapshot }) {
+  const str = useStrings();
   const max = Math.max(snap.target, ...snap.scores);
   const order = [...snap.seats].sort((a, b) => b.score - a.score);
   return (
-    <View style={{ gap: 6 }} accessibilityLabel={`Punkty: ${order.map((x) => `${x.name} ${x.score}`).join(", ")}, do ${snap.target}`}>
+    <View style={{ gap: 6 }} accessibilityLabel={str.table.roundEnd.scores(order, snap.target)}>
       {order.map((x) => (
         <View key={x.seat} style={s.barRow}>
           <Text style={s.barName} numberOfLines={1}>
@@ -52,7 +54,9 @@ export function ScoreBars({ snap }: { snap: GameSnapshot }) {
 
 export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; /** Absent at a Wi‑Fi guest's table: the host deals. */ onNext?: () => void; onReplay?: () => void }) {
   const insets = useSafeAreaInsets();
-  const h = headline(snap);
+  const str = useStrings();
+  const t = str.table.roundEnd;
+  const h = headline(snap, str);
   const order = snap.view.bank === null ? snap.seats : [...snap.seats.filter((x) => !x.isBank), ...snap.seats.filter((x) => x.isBank)];
   return (
     <View style={[s.panel, { paddingBottom: insets.bottom + 14 }]} accessibilityViewIsModal>
@@ -66,20 +70,19 @@ export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; 
       <Text style={s.sub}>{h.sub}</Text>
       <ScrollView style={{ maxHeight: 260 }} contentContainerStyle={{ paddingVertical: 4 }}>
         {order.map((x) => {
-          const o = outcome(snap, x);
+          const o = outcome(snap, x, str);
           return (
-            <View key={x.seat} style={s.row} accessible accessibilityLabel={`${x.name}${x.isBank ? " (bank)" : ""}: ${x.value?.persian ? "perskie oczko" : x.value?.bust ? `fura ${x.value.total}` : x.value?.total ?? ""}, ${o.text}`}>
-              <Portrait name={x.name} size={30} color={x.color} />
+            <View key={x.seat} style={s.row} accessible accessibilityLabel={t.row(x.name, x.isBank, x.value, o.text)}>
+              <Portrait name={x.name} persona={x.persona} size={30} color={x.color} />
               <Text style={s.who} numberOfLines={1}>
-                {x.name}
-                {x.isBank ? " · bank" : ""}
+                {t.who(x.name, x.isBank)}
               </Text>
               <View style={s.hand}>
                 {(x.hand ?? []).map((c, i) => (
                   <CardFace key={c} card={c} size="sm" style={{ marginLeft: i ? -12 : 0 }} />
                 ))}
               </View>
-              <Text style={[s.val, x.value?.bust && { color: P.danger }]}>{x.value?.persian ? "AA" : x.value?.total ?? ""}</Text>
+              <Text style={[s.val, x.value?.bust && { color: P.danger }]}>{x.value?.persian ? str.table.persianShort : x.value?.total ?? ""}</Text>
               <View style={{ width: 52, alignItems: "flex-end" }}>
                 <Pill text={o.text} tone={o.tone} />
               </View>
@@ -87,15 +90,15 @@ export function RoundEndPanel({ snap, onNext, onReplay }: { snap: GameSnapshot; 
           );
         })}
       </ScrollView>
-      <Text style={s.label}>{`Punkty · do ${snap.target}`}</Text>
+      <Text style={s.label}>{str.table.pointsTo(snap.target)}</Text>
       <ScoreBars snap={snap} />
       <View style={{ gap: 10, marginTop: 14 }}>
-        {snap.canReplay && onReplay && <Button3D label="Ta runda jeszcze raz" tone="dark" height={46} onPress={onReplay} />}
+        {snap.canReplay && onReplay && <Button3D label={t.replay} tone="dark" height={46} onPress={onReplay} />}
         {onNext ? (
-          <Button3D label="Następna runda" big onPress={onNext} testID="next-round" />
+          <Button3D label={t.next} big onPress={onNext} testID="next-round" />
         ) : (
           <Text style={s.wait} accessibilityLiveRegion="polite">
-            Gospodarz rozdaje następną rundę…
+            {t.hostDeals}
           </Text>
         )}
       </View>
@@ -123,7 +126,9 @@ export function MatchEndPanel({
   reduceMotion: boolean;
 }) {
   const insets = useSafeAreaInsets();
-  const h = headline(snap);
+  const str = useStrings();
+  const t = str.table.matchEnd;
+  const h = headline(snap, str);
   const ranked = [...snap.seats].sort((a, b) => b.score - a.score);
   const podium = [ranked[1], ranked[0], ranked[2]].filter(Boolean) as SeatInfo[];
   const won = snap.winner === snap.me;
@@ -139,35 +144,35 @@ export function MatchEndPanel({
           const place = ranked.indexOf(x) + 1;
           const top = place === 1;
           return (
-            <View key={x.seat} style={s.step} accessible accessibilityLabel={`${place}. miejsce: ${x.name}, ${x.score} pkt`}>
+            <View key={x.seat} style={s.step} accessible accessibilityLabel={t.placeA11y(place, x.name, x.score)}>
               {top && <Text style={s.crown}>★</Text>}
-              <Portrait name={x.name} size={top ? 70 : 54} color={x.color} ring={x.color} />
+              <Portrait name={x.name} persona={x.persona} size={top ? 70 : 54} color={x.color} ring={x.color} />
               <Text style={s.stepName} numberOfLines={1}>
                 {x.name}
               </Text>
               <View style={[s.block, { height: top ? 120 : place === 2 ? 88 : 66 }, top && { backgroundColor: P.accent }]}>
                 <Text style={[s.blockScore, top && { color: P.onAccent }]}>{x.score}</Text>
-                <Text style={[s.blockPlace, top && { color: P.onAccent }]}>{`${place}. miejsce`}</Text>
+                <Text style={[s.blockPlace, top && { color: P.onAccent }]}>{t.place(place)}</Text>
               </View>
             </View>
           );
         })}
       </View>
       {newBadges.map((b) => (
-        <View key={b.name} style={s.newBadge} accessible accessibilityLabel={`Nowa odznaka: ${b.name}. ${b.desc}`}>
+        <View key={b.name} style={s.newBadge} accessible accessibilityLabel={t.badgeA11y(b.name, b.desc)}>
           <Text style={s.newBadgeIcon}>★</Text>
           <View style={{ flex: 1 }}>
-            <Text style={s.newBadgeTitle}>{`Nowa odznaka: ${b.name}`}</Text>
+            <Text style={s.newBadgeTitle}>{t.badge(b.name)}</Text>
             <Text style={s.newBadgeDesc}>{b.desc}</Text>
           </View>
         </View>
       ))}
       <View style={{ flex: 1 }} />
       <View style={{ gap: 10, width: "100%" }}>
-        {snap.canReplay && onReplay && <Button3D label="Ta runda jeszcze raz" tone="dark" height={46} onPress={onReplay} />}
-        {onRematch && <Button3D label="Rewanż" big onPress={onRematch} testID="rematch" accessibilityHint="Ci sami rywale, nowe karty" />}
-        {onNewGame && <Button3D label="Nowa gra" tone="dark" height={48} onPress={onNewGame} />}
-        <Button3D label="Do lobby" tone="dark" height={44} onPress={onExit} />
+        {snap.canReplay && onReplay && <Button3D label={str.table.roundEnd.replay} tone="dark" height={46} onPress={onReplay} />}
+        {onRematch && <Button3D label={t.rematch} big onPress={onRematch} testID="rematch" accessibilityHint={t.rematchHint} />}
+        {onNewGame && <Button3D label={t.newGame} tone="dark" height={48} onPress={onNewGame} />}
+        <Button3D label={t.lobby} tone="dark" height={44} onPress={onExit} />
       </View>
     </View>
   );

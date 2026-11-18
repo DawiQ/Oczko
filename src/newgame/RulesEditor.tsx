@@ -2,12 +2,20 @@
 // every option (new game's BottomSheet, settings).
 import { StyleSheet, Text, View } from "react-native";
 
+import type { DeckSize } from "../engine/cards";
 import { type Rules } from "../engine/rules";
+import { useStrings } from "../i18n";
 import { Counter, Label, Segmented, SwitchRow } from "../ui/controls";
 import { P } from "../ui/palette";
 import { FACES, facesPreset, withFaces, type FacesPreset } from "./rulesText";
 
+const DECKS: DeckSize[] = [52, 32, 24];
+/** The onboarding skips the 32-card deck. */
+const DECKS_BASIC: DeckSize[] = [52, 24];
+
 export function RulesEditor({ rules, onChange, basic, showMode = true }: { rules: Rules; onChange: (r: Rules) => void; basic?: boolean; showMode?: boolean }) {
+  const str = useStrings();
+  const t = str.rules.editor;
   const preset = facesPreset(rules);
   const set = (patch: Partial<Rules>) => onChange({ ...rules, ...patch });
   const setPreset = (p: FacesPreset) => {
@@ -18,42 +26,36 @@ export function RulesEditor({ rules, onChange, basic, showMode = true }: { rules
     <View>
       {showMode && (
         <>
-          <Label>Tryb</Label>
+          <Label>{t.mode}</Label>
           <Segmented
-            label="Tryb gry"
+            label={t.modeA11y}
             value={rules.mode}
             onChange={(mode) => set({ mode })}
             options={[
-              { value: "family", label: "Rodzinne", sub: "wszyscy na wszystkich" },
-              { value: "bank", label: "Z bankierem", sub: "każdy gra z bankiem" },
+              { value: "family", label: str.rules.modes.family, sub: t.modeSubs.family },
+              { value: "bank", label: str.rules.modes.bank, sub: t.modeSubs.bank },
             ]}
           />
         </>
       )}
-      <Label>Figury</Label>
+      <Label>{t.faces}</Label>
       <Segmented
-        label="Wartości figur"
+        label={t.facesA11y}
         value={preset}
         onChange={setPreset}
         options={[
-          { value: "234", label: "2 · 3 · 4", sub: "W · D · K" },
-          { value: "345", label: "3 · 4 · 5", sub: "W · D · K" },
-          { value: "custom", label: "Własne", sub: "dowolne" },
+          { value: "234", label: "2 · 3 · 4", sub: t.facesSub },
+          { value: "345", label: "3 · 4 · 5", sub: t.facesSub },
+          { value: "custom", label: t.custom, sub: t.customSub },
         ]}
       />
       {preset === "custom" && (
         <View style={s.faces}>
-          {(
-            [
-              [11, "Walet"],
-              [12, "Dama"],
-              [13, "Król"],
-            ] as const
-          ).map(([k, name]) => (
+          {([11, 12, 13] as const).map((k) => (
             <View key={k} style={s.face}>
-              <Text style={s.faceName}>{name}</Text>
+              <Text style={s.faceName}>{t.faceNames[k]}</Text>
               <Counter
-                label={name}
+                label={t.faceNames[k]}
                 value={rules.values[k]}
                 min={1}
                 max={11}
@@ -63,62 +65,58 @@ export function RulesEditor({ rules, onChange, basic, showMode = true }: { rules
           ))}
         </View>
       )}
-      <Label>Talia</Label>
+      <Label>{t.deck}</Label>
       <Segmented
-        label="Talia"
+        label={t.deck}
         value={rules.deck}
         onChange={(deck) => set({ deck })}
-        options={[
-          { value: 52, label: "52 karty" },
-          ...(basic ? [] : [{ value: 32 as const, label: "32 karty", sub: "od siódemki" }]),
-          { value: 24, label: "24 karty", sub: "od dziewiątki" },
-        ]}
+        options={(basic ? DECKS_BASIC : DECKS).map((value) => ({ value, ...t.deckOptions[value] }))}
       />
       <View style={s.pair}>
         <View style={{ flex: 1 }}>
-          <Label>Perskie oczko</Label>
+          <Label>{t.persian}</Label>
           <Segmented
-            label="Perskie oczko"
+            label={t.persian}
             value={rules.persian ? 1 : 0}
             onChange={(v) => set({ persian: v === 1 })}
             options={[
-              { value: 1, label: "Tak" },
-              { value: 0, label: "Nie" },
+              { value: 1, label: t.yes },
+              { value: 0, label: t.no },
             ]}
           />
         </View>
         <View style={{ flex: 1 }}>
-          <Label>As</Label>
+          <Label>{t.ace}</Label>
           <Segmented
-            label="Wartość asa"
+            label={t.aceA11y}
             value={rules.ace}
             onChange={(ace) => set({ ace })}
             options={[
-              { value: "eleven", label: "11" },
-              { value: "oneOrEleven", label: "1 lub 11" },
+              { value: "eleven", label: t.aceOptions.eleven },
+              { value: "oneOrEleven", label: t.aceOptions.oneOrEleven },
             ]}
           />
         </View>
       </View>
       {!basic && (
         <>
-          <Label>Karty na start</Label>
+          <Label>{t.startCards}</Label>
           <Segmented
-            label="Karty na start"
+            label={t.startCards}
             value={rules.startCards}
             onChange={(startCards) => set({ startCards, maxCards: rules.maxCards !== null && rules.maxCards <= startCards ? startCards + 1 : rules.maxCards })}
             options={[
-              { value: 1, label: "1 karta" },
-              { value: 2, label: "2 karty" },
+              { value: 1, label: t.startCardsOptions[1] },
+              { value: 2, label: t.startCardsOptions[2] },
             ]}
           />
-          <Label>Limit kart w ręce</Label>
+          <Label>{t.maxCards}</Label>
           <Segmented
-            label="Limit kart w ręce"
+            label={t.maxCards}
             value={rules.maxCards ?? 0}
             onChange={(v) => set({ maxCards: v === 0 ? null : v })}
             options={[
-              { value: 0, label: "Bez" },
+              { value: 0, label: t.noLimit },
               { value: 5, label: "5" },
               { value: 6, label: "6" },
               { value: 8, label: "8" },
@@ -126,61 +124,61 @@ export function RulesEditor({ rules, onChange, basic, showMode = true }: { rules
           />
           {rules.mode === "family" ? (
             <>
-              <Label>Remis</Label>
+              <Label>{t.familyTie}</Label>
               <Segmented
-                label="Remis w trybie rodzinnym"
+                label={t.familyTieA11y}
                 value={rules.familyTie}
                 onChange={(familyTie) => set({ familyTie })}
                 options={[
-                  { value: "allScore", label: "Punkt dla każdego" },
-                  { value: "noneScore", label: "Nikt nie punktuje" },
+                  { value: "allScore", label: t.familyTieOptions.allScore },
+                  { value: "noneScore", label: t.familyTieOptions.noneScore },
                 ]}
               />
             </>
           ) : (
             <>
-              <Label>Remis z bankiem</Label>
+              <Label>{t.bankTie}</Label>
               <Segmented
-                label="Remis z bankiem"
+                label={t.bankTie}
                 value={rules.bankTie}
                 onChange={(bankTie) => set({ bankTie })}
                 options={[
-                  { value: "bankWins", label: "Wygrywa bank" },
-                  { value: "nobody", label: "Nikt" },
+                  { value: "bankWins", label: t.bankTieOptions.bankWins },
+                  { value: "nobody", label: t.bankTieOptions.nobody },
                 ]}
               />
-              <Label>Punkty banku</Label>
+              <Label>{t.bankScoring}</Label>
               <Segmented
-                label="Punkty banku"
+                label={t.bankScoring}
                 value={rules.bankScoring}
                 onChange={(bankScoring) => set({ bankScoring })}
                 options={[
-                  { value: "majority", label: "Za większość", sub: "1 pkt za rundę" },
-                  { value: "perDuel", label: "Za pojedynek", sub: "1 pkt za każdy" },
+                  { value: "majority", ...t.bankScoringOptions.majority },
+                  { value: "perDuel", ...t.bankScoringOptions.perDuel },
                 ]}
               />
-              <Label>Bank przechodzi</Label>
+              <Label>{t.bankRotation}</Label>
               <Segmented
-                label="Kiedy bank przechodzi"
+                label={t.bankRotationA11y}
                 value={rules.bankRotation}
                 onChange={(bankRotation) => set({ bankRotation })}
                 options={[
-                  { value: "everyRound", label: "Co rundę" },
-                  { value: "onPersian", label: "Po perskim" },
-                  { value: "fixed", label: "Stały" },
+                  { value: "everyRound", label: t.bankRotationOptions.everyRound },
+                  { value: "onPersian", label: t.bankRotationOptions.onPersian },
+                  { value: "fixed", label: t.bankRotationOptions.fixed },
                 ]}
               />
               <SwitchRow
-                label="Fura gracza przegrywa zawsze"
-                sub="Także gdy bank też ma furę"
+                label={t.playerBustLoses}
+                sub={t.playerBustLosesSub}
                 value={rules.playerBustLoses}
                 onChange={(playerBustLoses) => set({ playerBustLoses })}
               />
             </>
           )}
           <SwitchRow
-            label="Furę widać od razu"
-            sub="Karty z furą odkrywane natychmiast"
+            label={t.bustRevealed}
+            sub={t.bustRevealedSub}
             value={rules.bustRevealed}
             onChange={(bustRevealed) => set({ bustRevealed })}
           />

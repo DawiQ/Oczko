@@ -2,24 +2,27 @@
 import { Image, Pressable, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useStrings } from "../i18n";
 import { ART } from "../ui/art";
 import { P } from "../ui/palette";
 
 export type Tab = "play" | "profile" | "rules";
 
-const TABS: { id: Tab; label: string; icon: number }[] = [
-  { id: "play", label: "Graj", icon: ART.iconCards },
-  { id: "profile", label: "Profil", icon: ART.iconPerson },
-  { id: "rules", label: "Zasady", icon: ART.iconBook },
+const TABS: { id: Tab; icon: number }[] = [
+  { id: "play", icon: ART.iconCards },
+  { id: "profile", icon: ART.iconPerson },
+  { id: "rules", icon: ART.iconBook },
 ];
 
 export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
   return (
     <View style={[s.bar, { paddingBottom: Math.max(insets.bottom, 8) + 4 }]} accessibilityRole="tablist">
       {TABS.map((t) => {
         const on = t.id === tab;
         const color = on ? P.accent : P.muted;
+        const label = str.home.tabs[t.id];
         return (
           <Pressable
             key={t.id}
@@ -27,10 +30,10 @@ export function TabBar({ tab, onChange }: { tab: Tab; onChange: (t: Tab) => void
             onPress={() => onChange(t.id)}
             accessibilityRole="tab"
             accessibilityState={{ selected: on }}
-            accessibilityLabel={t.label}
+            accessibilityLabel={label}
           >
             <Image source={t.icon} style={[s.icon, { tintColor: color }]} />
-            <Text style={[s.label, { color }]}>{t.label}</Text>
+            <Text style={[s.label, { color }]}>{label}</Text>
           </Pressable>
         );
       })}

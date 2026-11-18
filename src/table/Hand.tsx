@@ -5,6 +5,7 @@ import { Animated, StyleSheet, Text, View } from "react-native";
 
 import type { Card } from "../engine/cards";
 import type { HandValue } from "../engine/score";
+import { useStrings } from "../i18n";
 import { CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
@@ -25,10 +26,12 @@ function FlyIn({ children, reduceMotion, animate }: { children: React.ReactNode;
 export function Hand({ cards, value, reduceMotion, highlight }: { cards: Card[]; value: HandValue; reduceMotion: boolean; highlight?: boolean }) {
   // Cards present at the first render (a resumed game) do not fly in.
   const initial = useState(() => new Set(cards))[0];
+  const str = useStrings();
+  const t = str.table.myHand;
   const n = cards.length;
   return (
     <View style={s.wrap} pointerEvents="none">
-      <View style={s.fan} accessible accessibilityLabel={`Twoja ręka: ${value.persian ? "perskie oczko" : value.bust ? `fura, ${value.total}` : `${value.total}`}`}>
+      <View style={s.fan} accessible accessibilityLabel={t.label(value)}>
         {cards.map((c, i) => {
           const f = fanCard(i, n);
           return (
@@ -42,10 +45,10 @@ export function Hand({ cards, value, reduceMotion, highlight }: { cards: Card[];
       </View>
       <View style={[s.total, value.bust && s.totalBust, value.persian && s.totalPersian, value.total === 21 && !value.bust && s.total21]}>
         <Text style={[s.totalText, value.persian && { color: P.onAccent, fontSize: 20 }]} accessibilityElementsHidden>
-          {value.persian ? "AA" : value.total}
+          {value.persian ? str.table.persianShort : value.total}
         </Text>
         <Text style={s.totalLabel} numberOfLines={1}>
-          {value.persian ? "perskie" : value.bust ? "fura" : value.soft ? "as = 11" : "Ty"}
+          {value.persian ? t.persian : value.bust ? t.bust : value.soft ? t.soft : str.common.you}
         </Text>
       </View>
     </View>

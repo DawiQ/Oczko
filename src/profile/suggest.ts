@@ -1,6 +1,7 @@
 // "Następny rywal": the character one level up from the strongest one you
 // beat in at least half of 2+ matches (and have not played much yet). Pure.
 import { PERSONAS, type Persona } from "../ai/personas";
+import { pl, type Strings } from "../i18n/pl";
 import type { Stats } from "../storage/stats";
 
 export const MIN_MATCHES = 2;
@@ -11,7 +12,7 @@ export interface Suggestion {
   reason: string;
 }
 
-export function suggestNext(s: Stats): Suggestion | null {
+export function suggestNext(s: Stats, str: Strings = pl): Suggestion | null {
   for (let i = PERSONAS.length - 2; i >= 0; i--) {
     const p = PERSONAS[i];
     const rec = s.byPersona[p.id];
@@ -19,7 +20,7 @@ export function suggestNext(s: Stats): Suggestion | null {
     const next = PERSONAS[i + 1];
     const played = s.byPersona[next.id]?.matches ?? 0;
     if (played >= 3) return null; // already playing the next one
-    return { persona: next, reason: `Wygrane z ${p.withName}: ${rec.won} z ${rec.matches}` };
+    return { persona: next, reason: str.profile.nextReason(str.personas[p.id].withName, rec.won, rec.matches) };
   }
   return null;
 }

@@ -7,6 +7,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PERSONAS, type PersonaId } from "../ai/personas";
 import { MAX_SEATS, type Rules } from "../engine/rules";
+import { useStrings } from "../i18n";
 import type { Length, NewGameChoices } from "../storage/newGame";
 import { BottomSheet } from "../ui/BottomSheet";
 import { Button3D } from "../ui/Button3D";
@@ -54,6 +55,8 @@ export function NewGameScreen({
   onBack: () => void;
 }) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
+  const t = str.newgame;
   const [choices, setChoices] = useState(initial);
   const [rules, setRules] = useState<Rules>({ ...rulesIn, mode: initial.mode });
   const [sheet, setSheet] = useState(false);
@@ -69,68 +72,69 @@ export function NewGameScreen({
     setRules({ ...rules, mode });
   };
   const over = total > limit;
+  const summary = summaryLine(rules, str);
   return (
     <View style={s.screen}>
-      <Header title={training ? "Trening" : "Nowa gra"} subtitle={training ? "Z podpowiedziami trenera" : undefined} onBack={onBack} />
+      <Header title={training ? t.training : t.title} subtitle={training ? t.trainingSub : undefined} onBack={onBack} />
       <ScrollView contentContainerStyle={[s.content, { paddingBottom: 24 }]}>
         <Segmented
-          label="Tryb gry"
+          label={t.modeA11y}
           value={choices.mode}
           onChange={setMode}
           options={[
-            { value: "family", label: "Rodzinne" },
-            { value: "bank", label: "Z bankierem" },
+            { value: "family", label: str.rules.modes.family },
+            { value: "bank", label: str.rules.modes.bank },
           ]}
         />
         <View style={s.rivalsHead}>
-          <Label>Rywale</Label>
-          <Text style={s.count} accessibilityLiveRegion="polite">{`Ty + ${total} · max ${limit}`}</Text>
+          <Label>{t.rivals}</Label>
+          <Text style={s.count} accessibilityLiveRegion="polite">{t.rivalsCount(total, limit)}</Text>
         </View>
         <View style={s.panel}>
           {PERSONAS.map((p, i) => (
             <View key={p.id} style={[s.persona, i === PERSONAS.length - 1 && { borderBottomWidth: 0 }]}>
-              <Portrait name={p.name} size={34} color={p.color} />
+              <Portrait name={str.personas[p.id].name} persona={p.id} size={34} color={p.color} />
               <View style={{ flex: 1, minWidth: 0 }}>
                 <View style={s.nameRow}>
-                  <Text style={s.name}>{p.name}</Text>
-                  <Text style={[s.badge, { color: p.color, backgroundColor: `${p.color}22` }]}>{p.label}</Text>
+                  <Text style={s.name}>{str.personas[p.id].name}</Text>
+                  <Text style={[s.badge, { color: p.color, backgroundColor: `${p.color}22` }]}>{str.personas[p.id].label}</Text>
                 </View>
                 <Text style={s.blurb} numberOfLines={1}>
-                  {p.blurb}
+                  {str.personas[p.id].blurb}
                 </Text>
               </View>
-              <Counter label={`${p.name} przy stole`} value={c[p.id]} min={0} max={Math.max(0, c[p.id] + limit - total)} onChange={(n) => setCount(p.id, n)} />
+              <Counter label={t.atTable(str.personas[p.id].name)} value={c[p.id]} min={0} max={Math.max(0, c[p.id] + limit - total)} onChange={(n) => setCount(p.id, n)} />
             </View>
           ))}
         </View>
-        {over && <Text style={s.warn}>{`Za dużo rywali dla tej talii — najwyżej ${limit}.`}</Text>}
+        {over && <Text style={s.warn}>{t.tooMany(limit)}</Text>}
         {!training && (
           <>
-            <Label>Do ilu punktów</Label>
+            <Label>{t.length}</Label>
             <Segmented
-              label="Długość partii"
+              label={t.lengthA11y}
               value={choices.length}
               onChange={(length: Length) => setChoices({ ...choices, length })}
               options={[
                 { value: 5, label: "5" },
                 { value: 10, label: "10" },
                 { value: 15, label: "15" },
-                { value: "single", label: "1 runda" },
+                { value: "single", label: str.common.rounds(1) },
               ]}
             />
           </>
         )}
-        <Pressable style={[s.panel, s.rules]} onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={`Zasady: ${summaryLine(rules)}. Zmień`}>
+        <Pressable style={[s.panel, s.rules]} onPress={() => setSheet(true)} accessibilityRole="button" accessibilityLabel={t.rulesA11y(summary)}>
           <View style={{ flex: 1 }}>
-            <Text style={s.name}>Zasady</Text>
-            <Text style={s.blurb}>{summaryLine(rules)}</Text>
+            <Text style={s.name}>{t.rules}</Text>
+            <Text style={s.blurb}>{summary}</Text>
           </View>
-          <Text style={s.change}>Zmień</Text>
+          <Text style={s.change}>{t.change}</Text>
         </Pressable>
       </ScrollView>
       <View style={[s.footer, { paddingBottom: insets.bottom + 12 }]}>
         <Button3D
-          label="Graj"
+          label={t.play}
           big
           disabled={total === 0 || over}
           onPress={() => onStart(choices, { ...rules, mode: choices.mode, target: choices.length === "single" ? 1 : choices.length })}
@@ -138,7 +142,7 @@ export function NewGameScreen({
         />
       </View>
       {sheet && (
-        <BottomSheet snapPoints={[560]} onClose={() => setSheet(false)} accessibilityLabel="Zasady tej gry" dimFrom={0} header={<Text style={s.sheetTitle}>Zasady tej gry</Text>}>
+        <BottomSheet snapPoints={[560]} onClose={() => setSheet(false)} accessibilityLabel={t.sheetTitle} dimFrom={0} header={<Text style={s.sheetTitle}>{t.sheetTitle}</Text>}>
           <RulesEditor
             rules={rules}
             onChange={(r) => {

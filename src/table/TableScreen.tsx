@@ -9,6 +9,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context";
 import { cardOf } from "../engine/cards";
 import type { RoundEvent } from "../engine/round";
 import type { GameSnapshot, TableGame } from "../game/TableGame";
+import { useStrings, type Strings } from "../i18n";
 import type { KV } from "../storage/kv";
 import { ART } from "../ui/art";
 import { BottomSheet } from "../ui/BottomSheet";
@@ -23,7 +24,7 @@ import { P } from "../ui/palette";
 import { playSound } from "../ui/sound";
 import { FuraStamp, PersianOverlay } from "./Effects";
 import { Hand } from "./Hand";
-import { HINT_TEXT, hintFor, loadHints, saveHints, type HintId } from "./hints";
+import { hintFor, hintText, loadHints, saveHints, type HintId } from "./hints";
 import { opponentsOf, PORTRAIT_SIZE, seatSize, seatSpots } from "./layout";
 import { OpponentSeat, ScorePop } from "./OpponentSeat";
 import { MatchEndPanel, RoundEndPanel, ScoreBars } from "./RoundEnd";
@@ -31,11 +32,12 @@ import { caption } from "./texts";
 
 const ACES = [cardOf(14, 0), cardOf(14, 3)];
 
-function modeLine(s: GameSnapshot): string {
-  const mode = s.rules.mode === "bank" ? "Z bankierem" : "Rodzinne";
-  if (s.mode === "single") return `${mode} · jedna runda`;
-  if (s.mode === "training") return `${mode} · trening`;
-  return `${mode} · do ${s.target} pkt`;
+function modeLine(snap: GameSnapshot, s: Strings): string {
+  const t = s.table.top;
+  const mode = snap.rules.mode === "bank" ? t.bank : t.family;
+  if (snap.mode === "single") return t.single(mode);
+  if (snap.mode === "training") return t.training(mode);
+  return t.match(mode, snap.target);
 }
 
 /** Sounds and haptics for new events. */
@@ -116,6 +118,8 @@ export function TableScreen({
   menuExtra?: ReactNode;
 }) {
   const snap = useSyncExternalStore(game.subscribe, game.getSnapshot);
+  const str = useStrings();
+  const t = str.table;
   const insets = useSafeAreaInsets();
   const confirm = useConfirm();
   const reduceMotion = useReduceMotion();
@@ -186,7 +190,7 @@ export function TableScreen({
 
   const giveUp = async () => {
     setMenu(false);
-    if (await confirm({ title: "Poddać partię?", message: "Partia zostanie zakończona bez zapisu wyniku.", confirmText: "Poddaj", destructive: true })) {
+    if (await confirm({ title: t.menu.giveUpTitle, message: t.menu.giveUpMessage, confirmText: t.menu.giveUpConfirm, destructive: true })) {
       game.abandon();
       onGiveUp?.();
       onExit();
@@ -197,16 +201,16 @@ export function TableScreen({
     <View style={s.screen}>
       <View style={[s.top, { paddingTop: insets.top + 6 }]}>
         <Image source={ART.woodTop} style={StyleSheet.absoluteFill} resizeMode="cover" />
-        <Pressable style={s.bandBtn} onPress={() => setMenu(true)} accessibilityRole="button" accessibilityLabel="Menu" hitSlop={4}>
+        <Pressable style={s.bandBtn} onPress={() => setMenu(true)} accessibilityRole="button" accessibilityLabel={t.top.menu} hitSlop={4}>
           <Image source={ART.iconMenu} style={s.bandIcon} />
         </Pressable>
         <View style={s.titleBox}>
           <Text style={s.title} accessibilityRole="header">
-            {`Runda ${snap.roundNo}`}
+            {t.top.round(snap.roundNo)}
           </Text>
-          <Text style={s.subtitle}>{modeLine(snap)}</Text>
+          <Text style={s.subtitle}>{modeLine(snap, str)}</Text>
         </View>
-        <View style={s.bandBtn} accessible accessibilityLabel={`Twoje punkty: ${me.score} z ${snap.target}`}>
+        <View style={s.bandBtn} accessible accessibilityLabel={t.top.myScore(me.score, snap.target)}>
           <ScorePop value={me.score} reduceMotion={reduceMotion}>
             <Text style={s.myScore}>{me.score}</Text>
           </ScorePop>
@@ -225,7 +229,7 @@ export function TableScreen({
           </View>
         ))}
 
-        <View style={[s.stock, { top: felt.h * 0.44 - 40 }]} accessible accessibilityLabel={`Talia: ${snap.view.stockLeft} kart`}>
+        <View style={[s.stock, { top: felt.h * 0.44 - 40 }]} accessible accessibilityLabel={t.stock(snap.view.stockLeft)}>
           {[0, 1, 2].map((i) => (
             <CardBack key={i} size="md" style={[s.stockCard, { left: i * 1.5, top: -i * 1.5 }]} />
           ))}
@@ -233,7 +237,7 @@ export function TableScreen({
 
         <View style={[s.captionBox, { top: felt.h * 0.44 + 38 }]}>
           <Text style={s.caption} accessibilityLiveRegion="polite" numberOfLines={2}>
-            {caption(snap)}
+            {caption(snap, str)}
           </Text>
         </View>
 
@@ -247,9 +251,9 @@ export function TableScreen({
 
         {hint && (
           <View style={s.tip} accessibilityLiveRegion="polite">
-            <Text style={s.tipText}>{HINT_TEXT[hint]}</Text>
-            <Pressable onPress={dismissHint} style={s.tipBtn} accessibilityRole="button" accessibilityLabel="Rozumiem">
-              <Text style={s.tipBtnText}>OK</Text>
+            <Text style={s.tipText}>{hintText(hint, str)}</Text>
+            <Pressable onPress={dismissHint} style={s.tipBtn} accessibilityRole="button" accessibilityLabel={t.hintOkLabel}>
+              <Text style={s.tipBtnText}>{t.hintOk}</Text>
             </Pressable>
           </View>
         )}
@@ -265,33 +269,33 @@ export function TableScreen({
         {myTurn ? (
           <>
             <Button3D
-              label="Dobieram"
+              label={t.actions.hit}
               tone={recommend === "hit" ? "accent" : "dark"}
               disabled={!canHit}
               onPress={() => game.hit()}
               style={s.btn}
               big
               testID="hit"
-              accessibilityHint="Bierze jedną kartę z talii"
+              accessibilityHint={t.actions.hitHint}
             />
             <Button3D
-              label="Starczy"
+              label={t.actions.stand}
               tone={recommend === "hit" ? "dark" : "accent"}
               disabled={!canStand}
               onPress={() => game.stand()}
               style={[s.btn, (at21 || recommend === "stand") && s.glow]}
               big
               testID="stand"
-              accessibilityHint="Kończy dobieranie w tej rundzie"
+              accessibilityHint={t.actions.standHint}
             />
           </>
         ) : (
           <>
-            <Button3D label="Dobieram" tone="off" disabled style={s.btn} big />
+            <Button3D label={t.actions.hit} tone="off" disabled style={s.btn} big />
             {snap.canSkip ? (
-              <Button3D label="Pokaż wynik" tone="dark" onPress={() => game.skipToEnd()} style={s.btn} big testID="skip" accessibilityHint="Rozgrywa resztę rundy od razu" />
+              <Button3D label={t.actions.skip} tone="dark" onPress={() => game.skipToEnd()} style={s.btn} big testID="skip" accessibilityHint={t.actions.skipHint} />
             ) : (
-              <Button3D label="Starczy" tone="off" disabled style={s.btn} big />
+              <Button3D label={t.actions.stand} tone="off" disabled style={s.btn} big />
             )}
           </>
         )}
@@ -318,21 +322,21 @@ export function TableScreen({
       )}
 
       {menu && (
-        <BottomSheet snapPoints={[420]} onClose={() => setMenu(false)} accessibilityLabel="Menu stołu" dimFrom={0}>
-          <Text style={s.menuTitle}>Menu</Text>
-          <MenuItem label="Zasady" onPress={() => (setMenu(false), onRules())} />
+        <BottomSheet snapPoints={[420]} onClose={() => setMenu(false)} accessibilityLabel={t.menu.label} dimFrom={0}>
+          <Text style={s.menuTitle}>{t.menu.title}</Text>
+          <MenuItem label={t.menu.rules} onPress={() => (setMenu(false), onRules())} />
           <View style={s.menuScores}>
-            <Text style={s.menuLabel}>{`Punkty · do ${snap.target}`}</Text>
+            <Text style={s.menuLabel}>{t.pointsTo(snap.target)}</Text>
             <ScoreBars snap={snap} />
           </View>
           {menuExtra}
           {onGiveUp ? (
             <>
-              <MenuItem label="Wyjdź do lobby" hint="Partia zostanie zapisana" onPress={() => (setMenu(false), onExit())} />
-              <MenuItem label="Poddaj partię" danger onPress={() => void giveUp()} />
+              <MenuItem label={t.menu.exit} hint={t.menu.exitHint} onPress={() => (setMenu(false), onExit())} />
+              <MenuItem label={t.menu.giveUp} danger onPress={() => void giveUp()} />
             </>
           ) : (
-            <MenuItem label="Opuść stół" danger onPress={() => (setMenu(false), onExit())} />
+            <MenuItem label={t.menu.leave} danger onPress={() => (setMenu(false), onExit())} />
           )}
         </BottomSheet>
       )}

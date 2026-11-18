@@ -21,6 +21,7 @@ import {
 } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
+import { useStrings } from "../i18n";
 import { P } from "./palette";
 
 export interface BottomSheetProps {
@@ -56,6 +57,7 @@ export function BottomSheet({
   handleHints,
 }: BottomSheetProps) {
   const insets = useSafeAreaInsets();
+  const str = useStrings();
   // By value: callers pass a fresh array each render, and the gesture handler
   // below is rebuilt whenever `snaps` changes.
   const snapKey = snapPoints.join(",");
@@ -171,7 +173,7 @@ export function BottomSheet({
         pointerEvents={blocking ? "auto" : "none"}
         style={[StyleSheet.absoluteFill, s.backdrop, { opacity: backdropOpacity }]}
       >
-        <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel="Zamknij" />
+        <Pressable style={StyleSheet.absoluteFill} onPress={close} accessibilityLabel={str.common.close} />
       </Animated.View>
       <Animated.View
         style={[s.sheet, { height, paddingBottom: insets.bottom }]}
@@ -183,11 +185,11 @@ export function BottomSheet({
             onPress={cycle}
             style={s.handleArea}
             accessibilityRole="adjustable"
-            accessibilityLabel="Zmień wysokość panelu"
-            accessibilityHint="Przeciągnij w górę lub w dół albo stuknij, aby przełączyć wysokość"
+            accessibilityLabel={str.ui.sheetHandle}
+            accessibilityHint={str.ui.sheetHint}
             accessibilityActions={[
-              { name: "increment", label: "Wyżej" },
-              { name: "decrement", label: "Niżej" },
+              { name: "increment", label: str.ui.sheetUp },
+              { name: "decrement", label: str.ui.sheetDown },
             ]}
             onAccessibilityAction={(e) =>
               e.nativeEvent.actionName === "increment" ? snapTo(index + 1) : index === 0 ? close() : snapTo(index - 1)

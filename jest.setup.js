@@ -48,6 +48,7 @@ jest.mock("react-native-tcp-socket", () => ({
   },
 }));
 jest.mock("expo-network", () => ({ getIpAddressAsync: () => Promise.resolve("192.168.1.40") }));
+jest.mock("expo-localization", () => ({ getLocales: () => [{ languageCode: "pl", languageTag: "pl-PL" }] }));
 jest.mock("expo-camera", () => ({
   CameraView: () => null,
   useCameraPermissions: () => [{ granted: false, canAskAgain: true }, () => Promise.resolve({ granted: false }), () => Promise.resolve({ granted: false })],

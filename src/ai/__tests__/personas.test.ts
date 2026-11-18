@@ -1,13 +1,15 @@
 import { STRENGTH } from "../calibration";
+import { pl } from "../../i18n/pl";
 import { PERSONAS, personaById, seatNames } from "../personas";
 
 describe("personas", () => {
   it("have unique ids, names and colours", () => {
     expect(new Set(PERSONAS.map((p) => p.id)).size).toBe(PERSONAS.length);
-    expect(new Set(PERSONAS.map((p) => p.name)).size).toBe(PERSONAS.length);
+    expect(new Set(PERSONAS.map((p) => pl.personas[p.id].name)).size).toBe(PERSONAS.length);
     expect(new Set(PERSONAS.map((p) => p.color)).size).toBe(PERSONAS.length);
     expect(PERSONAS.length).toBeGreaterThanOrEqual(8);
-    expect(personaById("hrabia")?.name).toBe("Hrabia");
+    expect(personaById("hrabia")?.color).toBe("#B39DFF");
+    expect(pl.personas.hrabia.name).toBe("Hrabia");
     expect(personaById("nikt")).toBeUndefined();
   });
 
@@ -19,6 +21,6 @@ describe("personas", () => {
   });
 
   it("number repeated characters", () => {
-    expect(seatNames(["ola", "hrabia", "ola", "ola"])).toEqual(["Ola", "Hrabia", "Ola II", "Ola III"]);
+    expect(seatNames(["ola", "hrabia", "ola", "ola"], (id) => pl.personas[id].name)).toEqual(["Ola", "Hrabia", "Ola II", "Ola III"]);
   });
 });

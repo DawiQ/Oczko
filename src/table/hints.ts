@@ -1,27 +1,25 @@
 // One-time tips at the first situations (oczko.hints.v1).
 import type { GameSnapshot } from "../game/TableGame";
+import { pl, type Strings } from "../i18n/pl";
 import { readJSON, writeJSON, type KV } from "../storage/kv";
 
 export const HINTS_KEY = "oczko.hints.v1";
 
 export type HintId = "firstTurn" | "first21" | "firstBust" | "bank" | "persian";
 
-export const HINT_TEXT: Record<HintId, string> = {
-  firstTurn: "„Dobieram” bierze kartę, „Starczy” kończy ruch. Punkt dostaje wynik najbliżej 21.",
-  first21: "Masz 21 — wyżej się nie da. Powiedz „Starczy”.",
-  firstBust: "Fura: więcej niż 21 przegrywa. Przy 17 i więcej każda karta to spore ryzyko.",
-  bank: "Gra z bankierem: każdy gra tylko z bankiem, a bank rusza się ostatni i wygrywa remisy.",
-  persian: "Perskie oczko: dwa asy wygrywają ze wszystkim.",
-};
+/** Every tip (texts: `s.table.hints[id]`). */
+export const HINT_IDS: readonly HintId[] = ["firstTurn", "first21", "firstBust", "bank", "persian"];
+
+/** The tip in words. */
+export const hintText = (id: HintId, s: Strings = pl): string => s.table.hints[id];
 
 export interface HintsState {
   v: 1;
   seen: HintId[];
 }
 
-const IDS = Object.keys(HINT_TEXT);
 export const looksLikeHints = (x: unknown): x is HintsState =>
-  typeof x === "object" && x !== null && (x as HintsState).v === 1 && Array.isArray((x as HintsState).seen) && (x as HintsState).seen.every((h) => IDS.includes(h));
+  typeof x === "object" && x !== null && (x as HintsState).v === 1 && Array.isArray((x as HintsState).seen) && (x as HintsState).seen.every((h) => HINT_IDS.includes(h));
 
 export const loadHints = async (kv: KV): Promise<HintId[]> => (await readJSON(kv, HINTS_KEY, looksLikeHints))?.seen ?? [];
 export const saveHints = (kv: KV, seen: HintId[]) => writeJSON(kv, HINTS_KEY, { v: 1, seen });

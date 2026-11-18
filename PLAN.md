@@ -484,7 +484,7 @@ aktualizacja README. Przed Etapami 5, 6 i 10 — makieta (HTML) do akceptacji
 - **Gotowe, gdy:** build AAB i iOS przechodzi, checklista RELEASE.md
   wypełniona.
 
-### Etap 12 — Infrastruktura wielu języków (bez widocznej zmiany) ⏳
+### Etap 12 — Infrastruktura wielu języków (bez widocznej zmiany) ✅
 Szczegóły i decyzje: §12. Po tym etapie aplikacja nadal jest tylko po polsku,
 ale żaden tekst UI nie jest już wpisany w komponent.
 - `src/i18n/`: typ `Lang`, słownik bazowy `pl.ts` (obiekt z kluczami
@@ -654,7 +654,13 @@ punkty, bez stawek; nigdy „blackjack”/„casino” w nazwie ani słowach
 kluczowych; kwestionariusze ocen wiekowych z tymi samymi odpowiedziami co
 dla Polski (`store/rating-answers.md`).
 
-**Do sprawdzenia w Etapie 12:** obsługa `locales` w `app.json` dla Androida
-w SDK 58 (nazwa aplikacji per język), dostępność `Intl` w Hermes (jeśli
-pewna — formatowanie dat historii przez `Intl.DateTimeFormat`), czcionka
-z cyrylicą pasująca do Fraunces.
+**Ustalenia z Etapu 12:**
+- Daty i liczby formatują funkcje słownika (bez `Intl`).
+- Czcionka dla cyrylicy (Etap 15): Literata ExtraBold
+  (`@expo-google-fonts/literata`, SIL OFL; cyrylica i greka). Do tego czasu
+  system rysuje brakujące znaki czcionką systemową.
+- Moduły bez Reacta mają domyślny parametr `s = pl`: w Etapie 13 test dymny
+  aplikacji po angielsku sprawdza, że na ekranie nie ma polskich liter
+  (wykrywa wywołanie bez słownika).
+- Do sprawdzenia w Etapie 13: `locales` w `app.json` dla Androida w SDK 58
+  (nazwa aplikacji per język).

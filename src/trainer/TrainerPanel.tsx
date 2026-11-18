@@ -6,6 +6,7 @@ import { Pressable, StyleSheet, Text, View } from "react-native";
 import { chunkedEvaluator, type ChunkedEvaluator, type Evaluation } from "../ai/evaluate";
 import { splitmix32 } from "../engine/rng";
 import type { GameSnapshot } from "../game/TableGame";
+import { useStrings } from "../i18n";
 import { P } from "../ui/palette";
 
 export const TRAINER_SAMPLES = 1500;
@@ -61,17 +62,19 @@ function Bar({ label, value, best }: { label: string; value: number; best: boole
 }
 
 export function TrainerPanel({ evaluation, onMore }: { evaluation: Evaluation | "locked" | null; /** Locked: more hints (Oczko Pro). */ onMore?: () => void }) {
+  const str = useStrings();
+  const t = str.table.trainer;
   if (evaluation === "locked")
     return (
-      <Pressable style={s.panel} onPress={onMore} accessibilityRole="button" accessibilityLabel="Dzisiejsze podpowiedzi wykorzystane. Więcej w Oczko Pro">
-        <Text style={s.title}>Trener · dzisiejsze podpowiedzi wykorzystane</Text>
-        <Text style={s.bust}>Więcej: Oczko Pro albo reklama w ustawieniach (poza rundą).</Text>
+      <Pressable style={s.panel} onPress={onMore} accessibilityRole="button" accessibilityLabel={t.lockedLabel}>
+        <Text style={s.title}>{t.lockedTitle}</Text>
+        <Text style={s.bust}>{t.lockedMore}</Text>
       </Pressable>
     );
   if (!evaluation)
     return (
-      <View style={s.panel} accessible accessibilityLabel="Trener liczy szanse">
-        <Text style={s.title}>Trener · liczę szanse…</Text>
+      <View style={s.panel} accessible accessibilityLabel={t.computingLabel}>
+        <Text style={s.title}>{t.computing}</Text>
       </View>
     );
   const e = evaluation;
@@ -81,16 +84,17 @@ export function TrainerPanel({ evaluation, onMore }: { evaluation: Evaluation | 
       style={s.panel}
       accessible
       accessibilityLiveRegion="polite"
-      accessibilityLabel={`Trener: szansa na furę ${pct(e.bustIfHit)}. Starczy ${pct(e.winIfStand)}, Dobieram ${pct(e.winIfHit)}. Lepiej: ${hitBest ? "Dobieram" : "Starczy"}.`}
+      accessibilityLabel={t.label(pct(e.bustIfHit), pct(e.winIfStand), pct(e.winIfHit), hitBest)}
     >
       <View style={s.head}>
-        <Text style={s.title}>Trener</Text>
+        <Text style={s.title}>{t.title}</Text>
         <Text style={s.bust}>
-          Szansa na furę: <Text style={{ color: P.danger, fontWeight: "800" }}>{pct(e.bustIfHit)}</Text>
+          {t.bustChance}
+          <Text style={{ color: P.danger, fontWeight: "800" }}>{pct(e.bustIfHit)}</Text>
         </Text>
       </View>
-      <Bar label="Starczy" value={e.winIfStand} best={!hitBest} />
-      <Bar label="Dobieram" value={e.winIfHit} best={hitBest} />
+      <Bar label={str.table.actions.stand} value={e.winIfStand} best={!hitBest} />
+      <Bar label={str.table.actions.hit} value={e.winIfHit} best={hitBest} />
     </View>
   );
 }

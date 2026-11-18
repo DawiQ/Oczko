@@ -1,10 +1,10 @@
 // The history of matches: newest first, export as JSON, open a replay.
 import { FlatList, Pressable, Share, StyleSheet, Text, View } from "react-native";
 
+import { pl, useStrings, type Strings } from "../i18n";
 import { DISPLAY } from "../ui/fonts";
 import { Header } from "../ui/Header";
 import { P } from "../ui/palette";
-import { plural } from "../ui/plural";
 import { exportHistory } from "../storage/history";
 import type { HistoryRecord } from "./record";
 
@@ -15,15 +15,17 @@ export function shortDate(ms: number): string {
   return `${two(d.getDate())}.${two(d.getMonth() + 1)}, ${two(d.getHours())}:${two(d.getMinutes())}`;
 }
 
-export function recordTitle(r: HistoryRecord): string {
-  if (r.winner === null) return "Partia przerwana";
-  return r.winner === r.me ? "Partia dla Ciebie" : `Wygrywa ${r.setup.seats[r.winner].name}`;
+export function recordTitle(r: HistoryRecord, s: Strings = pl): string {
+  const t = s.history.list;
+  if (r.winner === null) return t.aborted;
+  return r.winner === r.me ? t.mine : t.wins(r.setup.seats[r.winner].name);
 }
 
-export function recordLine(r: HistoryRecord): string {
-  const mode = r.setup.rules.mode === "bank" ? "Z bankierem" : "Rodzinne";
-  const rivals = r.setup.seats.filter((_, i) => i !== r.me).map((s) => s.name).join(", ");
-  return `${mode} · ${r.rounds} ${plural(r.rounds, "runda", "rundy", "rund")} · ${rivals}`;
+export function recordLine(r: HistoryRecord, s: Strings = pl): string {
+  const t = s.history.list;
+  const mode = r.setup.rules.mode === "bank" ? t.bank : t.family;
+  const rivals = r.setup.seats.filter((_, i) => i !== r.me).map((x) => x.name).join(", ");
+  return t.line(mode, r.rounds, rivals);
 }
 
 export function HistoryScreen({
@@ -46,21 +48,23 @@ export function HistoryScreen({
   /** Shown under the list when some records are locked. */
   onMore?: () => void;
 }) {
+  const str = useStrings();
+  const t = str.history.list;
   const shown = records.slice(0, limit);
   const locked = records.length - shown.length;
   const doExport = () => {
     if (!canExport) return onExportLocked?.();
-    void Share.share({ title: "Oczko — historia", message: exportHistory(shown) }).catch(() => {});
+    void Share.share({ title: t.shareTitle, message: exportHistory(shown) }).catch(() => {});
   };
   return (
     <View style={s.screen}>
       <Header
-        title="Historia"
+        title={t.title}
         onBack={onBack}
         right={
           shown.length ? (
-            <Pressable onPress={doExport} style={s.export} accessibilityRole="button" accessibilityLabel="Eksportuj historię (JSON)">
-              <Text style={s.exportText}>Eksport</Text>
+            <Pressable onPress={doExport} style={s.export} accessibilityRole="button" accessibilityLabel={t.exportLabel}>
+              <Text style={s.exportText}>{t.export}</Text>
             </Pressable>
           ) : undefined
         }
@@ -69,19 +73,19 @@ export function HistoryScreen({
         data={shown}
         keyExtractor={(r) => r.id}
         contentContainerStyle={s.list}
-        ListEmptyComponent={<Text style={s.empty}>Tu pojawią się rozegrane partie — z powtórką ruch po ruchu.</Text>}
+        ListEmptyComponent={<Text style={s.empty}>{t.empty}</Text>}
         renderItem={({ item }) => {
           const me = item.scores[item.me];
           const won = item.winner === item.me;
           return (
-            <Pressable style={s.row} onPress={() => onOpen(item)} accessibilityRole="button" accessibilityLabel={`${recordTitle(item)}, ${recordLine(item)}, ${shortDate(item.date)}`}>
+            <Pressable style={s.row} onPress={() => onOpen(item)} accessibilityRole="button" accessibilityLabel={t.rowLabel(recordTitle(item, str), recordLine(item, str), shortDate(item.date))}>
               <View style={[s.score, won && { backgroundColor: P.accent }]}>
                 <Text style={[s.scoreText, won && { color: P.onAccent }]}>{me}</Text>
               </View>
               <View style={{ flex: 1 }}>
-                <Text style={s.title}>{recordTitle(item)}</Text>
+                <Text style={s.title}>{recordTitle(item, str)}</Text>
                 <Text style={s.line} numberOfLines={1}>
-                  {recordLine(item)}
+                  {recordLine(item, str)}
                 </Text>
               </View>
               <Text style={s.date}>{shortDate(item.date)}</Text>
@@ -90,8 +94,8 @@ export function HistoryScreen({
         }}
         ListFooterComponent={
           locked > 0 ? (
-            <Pressable style={s.more} onPress={onMore} accessibilityRole="button" accessibilityLabel={`Jeszcze ${locked} w Oczko Pro`}>
-              <Text style={s.moreText}>{`Jeszcze ${locked} ${plural(locked, "partia", "partie", "partii")} w Oczko Pro`}</Text>
+            <Pressable style={s.more} onPress={onMore} accessibilityRole="button" accessibilityLabel={t.moreLabel(locked)}>
+              <Text style={s.moreText}>{t.more(locked)}</Text>
             </Pressable>
           ) : undefined
         }

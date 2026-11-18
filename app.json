@@ -71,7 +71,8 @@
           "delayAppMeasurementInit": true
         }
       ],
-      "./plugins/withReleaseSigning"
+      "./plugins/withReleaseSigning",
+      "expo-localization"
     ],
     "extra": {
       "monetization": {

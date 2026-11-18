@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import { Animated, StyleSheet, Text, View } from "react-native";
 
 import type { SeatInfo } from "../game/TableGame";
+import { useStrings } from "../i18n";
+import { pl, type Strings } from "../i18n/pl";
 import { CardBack, CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
-import { plural } from "../ui/plural";
 import { Portrait } from "../ui/Portrait";
 import { PORTRAIT_SIZE, type SeatSize } from "./layout";
 import { statusLabel } from "./texts";
@@ -64,25 +65,27 @@ const ps = StyleSheet.create({
   plus: { position: "absolute", top: -6, left: -4, right: -4, textAlign: "center", color: P.accent, fontFamily: DISPLAY, fontSize: 16 },
 });
 
-export function seatA11y(seat: SeatInfo): string {
-  const parts = [seat.name, `${seat.cards} ${plural(seat.cards, "karta", "karty", "kart")}`];
-  const st = statusLabel(seat);
+export function seatA11y(seat: SeatInfo, s: Strings = pl): string {
+  const t = s.table.seat;
+  const parts = [seat.name, s.common.cards(seat.cards)];
+  const st = statusLabel(seat, s);
   if (st) parts.push(st);
-  if (seat.value && !seat.value.persian) parts.push(seat.value.bust ? `fura, ${seat.value.total}` : `wynik ${seat.value.total}`);
-  if (seat.isBank) parts.push("bank");
-  if (seat.isDealer) parts.push("rozdaje");
-  parts.push(`${seat.score} ${plural(seat.score, "punkt", "punkty", "punktów")}`);
+  if (seat.value && !seat.value.persian) parts.push(seat.value.bust ? t.bust(seat.value.total) : t.total(seat.value.total));
+  if (seat.isBank) parts.push(t.bank);
+  if (seat.isDealer) parts.push(t.dealer);
+  parts.push(s.common.points(seat.score));
   return parts.join(", ");
 }
 
 export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; size: SeatSize; reduceMotion: boolean }) {
+  const str = useStrings();
   const p = PORTRAIT_SIZE[size];
-  const status = statusLabel(seat);
+  const status = statusLabel(seat, str);
   const shown = seat.hand;
   return (
-    <View style={[s.seat, { width: p + 56 }, seat.status === "bust" && s.dim]} accessible accessibilityLabel={seatA11y(seat)}>
+    <View style={[s.seat, { width: p + 56 }, seat.status === "bust" && s.dim]} accessible accessibilityLabel={seatA11y(seat, str)}>
       <View>
-        <Portrait name={seat.name} size={p} color={seat.color} ring={seat.color} />
+        <Portrait name={seat.name} persona={seat.persona} size={p} color={seat.color} ring={seat.color} />
         <View style={[s.score, { borderColor: seat.color }]}>
           <ScorePop value={seat.score} reduceMotion={reduceMotion}>
             <Text style={s.scoreText}>{seat.score}</Text>
@@ -90,12 +93,12 @@ export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; siz
         </View>
         {seat.isBank && (
           <View style={s.bank}>
-            <Text style={s.bankText}>BANK</Text>
+            <Text style={s.bankText}>{str.table.seat.bankMark}</Text>
           </View>
         )}
         {seat.isDealer && !seat.isBank && (
           <View style={s.dealer}>
-            <Text style={s.dealerText}>R</Text>
+            <Text style={s.dealerText}>{str.table.seat.dealerMark}</Text>
           </View>
         )}
       </View>

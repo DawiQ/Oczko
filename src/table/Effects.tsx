@@ -4,11 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import { Animated, Easing, Pressable, StyleSheet, Text, View } from "react-native";
 
 import type { Card } from "../engine/cards";
+import { useStrings } from "../i18n";
 import { CardFace } from "../ui/cards";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
 
 export function FuraStamp({ reduceMotion }: { reduceMotion: boolean }) {
+  const str = useStrings();
   const v = useState(() => new Animated.Value(reduceMotion ? 1 : 0))[0];
   useEffect(() => {
     if (reduceMotion) return;
@@ -17,7 +19,7 @@ export function FuraStamp({ reduceMotion }: { reduceMotion: boolean }) {
   const scale = v.interpolate({ inputRange: [0, 1], outputRange: [2.2, 1] });
   return (
     <Animated.View style={[s.stamp, { opacity: v, transform: [{ rotate: "-10deg" }, { scale }] }]} pointerEvents="none" accessibilityElementsHidden>
-      <Text style={s.stampText}>Fura!</Text>
+      <Text style={s.stampText}>{str.table.effects.fura}</Text>
     </Animated.View>
   );
 }
@@ -70,6 +72,7 @@ export function Confetti({ count = 28, reduceMotion }: { count?: number; reduceM
 
 /** "Perskie oczko!": rays, two aces flying in, the title; closes by itself. */
 export function PersianOverlay({ name, aces, onDone, reduceMotion }: { name: string | null; aces: Card[]; onDone: () => void; reduceMotion: boolean }) {
+  const t = useStrings().table.effects;
   const enter = useState(() => new Animated.Value(reduceMotion ? 1 : 0))[0];
   const spin = useState(() => new Animated.Value(0))[0];
   useEffect(() => {
@@ -88,7 +91,7 @@ export function PersianOverlay({ name, aces, onDone, reduceMotion }: { name: str
   const rotate = spin.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] });
   const scale = enter.interpolate({ inputRange: [0, 1], outputRange: [0.3, 1] });
   return (
-    <Pressable style={s.overlay} onPress={onDone} accessibilityViewIsModal accessibilityRole="alert" accessibilityLabel={`${name ? `${name}: ` : ""}Perskie oczko!`}>
+    <Pressable style={s.overlay} onPress={onDone} accessibilityViewIsModal accessibilityRole="alert" accessibilityLabel={t.persianA11y(name)}>
       <Animated.View style={[s.rays, { transform: [{ rotate }] }]} pointerEvents="none">
         {Array.from({ length: RAYS }, (_, i) => (
           <View key={i} style={[s.ray, { transform: [{ rotate: `${(i * 180) / RAYS}deg` }] }]} />
@@ -100,8 +103,8 @@ export function PersianOverlay({ name, aces, onDone, reduceMotion }: { name: str
             <CardFace key={c} card={c} size="lg" style={{ transform: [{ rotate: i ? "10deg" : "-10deg" }, { translateX: i ? -8 : 8 }] }} />
           ))}
         </View>
-        <Text style={s.title}>Perskie{"\n"}oczko!</Text>
-        <Text style={s.sub}>{name ? `${name} — dwa asy wygrywają wszystko` : "Dwa asy — ta ręka wygrywa wszystko"}</Text>
+        <Text style={s.title}>{t.persianTitle}</Text>
+        <Text style={s.sub}>{t.persianSub(name)}</Text>
       </Animated.View>
       <Confetti reduceMotion={reduceMotion} />
     </Pressable>

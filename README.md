@@ -19,6 +19,8 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 9 | Gra przez Wi‑Fi: stół u gospodarza, goście, kod, QR, mDNS, rozłączenia | gotowe |
 | 10 | Oczko Pro, portfel dzienny, reklamy z nagrodą, wygląd | gotowe |
 | 11 | Grafiki (portrety, sklep), dźwięki, `build.js`, EAS, podpisywanie, teksty sklepu | gotowe |
+| 12 | Wiele języków — infrastruktura: słowniki, wybór języka, protokół Wi‑Fi v2 | gotowe |
+| 13–15 | Angielski i niemiecki; czeski, słowacki, węgierski; ukraiński, rosyjski, BCMS | plan (`PLAN.md`) |
 
 ## Uruchomienie
 
@@ -86,7 +88,8 @@ src/newgame/            NewGameScreen (rywale − n +, tryb, długość, reguły
                         RulesEditor (wszystkie warianty), HouseRulesScreen, rulesText (opisy)
 src/info/RulesScreen    zasady: rodzinne, z bankierem, warianty, przykłady rąk, wartości kart
 src/home/SettingsSheet  dźwięk, wibracje, trener, tempo rywali, reguły domowe, wskazówki od nowa
-src/storage/settings, houseRules, onboarding, newGame   oczko.settings / rules / onboarding / newgame .v1
+src/storage/settings, houseRules, onboarding, newGame   oczko.settings.v2 (język) / rules / onboarding / newgame .v1
+src/i18n/               słowniki (pl/…), useStrings, I18nProvider, wybór języka, liczba mnoga
 src/trainer/TrainerPanel  trener przy ręce: P(fura), Starczy / Dobieram (%), lepszy przycisk
                         podświetlony; ewaluator w kawałkach; tylko z widoku gracza
 src/history/            record (partia = ziarno + reguły + decyzje, powtórka z silnika),
@@ -179,11 +182,29 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
   **blokada kategorii „Gambling & Betting” i „Social Casino”**, UMP).
   Bez kluczy aplikacja działa: zakupy niedostępne, reklam brak.
 
+## Języki
+
+- Teksty w słownikach `src/i18n/<język>/` (sekcje wg obszarów aplikacji);
+  bazowy `pl` wyznacza typ `Strings` — kompilator i test kształtu pilnują,
+  że każdy język ma te same klucze i funkcje.
+- Komponenty: `useStrings()`; moduły bez Reacta (np. `table/texts.ts`,
+  `newgame/rulesText.ts`) dostają słownik parametrem.
+- Język: telefonu (`expo-localization`) albo wybrany w Ustawieniach
+  (`oczko.settings.v2`, pole `lang`; wiersz „Język” pojawia się przy co
+  najmniej dwóch językach). Zapasowy: angielski (gdy dostępny).
+- Liczba mnoga: `src/i18n/plural.ts` (pl, cs/sk, uk/ru/BCMS, en/de, hu).
+- Postacie: imiona i opisy w słowniku; portret po id postaci.
+- Wi‑Fi: protokół v2 — reakcje jako identyfikatory; każdy telefon pokazuje
+  je w swoim języku.
+- `noLiterals.test.ts` — żadnych tekstów poza słownikami.
+
 ## Zgodność: zero hazardu
 
 `src/__tests__/forbiddenWords.test.ts` przeszukuje `src/`, `store/`,
 `App.tsx` i `app.json` pod kątem słów zakazanych (`PLAN.md` §9): rdzenie
 z początkiem słowa, więc „zakładka”, „wstawka” czy „podstawka” przechodzą.
+Słowniki i opisy sklepu sprawdzane są też listami pozostałych języków
+(`PLAN.md` §12).
 
 ## Silnik — zasady w skrócie
 
@@ -226,7 +247,8 @@ nie pasuje do modelu, po kilkunastu próbkach przestaje być wymuszany.
   walidator → `null`, kolejność zapisów, awaria magazynu.
 - `src/ui/__tests__/components.test.tsx` — Button3D, Dialog, BottomSheet,
   Header, karty (etykiety dla czytnika ekranu), Portrait.
-- `src/ui/__tests__/plural.test.ts`, `src/ui/__tests__/haptics.test.ts`.
+- `src/i18n/__tests__/` — liczba mnoga (tabele CLDR), kształt słowników,
+  wybór języka, wiersz „Język”; `src/ui/__tests__/haptics.test.ts`.
 - `src/engine/__tests__/` — karty, RNG (jednorodność tasowania), reguły
   (walidacja), wartości rąk (tabele), runda (ruchy, niezmienniki na 1500
   losowych rundach, determinizm, brak mutacji), rozliczenia (tabele family

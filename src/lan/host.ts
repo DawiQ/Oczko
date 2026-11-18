@@ -4,6 +4,7 @@
 // by the controller. A guest has MOVE_MS for a move (then "Starczy"); one who
 // drops out keeps the seat for AWAY_MS, then a bot plays it under the guest's
 // name until the guest is back (with the seat's token).
+import { pl, type Strings } from "../i18n/pl";
 import { personaById, seatNames, type PersonaId } from "../ai/personas";
 import { splitmix32 } from "../engine/rng";
 import { GameController, type ControllerDeps } from "../game/GameController";
@@ -22,7 +23,7 @@ import {
   type LanInfo,
   type LobbySlot,
   type Presence,
-  type ReactionText,
+  type Reaction,
   type TableInfo,
 } from "./protocol";
 import { LAN_PORT } from "./protocol";
@@ -77,6 +78,8 @@ export interface HostView {
 export interface LanHostOptions {
   /** The host's name at the table. */
   name: string;
+  /** The host's language (the bots' names; default Polish). */
+  strings?: Strings;
   table: TableInfo;
   server: Server;
   deps: ControllerDeps;
@@ -95,6 +98,7 @@ export interface LanHostOptions {
 const randomToken = () => Array.from({ length: 4 }, () => Math.floor(Math.random() * 0x100000000).toString(16).padStart(8, "0")).join("");
 
 export class LanHost {
+  private readonly botName = (id: PersonaId) => this.opts.strings.personas[id].name;
   private opts: Required<Omit<LanHostOptions, "port">> & { port: number };
   private slots: Slot[] = [{ kind: "host" }, { kind: "open" }];
   private phase: HostView["phase"] = "lobby";
@@ -126,6 +130,7 @@ export class LanHost {
       now: Date.now,
       token: randomToken,
       seed: freshSeed,
+      strings: pl,
       ...opts,
     };
     this.view = this.buildView();
@@ -231,7 +236,7 @@ export class LanHost {
     if (!this.canStart) return false;
     this.slots = this.slots.filter((s) => s.kind !== "open");
     const personas = this.slots.flatMap((s) => (s.kind === "bot" ? [s.persona] : []));
-    const botNames = seatNames(personas);
+    const botNames = seatNames(personas, this.botName);
     let b = 0;
     const seats: SeatSetup[] = this.slots.map((s, seat) => {
       if (s.kind === "host") return { kind: "human", name: this.opts.name };
@@ -262,8 +267,8 @@ export class LanHost {
   // ---- the game (host side) ---------------------------------------------------
 
   /** A quick reaction from the host. */
-  react(text: ReactionText): void {
-    if (this.game) this.reactFrom(this.game.me, text);
+  react(id: Reaction): void {
+    if (this.game) this.reactFrom(this.game.me, id);
   }
 
   /** A bot plays an away guest's seat now. */
@@ -309,7 +314,7 @@ export class LanHost {
       const lines = reader.push(chunk);
       if (!lines) return conn.close(); // garbage: drop the link
       for (const line of lines) {
-        const msg = parseGuestMsg(line);
+        const msg = parseGuestMsg(line, this.opts.strings);
         if (!msg) continue;
         // One seat per link: a second hello on it is ignored.
         if (msg.t === "hello") {
@@ -389,7 +394,7 @@ export class LanHost {
         const now = this.opts.now();
         if (this.phase !== "playing" || g.botted || now - g.reactedAt < REACT_GAP_MS) return;
         g.reactedAt = now;
-        this.reactFrom(g.seat, msg.text);
+        this.reactFrom(g.seat, msg.id);
         return;
       }
       case "move": {
@@ -441,9 +446,9 @@ export class LanHost {
     for (const [c, since] of [...this.strangers]) if (now - since > this.opts.silentMs) c.close();
   }
 
-  private reactFrom(seat: number, text: ReactionText): void {
+  private reactFrom(seat: number, id: Reaction): void {
     if (this.phase !== "playing") return;
-    this.reaction = { seq: ++this.reactionSeq, seat, text };
+    this.reaction = { seq: ++this.reactionSeq, seat, id };
     this.gameChanged();
   }
 
@@ -508,7 +513,7 @@ export class LanHost {
 
   private lobbySlots(): LobbySlot[] {
     const personas = this.slots.flatMap((s) => (s.kind === "bot" ? [s.persona] : []));
-    const names = seatNames(personas);
+    const names = seatNames(personas, this.botName);
     let b = 0;
     return this.slots.map((s): LobbySlot => {
       switch (s.kind) {

@@ -1,5 +1,6 @@
 // Who sits at the table and under which rules (serialisable: saved games,
 // history, Wi‑Fi).
+import { pl, type Strings } from "../i18n/pl";
 import { personaById, PERSONAS, seatNames, type PersonaId } from "../ai/personas";
 import { splitmix32 } from "../engine/rng";
 import { MAX_SEATS, MIN_SEATS, validateRules, type Rules } from "../engine/rules";
@@ -24,12 +25,10 @@ export interface GameSetup {
   first: number;
 }
 
-export const HUMAN_NAME = "Ty";
-
-/** A local table: you at seat 0, then the bots. */
-export function makeSetup(rules: Rules, bots: readonly PersonaId[], mode: GameMode, seed: number): GameSetup {
-  const names = seatNames(bots);
-  const seats: SeatSetup[] = [{ kind: "human", name: HUMAN_NAME }, ...bots.map((persona, i) => ({ kind: "bot" as const, persona, name: names[i] }))];
+/** A local table: you at seat 0, then the bots (names in the language of `s`). */
+export function makeSetup(rules: Rules, bots: readonly PersonaId[], mode: GameMode, seed: number, s: Strings = pl): GameSetup {
+  const names = seatNames(bots, (id) => s.personas[id].name);
+  const seats: SeatSetup[] = [{ kind: "human", name: s.common.you }, ...bots.map((persona, i) => ({ kind: "bot" as const, persona, name: names[i] }))];
   const r = mode === "single" ? { ...rules, target: 1 } : rules;
   return { v: 1, rules: r, seats, seed: seed >>> 0, mode, first: splitmix32(seed) % seats.length };
 }

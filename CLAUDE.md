@@ -69,8 +69,11 @@ Przed commitem: `npm test` i `npm run typecheck` muszą przejść.
 - Stała ciemna paleta (`src/ui/palette.ts`, akcent Miedź `#E8925A`),
   komponenty bazowe z `src/ui/`.
 - Słownictwo ze stołu: „Dobieram”, „Starczy”, „Fura!”, „Perskie oczko!”, „Bank”.
-- Teksty po polsku, neutralne płciowo (bez „dobrałeś/dobrałaś”), odmiana
-  liczebników przez `plural`.
+- Teksty tylko w słownikach `src/i18n/<język>/` (bazowy: `pl`, typ `Strings`);
+  komponenty: `useStrings()`, moduły bez Reacta: parametr `s: Strings`.
+  Żadnych literałów tekstu w kodzie (pilnuje `noLiterals.test.ts`).
+- Teksty neutralne płciowo w każdym języku (bez „dobrałeś/dobrałaś”),
+  liczba mnoga przez funkcje słownika (`src/i18n/plural.ts`).
 - Dostępność: role, etykiety kart, `accessibilityLiveRegion` dla przebiegu
   rundy, cele dotyku ≥ 44 px, `accessibilityViewIsModal` dla nakładek.
 - Grafiki i dźwięki tylko własne, generowane skryptami z `tools/`.
@@ -81,6 +84,9 @@ Przed commitem: `npm test` i `npm run typecheck` muszą przejść.
 - Boty/ewaluator: dokładne P(fura), zbieżność MC, monotoniczność poziomów.
 - Kontroler: bez UI, natychmiastowy `sleep`, stałe ziarno, mock ewaluatora.
 - `src/__tests__/App.render.test.tsx` — test dymny całej aplikacji.
-- `src/__tests__/forbiddenWords.test.ts` — słowa zakazane w `src/` i `store/`.
+- `src/__tests__/forbiddenWords.test.ts` — słowa zakazane w `src/` i `store/`
+  (listy dla wszystkich języków z `PLAN.md` §12).
+- `src/__tests__/noLiterals.test.ts` — brak tekstów poza słownikami.
+- `src/i18n/__tests__/` — kształt słowników, liczba mnoga, wybór języka.
 - Protokół Wi‑Fi na transporcie pamięciowym.
 - Mocki modułów natywnych w `jest.setup.js`.

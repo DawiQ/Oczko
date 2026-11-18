@@ -2,6 +2,7 @@
 // section label. Touch targets ≥ 44 px.
 import { Pressable, StyleSheet, Switch, Text, View, type StyleProp, type ViewStyle } from "react-native";
 
+import { useStrings } from "../i18n";
 import { DISPLAY } from "./fonts";
 import { P } from "./palette";
 
@@ -62,6 +63,7 @@ export function Counter({
   onChange: (v: number) => void;
   label: string;
 }) {
+  const str = useStrings();
   return (
     <View
       style={[s.counter, value === 0 && s.counterZero]}
@@ -70,19 +72,19 @@ export function Counter({
       accessibilityLabel={label}
       accessibilityValue={{ min, max, now: value }}
       accessibilityActions={[
-        { name: "increment", label: "Więcej" },
-        { name: "decrement", label: "Mniej" },
+        { name: "increment", label: str.ui.more },
+        { name: "decrement", label: str.ui.less },
       ]}
       onAccessibilityAction={(e) => {
         if (e.nativeEvent.actionName === "increment" && value < max) onChange(value + 1);
         if (e.nativeEvent.actionName === "decrement" && value > min) onChange(value - 1);
       }}
     >
-      <Pressable style={s.counterBtn} onPress={() => value > min && onChange(value - 1)} disabled={value <= min} accessibilityLabel={`${label}: mniej`} hitSlop={4}>
+      <Pressable style={s.counterBtn} onPress={() => value > min && onChange(value - 1)} disabled={value <= min} accessibilityLabel={str.ui.counterLess(label)} hitSlop={4}>
         <Text style={[s.counterSign, value <= min && s.dim]}>−</Text>
       </Pressable>
       <Text style={[s.counterValue, value === 0 && { color: P.muted }]}>{value}</Text>
-      <Pressable style={s.counterBtn} onPress={() => value < max && onChange(value + 1)} disabled={value >= max} accessibilityLabel={`${label}: więcej`} hitSlop={4}>
+      <Pressable style={s.counterBtn} onPress={() => value < max && onChange(value + 1)} disabled={value >= max} accessibilityLabel={str.ui.counterMore(label)} hitSlop={4}>
         <Text style={[s.counterSign, value >= max && s.dim]}>+</Text>
       </Pressable>
     </View>

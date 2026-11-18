@@ -1,6 +1,7 @@
 // House rules in words: the lobby's two lines, one sentence, presets of the
 // face values. Pure.
 import { CLASSIC_VALUES, type FaceRank, type Rules } from "../engine/rules";
+import { pl, type Strings } from "../i18n/pl";
 
 export type FacesPreset = "234" | "345" | "custom";
 
@@ -21,26 +22,23 @@ export function withFaces(r: Rules, w: number, d: number, k: number): Rules {
   return { ...r, values: { ...values, 11: w, 12: d, 13: k } };
 }
 
-const modeName = (r: Rules) => (r.mode === "bank" ? "Z bankierem" : "Rodzinne");
-const faces = (r: Rules) => `W ${r.values[11]}, D ${r.values[12]}, K ${r.values[13]}`;
-const deck = (r: Rules) => (r.deck === 52 ? "52 karty" : r.deck === 32 ? "32 karty" : "24 karty");
-const ace = (r: Rules) => (r.ace === "eleven" ? "As za 11" : "As za 1 lub 11");
-
 /** Two short lines for the lobby. */
-export function summaryLines(r: Rules): [string, string] {
-  return [`${modeName(r)} · ${faces(r)} · ${deck(r)}`, `${r.persian ? "Perskie oczko" : "Bez perskiego oczka"} · ${ace(r)}`];
+export function summaryLines(r: Rules, s: Strings = pl): [string, string] {
+  const t = s.rules.summary;
+  return [
+    `${s.rules.modes[r.mode]} · ${t.faces(r.values[11], r.values[12], r.values[13])} · ${t.deck(r.deck)}`,
+    `${r.persian ? t.persian : t.noPersian} · ${t.ace[r.ace]}`,
+  ];
 }
 
 /** One line (new game, settings). */
-export const summaryLine = (r: Rules) => summaryLines(r).join(" · ");
+export const summaryLine = (r: Rules, s: Strings = pl) => summaryLines(r, s).join(" · ");
 
 /** The rules in one or two sentences ("W skrócie"). */
-export function preview(r: Rules): string {
-  const start =
-    r.mode === "bank"
-      ? `Każdy gra z bankiem: dobiera karty i mówi „Starczy”, bank odpowiada na końcu${r.bankTie === "bankWins" ? " i wygrywa remisy" : ""}.`
-      : "Każdy dobiera karty i mówi „Starczy”, gdy chce. Punkt dostaje wynik najbliżej 21 bez fury.";
-  const persian = r.persian ? " Dwa asy to perskie oczko — wygrywa wszystko." : "";
-  const aceTxt = r.ace === "oneOrEleven" ? " As liczy się za 1 albo 11." : "";
+export function preview(r: Rules, s: Strings = pl): string {
+  const t = s.rules.preview;
+  const start = r.mode === "bank" ? t.bank(r.bankTie === "bankWins") : t.family;
+  const persian = r.persian ? t.persian : "";
+  const aceTxt = r.ace === "oneOrEleven" ? t.oneOrEleven : "";
   return start + persian + aceTxt;
 }

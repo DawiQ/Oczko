@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { ActivityIndicator, Pressable, StyleSheet, Text, View } from "react-native";
 
+import { useStrings } from "../i18n";
 import { BottomSheet } from "../ui/BottomSheet";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
@@ -15,7 +16,7 @@ export function LimitSheet({
   reason,
   proLabel,
   ad,
-  dismissLabel = "Może później",
+  dismissLabel,
   onClose,
   onGranted,
 }: {
@@ -32,6 +33,7 @@ export function LimitSheet({
   onGranted?: () => void;
 }) {
   const premium = usePremium();
+  const str = useStrings();
   const [busy, setBusy] = useState(false);
   const [failed, setFailed] = useState(false);
   const watch = async () => {
@@ -56,11 +58,11 @@ export function LimitSheet({
     >
       <Text style={s.text}>{text}</Text>
       {showAd && (
-        <Pressable onPress={watch} disabled={busy} style={s.ad} accessibilityRole="button" accessibilityLabel={`Obejrzyj reklamę: ${ad!.label}`}>
+        <Pressable onPress={watch} disabled={busy} style={s.ad} accessibilityRole="button" accessibilityLabel={str.premium.limit.adLabel(ad!.label)}>
           <View style={s.play}>{busy ? <ActivityIndicator color={P.feltMuted} /> : <Text style={s.playText}>▶</Text>}</View>
           <View style={{ flex: 1 }}>
-            <Text style={s.adTitle}>Obejrzyj reklamę · {ad!.label}</Text>
-            <Text style={s.adNote}>{failed ? "Reklama niedostępna — spróbuj za chwilę." : "około 30 sekund"}</Text>
+            <Text style={s.adTitle}>{str.premium.limit.adTitle(ad!.label)}</Text>
+            <Text style={s.adNote}>{failed ? str.premium.adFailed : str.premium.limit.adLength}</Text>
           </View>
         </Pressable>
       )}
@@ -74,14 +76,14 @@ export function LimitSheet({
       >
         <View style={{ flex: 1 }}>
           <Text style={s.proTitle}>{proLabel}</Text>
-          <Text style={s.proNote}>Oczko Pro</Text>
+          <Text style={s.proNote}>{str.premium.pro}</Text>
         </View>
         <View style={s.badge}>
-          <Text style={s.badgeText}>PRO</Text>
+          <Text style={s.badgeText}>{str.premium.tag}</Text>
         </View>
       </Pressable>
       <Pressable onPress={onClose} style={s.dismiss} accessibilityRole="button">
-        <Text style={s.dismissText}>{dismissLabel}</Text>
+        <Text style={s.dismissText}>{dismissLabel ?? str.premium.limit.later}</Text>
       </Pressable>
     </BottomSheet>
   );
@@ -89,9 +91,10 @@ export function LimitSheet({
 
 /** A small "PRO" tag next to a locked option. */
 export function ProTag({ small }: { small?: boolean }) {
+  const str = useStrings();
   return (
     <View style={[s.badge, small && { paddingHorizontal: 6, paddingVertical: 1 }]}>
-      <Text style={[s.badgeText, small && { fontSize: 9 }]}>PRO</Text>
+      <Text style={[s.badgeText, small && { fontSize: 9 }]}>{str.premium.tag}</Text>
     </View>
   );
 }

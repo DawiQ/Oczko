@@ -4,6 +4,7 @@ import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PERSONAS } from "../ai/personas";
+import { useStrings } from "../i18n";
 import type { Stats } from "../storage/stats";
 import { Button3D } from "../ui/Button3D";
 import { Label } from "../ui/controls";
@@ -11,15 +12,16 @@ import { useConfirm } from "../ui/Dialog";
 import { DISPLAY } from "../ui/fonts";
 import { P } from "../ui/palette";
 import { Portrait } from "../ui/Portrait";
-import { BADGES, earnedBadges, rankOf, ratios } from "./progress";
+import { badges, earnedBadges, rankOf, ratios } from "./progress";
 import { suggestNext } from "./suggest";
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
 const COLORS = ["#E8925A", "#7FD3E6", "#FF8FA3", "#6FCF97", "#B39DFF", "#F0B44C", "#7FA8FF"];
 
 function Tile({ value, label }: { value: string; label: string }) {
+  const str = useStrings();
   return (
-    <View style={s.tile} accessible accessibilityLabel={`${label}: ${value}`}>
+    <View style={s.tile} accessible accessibilityLabel={str.profile.tileLabel(label, value)}>
       <Text style={s.tileValue}>{value}</Text>
       <Text style={s.tileLabel}>{label}</Text>
     </View>
@@ -45,48 +47,51 @@ export function ProfileScreen({
 }) {
   const insets = useSafeAreaInsets();
   const confirm = useConfirm();
-  const rank = rankOf(stats);
+  const str = useStrings();
+  const t = str.profile;
+  const rank = rankOf(stats, str);
+  const all = badges(str);
   const r = ratios(stats);
   const earned = new Set(earnedBadges(stats));
-  const next = suggestNext(stats);
+  const next = suggestNext(stats, str);
   const played = PERSONAS.filter((p) => (stats.byPersona[p.id]?.matches ?? 0) > 0);
   return (
     <ScrollView style={s.screen} contentContainerStyle={[s.content, { paddingTop: insets.top + 12 }]}>
       <Text style={s.h1} accessibilityRole="header">
-        Profil
+        {t.title}
       </Text>
-      <View style={s.rankCard} accessible accessibilityLabel={`Ranga: ${rank.name}, ${rank.xp} punktów doświadczenia${rank.next ? `, do rangi ${rank.next.name}: ${rank.next.at - rank.xp}` : ""}`}>
+      <View style={s.rankCard} accessible accessibilityLabel={t.rankLabel(rank.name, rank.xp, rank.next && { name: rank.next.name, left: rank.next.at - rank.xp })}>
         <View style={s.rankBadge}>
           <Text style={s.rankBadgeText}>21</Text>
         </View>
         <View style={{ flex: 1 }}>
-          <Text style={s.small}>Ranga</Text>
+          <Text style={s.small}>{t.rank}</Text>
           <Text style={s.rankName}>{rank.name}</Text>
           <View style={s.track}>
             <View style={[s.fill, { width: `${Math.round(rank.progress * 100)}%` }]} />
           </View>
-          <Text style={s.small}>{rank.next ? `${rank.xp} / ${rank.next.at} do rangi „${rank.next.name}”` : `${rank.xp} — najwyższa ranga`}</Text>
+          <Text style={s.small}>{t.rankProgress(rank.xp, rank.next)}</Text>
         </View>
       </View>
 
       <View style={s.tiles}>
-        <Tile value={String(stats.matches)} label="partii" />
-        <Tile value={pct(r.winMatches)} label="wygranych" />
-        <Tile value={pct(r.bust)} label="rund z furą" />
+        <Tile value={String(stats.matches)} label={t.tiles.matches} />
+        <Tile value={pct(r.winMatches)} label={t.tiles.won} />
+        <Tile value={pct(r.bust)} label={t.tiles.busts} />
       </View>
       <View style={s.tiles}>
-        <Tile value={String(stats.rounds)} label="rund" />
-        <Tile value={pct(r.winRounds)} label="rund z punktem" />
-        <Tile value={stats.stands ? r.standAvg.toFixed(1).replace(".", ",") : "—"} label="średnio przy „Starczy”" />
+        <Tile value={String(stats.rounds)} label={t.tiles.rounds} />
+        <Tile value={pct(r.winRounds)} label={t.tiles.roundsWon} />
+        <Tile value={stats.stands ? t.average(r.standAvg) : "—"} label={t.tiles.standAvg} />
       </View>
 
-      <Label>{`Odznaki · ${earned.size} z ${BADGES.length}`}</Label>
+      <Label>{t.badgesHeader(earned.size, all.length)}</Label>
       <View style={s.badges}>
-        {BADGES.map((b, i) => {
+        {all.map((b, i) => {
           const on = earned.has(b.id);
           const c = COLORS[i % COLORS.length];
           return (
-            <View key={b.id} style={[s.badge, !on && s.locked]} accessible accessibilityLabel={`${b.name}: ${b.desc}${on ? "" : " (jeszcze nie zdobyta)"}`}>
+            <View key={b.id} style={[s.badge, !on && s.locked]} accessible accessibilityLabel={t.badgeLabel(b.name, b.desc, on)}>
               <View style={[s.badgeIcon, { backgroundColor: on ? `${c}33` : P.surface }]}>
                 <Text style={[s.badgeIconText, { color: on ? c : P.muted }]}>{b.icon}</Text>
               </View>
@@ -99,35 +104,35 @@ export function ProfileScreen({
       </View>
 
       {!pro && (
-        <Pressable style={[s.panel, { justifyContent: "space-between" }]} onPress={onPro} accessibilityRole="button" accessibilityLabel="Rozszerzone statystyki w Oczko Pro">
+        <Pressable style={[s.panel, { justifyContent: "space-between" }]} onPress={onPro} accessibilityRole="button" accessibilityLabel={t.moreLabel}>
           <View style={{ flex: 1 }}>
-            <Text style={s.name}>Rozszerzone statystyki</Text>
-            <Text style={s.small}>Tryby, wyniki z każdym rywalem, następny rywal — w Oczko Pro.</Text>
+            <Text style={s.name}>{t.more}</Text>
+            <Text style={s.small}>{t.moreNote}</Text>
           </View>
-          <Text style={s.linkText}>Pro ›</Text>
+          <Text style={s.linkText}>{t.morePro}</Text>
         </Pressable>
       )}
 
       {pro && next && (
         <View style={s.panel}>
-          <Portrait name={next.persona.name} size={42} color={next.persona.color} />
+          <Portrait name={str.personas[next.persona.id].name} persona={next.persona.id} size={42} color={next.persona.color} />
           <View style={{ flex: 1 }}>
-            <Text style={s.small}>Następny rywal</Text>
-            <Text style={s.name}>{next.persona.name}</Text>
+            <Text style={s.small}>{t.nextRival}</Text>
+            <Text style={s.name}>{str.personas[next.persona.id].name}</Text>
             <Text style={s.small}>{next.reason}</Text>
           </View>
-          <Button3D label="Zagraj" height={42} style={{ width: 92 }} onPress={() => onPlay(next.persona.id)} />
+          <Button3D label={t.play} height={42} style={{ width: 92 }} onPress={() => onPlay(next.persona.id)} />
         </View>
       )}
 
-      {pro && <Label>Tryby</Label>}
+      {pro && <Label>{t.modes}</Label>}
       {pro && <View style={s.panel2}>
         {(["family", "bank"] as const).map((m) => {
           const x = stats.byMode[m];
           return (
             <View key={m} style={s.line}>
-              <Text style={s.lineName}>{m === "family" ? "Rodzinne" : "Z bankierem"}</Text>
-              <Text style={s.lineValue}>{`${x.matchesWon}/${x.matches} partii · ${x.roundsWon}/${x.rounds} rund`}</Text>
+              <Text style={s.lineName}>{m === "family" ? t.family : t.bank}</Text>
+              <Text style={s.lineValue}>{t.modeLine(x)}</Text>
             </View>
           );
         })}
@@ -135,15 +140,15 @@ export function ProfileScreen({
 
       {pro && played.length > 0 && (
         <>
-          <Label>Rywale</Label>
+          <Label>{t.rivals}</Label>
           <View style={s.panel2}>
             {played.map((p) => {
               const x = stats.byPersona[p.id];
               return (
                 <View key={p.id} style={s.line}>
-                  <Portrait name={p.name} size={24} color={p.color} />
-                  <Text style={[s.lineName, { flex: 1 }]}>{p.name}</Text>
-                  <Text style={s.lineValue}>{`${x.won} z ${x.matches}`}</Text>
+                  <Portrait name={str.personas[p.id].name} persona={p.id} size={24} color={p.color} />
+                  <Text style={[s.lineName, { flex: 1 }]}>{str.personas[p.id].name}</Text>
+                  <Text style={s.lineValue}>{t.rivalLine(x.won, x.matches)}</Text>
                 </View>
               );
             })}
@@ -151,19 +156,19 @@ export function ProfileScreen({
         </>
       )}
 
-      <Pressable style={s.link} onPress={onHistory} accessibilityRole="button" accessibilityLabel="Historia partii">
-        <Text style={s.linkText}>Historia partii ›</Text>
+      <Pressable style={s.link} onPress={onHistory} accessibilityRole="button" accessibilityLabel={t.history}>
+        <Text style={s.linkText}>{t.historyLink}</Text>
       </Pressable>
       <Pressable
         style={s.link}
         accessibilityRole="button"
-        accessibilityLabel="Wyzeruj statystyki"
+        accessibilityLabel={t.reset}
         onPress={async () => {
-          if (await confirm({ title: "Wyzerować statystyki?", message: "Ranga, odznaki i wyniki zaczną się od nowa. Historii partii to nie zmienia.", confirmText: "Wyzeruj", destructive: true }))
+          if (await confirm({ title: t.resetTitle, message: t.resetMessage, confirmText: t.resetConfirm, destructive: true }))
             onReset();
         }}
       >
-        <Text style={[s.linkText, { color: P.danger }]}>Wyzeruj statystyki</Text>
+        <Text style={[s.linkText, { color: P.danger }]}>{t.reset}</Text>
       </Pressable>
     </ScrollView>
   );

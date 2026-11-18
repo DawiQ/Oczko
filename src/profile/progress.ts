@@ -1,32 +1,43 @@
-// Ranks (by experience points) and badges. Pure; thresholds here.
+// Ranks (by experience points) and badges. Pure; thresholds here, names and
+// descriptions in the dictionary.
 import type { MatchState } from "../engine/match";
+import { pl, type Strings } from "../i18n/pl";
 import { handValue } from "../engine/score";
 import type { Stats } from "../storage/stats";
 
+/** Experience points of each rank, weakest first. */
+const RANK_AT = [0, 50, 150, 350, 700, 1200, 2000];
+
 /** Ranks named after cards (gender-neutral), weakest first. */
-export const RANKS: { name: string; at: number }[] = [
-  { name: "Dziewiątka", at: 0 },
-  { name: "Dziesiątka", at: 50 },
-  { name: "Walet", at: 150 },
-  { name: "Dama", at: 350 },
-  { name: "Król", at: 700 },
-  { name: "As", at: 1200 },
-  { name: "Perskie oczko", at: 2000 },
-];
+export const ranks = (s: Strings = pl): { name: string; at: number }[] => RANK_AT.map((at, i) => ({ name: s.profile.ranks[i], at }));
+/** The ranks with Polish names (`ranks(s)` for the language in use). */
+export const RANKS = ranks();
 
 export const XP = { round: 1, roundWon: 2, matchWon: 10, badge: 15 } as const;
 
 export type BadgeId = "persian" | "exact21" | "fiveCard" | "edge" | "ironBank" | "streak" | "veteran";
 
-export const BADGES: { id: BadgeId; name: string; desc: string; icon: string }[] = [
-  { id: "persian", name: "Perskie oczko", desc: "Dwa asy w jednej ręce", icon: "AA" },
-  { id: "exact21", name: "Równe 21", desc: "Runda zakończona z 21", icon: "21" },
-  { id: "fiveCard", name: "Oczko z pięciu kart", desc: "21 z pięciu lub więcej kart", icon: "5×" },
-  { id: "edge", name: "Na krawędzi", desc: "Wygrana z 21 po dobraniu przy 17 lub więcej", icon: "17+" },
-  { id: "ironBank", name: "Żelazny bank", desc: "Bank wygrywa wszystkie pojedynki (2+ graczy)", icon: "B" },
-  { id: "streak", name: "Seria", desc: "5 wygranych rund z rzędu", icon: "×5" },
-  { id: "veteran", name: "Weteran", desc: "100 rozegranych partii", icon: "100" },
+export interface Badge {
+  id: BadgeId;
+  name: string;
+  desc: string;
+  icon: string;
+}
+
+const BADGE_ICONS: { id: BadgeId; icon: string }[] = [
+  { id: "persian", icon: "AA" },
+  { id: "exact21", icon: "21" },
+  { id: "fiveCard", icon: "5×" },
+  { id: "edge", icon: "17+" },
+  { id: "ironBank", icon: "B" },
+  { id: "streak", icon: "×5" },
+  { id: "veteran", icon: "100" },
 ];
+
+/** The badges in display order, with names and descriptions. */
+export const badges = (s: Strings = pl): Badge[] => BADGE_ICONS.map((b) => ({ ...b, ...s.profile.badges[b.id] }));
+/** The badges with Polish texts (`badges(s)` for the language in use). */
+export const BADGES = badges();
 
 export const STREAK_BADGE = 5;
 export const VETERAN_BADGE = 100;
@@ -63,7 +74,7 @@ export function earnedBadges(s: Stats): BadgeId[] {
   if (s.twentyOnes > 0) set.add("exact21");
   if (s.bestStreak >= STREAK_BADGE) set.add("streak");
   if (s.matches >= VETERAN_BADGE) set.add("veteran");
-  return BADGES.map((b) => b.id).filter((id) => set.has(id));
+  return BADGE_ICONS.map((b) => b.id).filter((id) => set.has(id));
 }
 
 export function xpOf(s: Stats): number {
@@ -79,13 +90,14 @@ export interface RankInfo {
   progress: number;
 }
 
-export function rankOf(s: Stats): RankInfo {
+export function rankOf(s: Stats, str: Strings = pl): RankInfo {
+  const all = ranks(str);
   const xp = xpOf(s);
   let index = 0;
-  for (let i = 0; i < RANKS.length; i++) if (xp >= RANKS[i].at) index = i;
-  const next = RANKS[index + 1] ?? null;
-  const from = RANKS[index].at;
-  return { xp, index, name: RANKS[index].name, next, progress: next ? (xp - from) / (next.at - from) : 1 };
+  for (let i = 0; i < all.length; i++) if (xp >= all[i].at) index = i;
+  const next = all[index + 1] ?? null;
+  const from = all[index].at;
+  return { xp, index, name: all[index].name, next, progress: next ? (xp - from) / (next.at - from) : 1 };
 }
 
 /** Rounds-won share, furas share, average total on "Starczy". */
