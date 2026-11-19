@@ -18,7 +18,7 @@ asztalnál, edző, aki mutatja az esélyeidet, és játék barátokkal Wi‑Fi-n
 
 ## Kulcsszavak — App Store (100, vesszővel elválasztva, szóköz nélkül)
 
-huszonegy,oczko,21,kártyajáték,kártya,család,barátok,wifi,házi szabályok,két ász,edző
+huszonegy,huszonegyes,oczko,21,kártyajáték,kártya,család,barátok,wifi,házi szabályok,edző
 
 ## Teljes leírás (4000)
 
@@ -32,7 +32,9 @@ pontig tart. Nincs pénz, nincsenek nyeremények — csak kártya és jó
 hangulat.
 
 HÁZI SZABÁLYAID
-• Kész szabálykészletek más országokból: 17 und 4 (Németország, Ausztria),
+• Kész „Huszonegyes” szabálykészlet: 32 lap, alsó 2, felső 3, király 4,
+  ász 11, a két ász mindent visz, bankárral.
+• Kész szabálykészletek más országokból is: 17 und 4 (Németország, Ausztria),
   Oko bere (Csehország, Szlovákia), Ajnc (Balkán), Ocsko (36 lapos pakli),
   Pontoon (Nagy-Britannia).
 • Családi játék (mindenki mindenki ellen) vagy bankárral.

@@ -32,7 +32,7 @@ Hraje se na body: každé vyhrané kolo je bod, partie jde do 5, 10 nebo 15 bod�
 
 TVOJE DOMÁCÍ PRAVIDLA
 • Hotová sada „Oko bere“: 32 karet, J a Q za 1, K za 2, dvě esa = 21.
-  K tomu 17 und 4, Ajnc, Očko (36 karet) a Pontoon.
+  K tomu 17 und 4, Huszonegyes, Ajnc, Očko (36 karet) a Pontoon.
 • Rodinná hra (všichni proti všem) nebo s bankéřem.
 • Hodnoty figur (J 2, Q 3, K 4 nebo vlastní), balíček 52, 36, 32 nebo
   24 karet.

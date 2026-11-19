@@ -39,6 +39,7 @@ export const rules = {
       oczko: { name: "Oczko", sub: "Polska" },
       siebzehnUndVier: { name: "17 und 4", sub: "Niemcy, Austria" },
       okoBere: { name: "Oko bere", sub: "Czechy, Słowacja" },
+      huszonegyes: { name: "Huszonegyes", sub: "Węgry" },
       ajnc: { name: "Ajnc", sub: "Bałkany" },
       ochko: { name: "Очко", sub: "Ukraina, Kazachstan" },
       pontoon: { name: "Pontoon", sub: "Wielka Brytania, Irlandia, Australia" },

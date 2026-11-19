@@ -40,6 +40,7 @@ export const rules: typeof pl.rules = {
       oczko: { name: "Oczko", sub: "Польша" },
       siebzehnUndVier: { name: "17 und 4", sub: "Германия, Австрия" },
       okoBere: { name: "Oko bere", sub: "Чехия, Словакия" },
+      huszonegyes: { name: "Huszonegyes", sub: "Венгрия" },
       ajnc: { name: "Ajnc", sub: "Балканы" },
       ochko: { name: "Двадцать одно", sub: "Украина, Казахстан" },
       pontoon: { name: "Pontoon", sub: "Британия, Ирландия, Австралия" },

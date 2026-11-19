@@ -136,8 +136,8 @@ poziomy różnią się istotnie: **${distinct ? "tak" : "NIE"}**.
 
 ## Zestawy zasad (PLAN.md §13)
 
-Ten sam turniej na kartach zestawu (${SET_N} rozdań na tryb). Ajnc ma karty
-17 und 4.
+Ten sam turniej na kartach zestawu (${SET_N} rozdań na tryb). Huszonegyes i Ajnc
+mają karty 17 und 4.
 
 | Zestaw | ${PERSONAS.map((p) => pl.personas[p.id].name).join(" | ")} | Rosną monotonicznie |
 |---|${PERSONAS.map(() => "---|").join("")}---|

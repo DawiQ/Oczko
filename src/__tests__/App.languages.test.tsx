@@ -195,6 +195,28 @@ describe("rule sets", () => {
   });
 });
 
+describe("rule sets: Hungary", () => {
+  it("a fresh install in Hungary starts with Huszonegyes (not 17 und 4, which has the same cards)", async () => {
+    const spy = jest.spyOn(jest.requireMock("expo-localization") as { getLocales: () => unknown[] }, "getLocales").mockReturnValue([{ languageCode: "hu", regionCode: "HU" }]);
+    const hu = DICTIONARIES.hu;
+    const kv = memoryKV();
+    let r!: ReactTestRenderer;
+    await act(async () => {
+      r = create(<App kv={kv} pace={INSTANT} sleep={() => Promise.resolve()} />);
+    });
+    await settle();
+    expect(shown(r)).toContain(hu.onboarding.welcome.title);
+    const selected = r.root.findAll((n) => n.props.accessibilityState?.checked && typeof n.props.onPress === "function").map((n) => n.props.accessibilityLabel as string);
+    expect(selected.some((l) => l.startsWith(hu.rules.editor.presets.huszonegyes.name))).toBe(true);
+    expect(selected.some((l) => l.startsWith(hu.rules.editor.presets.siebzehnUndVier.name))).toBe(false);
+    await act(async () => button(r, hu.onboarding.welcome.done).props.onPress());
+    await settle();
+    expect(JSON.parse((await kv.get("oczko.rules.v1"))!)).toMatchObject({ deck: 32, persian: "wins", mode: "bank", bankTie: "bankWins" });
+    act(() => r.unmount());
+    spy.mockRestore();
+  });
+});
+
 describe("changing the language", () => {
   const de = DICTIONARIES.de;
   const pl = DICTIONARIES.pl;

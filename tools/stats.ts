@@ -69,7 +69,7 @@ for (const [name, rules, seats] of [
   ["Rodzinne (24 karty)", PRESETS.small24, 4],
   ["Rodzinne, 2 karty na start", { ...PRESETS.family, startCards: 2 } as Rules, 4],
   // Regional rule sets (PLAN.md §13); Ajnc has the cards of 17 und 4.
-  ["17 und 4 / Ajnc (32, z bankierem)", withPreset(DEFAULT_RULES, "siebzehnUndVier"), 4],
+  ["17 und 4 / Huszonegyes / Ajnc (32, z bankierem)", withPreset(DEFAULT_RULES, "siebzehnUndVier"), 4],
   ["Oko bere (32, 1 · 1 · 2, dwa asy = 21)", withPreset(DEFAULT_RULES, "okoBere"), 4],
   ["Очко (36, z bankierem, bank do 17)", withPreset(DEFAULT_RULES, "ochko"), 4],
   ["Pontoon (figury 10, as 1/11, pontoon, 5 kart)", withPreset(DEFAULT_RULES, "pontoon"), 4],

@@ -16,7 +16,7 @@ wszyscy jednakowi (próg 17).
 | Z bankierem (52) | 2 | 2,11 | 18.6% | 55.9% | 55.9% |
 | Rodzinne (24 karty) | 4 | 2,15 | 37.7% | — | — |
 | Rodzinne, 2 karty na start | 4 | 1,47 | 27.4% | — | — |
-| 17 und 4 / Ajnc (32, z bankierem) | 4 | 1,98 | 31.3% | 58.1% | 57.4% |
+| 17 und 4 / Huszonegyes / Ajnc (32, z bankierem) | 4 | 1,98 | 31.3% | 58.1% | 57.4% |
 | Oko bere (32, 1 · 1 · 2, dwa asy = 21) | 4 | 2,26 | 27.7% | 57.9% | 57.0% |
 | Очко (36, z bankierem, bank do 17) | 4 | 2,01 | 30.3% | 59.9% | 60.5% |
 | Pontoon (figury 10, as 1/11, pontoon, 5 kart) | 4 | 1,86 | 27.5% | 57.3% | 56.8% |

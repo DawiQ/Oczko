@@ -13,10 +13,11 @@ describe("rule sets", () => {
     expect(presetOf(r, id)).toBe(id);
   });
 
-  it("sets with the same cards (17 und 4, Ajnc): the preferred one, else the first", () => {
+  it("sets with the same cards (17 und 4, Huszonegyes, Ajnc): the preferred one, else the first", () => {
     const r = withPreset(DEFAULT_RULES, "ajnc");
     expect(presetOf(r)).toBe("siebzehnUndVier");
     expect(presetOf(r, "ajnc")).toBe("ajnc");
+    expect(presetOf(r, "huszonegyes")).toBe("huszonegyes");
     expect(presetOf(r, "okoBere")).toBe("siebzehnUndVier");
   });
 
@@ -46,12 +47,30 @@ describe("rule sets", () => {
     expect(suggestPreset("cz", null)).toBe("okoBere");
     expect(suggestPreset("RS", "sr")).toBe("ajnc");
     expect(suggestPreset(null, "sk")).toBe("okoBere");
+    expect(suggestPreset("HU", "hu")).toBe("huszonegyes");
+    expect(suggestPreset(null, "hu")).toBe("huszonegyes");
+    // Hungarian speakers in Slovakia or Serbia: the country's set.
+    expect(suggestPreset("SK", "hu")).toBe("okoBere");
     // A known country outside the sets: Oczko, whatever the language.
     expect(suggestPreset("US", "de")).toBe("oczko");
     expect(suggestPreset("PL", "cs")).toBe("oczko");
     expect(suggestPreset("PL", "pl")).toBe("oczko");
     expect(suggestPreset(undefined, undefined)).toBe("oczko");
     expect(suggestedRules("CZ", "cs")).toEqual(withPreset(DEFAULT_RULES, "okoBere"));
+  });
+});
+
+describe("Huszonegyes", () => {
+  it("32 Hungarian cards: alsó 2, felső 3, király 4, ász 11; two aces win at once; the bank wins ties", () => {
+    const r = withPreset(DEFAULT_RULES, "huszonegyes");
+    expect(r).toMatchObject({ deck: 32, ace: "eleven", persian: "wins", mode: "bank", bankTie: "bankWins", bankTo17: false });
+    expect([r.values[11], r.values[12], r.values[13]]).toEqual([2, 3, 4]);
+    // "19-re lapot kér": on 19 only an alsó (2) keeps the hand.
+    expect(handValue(cards("10♥ 9♠ W♣"), r)).toMatchObject({ total: 21, bust: false });
+    expect(handValue(cards("10♥ 9♠ D♣"), r).bust).toBe(true);
+    // Two aces beat the bank's 21.
+    expect(scoreRound(r, [cards("10♣ 9♦ W♥"), cards("A♥ A♠")], 0).duels![0].winner).toBe("player");
+    expect(scoreRound(r, [cards("10♣ 9♦"), cards("10♥ 9♠")], 0).duels![0].winner).toBe("bank");
   });
 });
 

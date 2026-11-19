@@ -31,7 +31,7 @@ export function RulesEditor({
   const t = str.rules.editor;
   // The faces' own counters (also when the values match a preset, e.g. 1 · 1 · 2).
   const [customFaces, setCustomFaces] = useState(false);
-  // The set picked here wins when several have the same cards (17 und 4, Ajnc).
+  // The set picked here wins when several have the same cards (17 und 4, Huszonegyes, Ajnc).
   const [picked, setPicked] = useState<PresetId | null>(null);
   const preset = customFaces ? "custom" : facesPreset(rules);
   const set = (patch: Partial<Rules>) => onChange({ ...rules, ...patch });

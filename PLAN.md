@@ -616,8 +616,16 @@ Szczegóły i decyzje: §13.
   bez symulowanego hazardu, jak wszędzie.
 - **Gotowe, gdy:** jak Etap 16, plus turniej botów dla zestawu Pontoon.
 
-Poza planem (do decyzji po danych ze sklepów): Węgry (zasady Huszonegy do
-potwierdzenia u rodzimych graczy), Szwecja/Finlandia (figury 11–13, as 1
+### Etap 19 — Huszonegyes (Węgry) ✅
+- Research zasad: `docs/HUSZONEGYES.md` (hu.wiki „Huszonegyes” — „Huszonegy”
+  to tam blackjack; MEK Kisokos; strony z zasadami; aplikacja jbdev).
+- Zestaw „Huszonegyes” = karty 17 und 4 (32, 2/3/4, as 11, dwa asy
+  wygrywają, z bankierem, remis dla banku, bez „bank do 17”); podpowiedź HU
+  i język hu. Bez zmian silnika i protokołu Wi‑Fi.
+- Nieobsługiwane (do decyzji po rozmowie z rodzimymi graczami): minimum 15
+  do „Starczy”, remis dla mniejszej liczby kart, óneász, as + 10 wygrywa.
+
+Poza planem (do decyzji po danych ze sklepów): Szwecja/Finlandia (figury 11–13, as 1
 albo 14 — rozszerzenie zakresu wartości), Włochy/Hiszpania (7½ — osobna gra,
 talia 40 kart), talie z kolorami niemieckimi/węgierskimi (wygląd, nie reguły).
 
@@ -745,12 +753,13 @@ same reguły, nie zestaw.
 | Oczko | PL i pozostałe | 52 | 2 / 3 / 4, 11 | wins | rodzinny | obecne domyślne |
 | Siebzehn und Vier | DE, AT | 32 | 2 / 3 / 4, 11 | wins („Feuer”) | z bankierem | źródła sprzeczne (de.wiki 2/3/4, en.wiki 1/1/2, t-online 10) — przyjęte de.wiki; do potwierdzenia u rodzimych graczy |
 | Oko bere / Oko berie | CZ, SK | 32 | 1 / 1 / 2, 11 | is21 („fojer”) | z bankierem, remis dla banku | wartości wg cs.wiki i lentiamo.sk |
+| Huszonegyes (Etap 19) | HU | 32 (magyar kártya) | 2 / 3 / 4, 11 (alsó / felső / király / ász) | wins („két ász”, wygrywa od razu) | z bankierem, remis dla banku, bank dobiera wg uznania | hu.wiki „Huszonegyes”, MEK Kisokos; research: `docs/HUSZONEGYES.md` |
 | Ajnc | BA, HR, ME, RS | 32 | 2 / 3 / 4, 11 | wins („suvi ajnc”) | z bankierem | tradycyjne zasady 1:1 z Oczkiem |
 | Очко / Двадцять одне (Etap 17) | UA, KZ, MD, kraje bałtyckie | 36 | 2 / 3 / 4, 11 | wins („золоте очко”) | z bankierem, bank do 17 | ru/uk.wiki |
 | Pontoon (Etap 18) | GB, IE, AU, NZ | 52 | 10 / 10 / 10, 1 lub 11 | — (Pontoon: as + 10) | z bankierem, remis dla banku | Pagat; Five Card Trick |
 
 - Podpowiedź: kraj telefonu (`regionCode`), a bez niego język (de → DE,
-  cs → CZ, sk → SK, sh → Ajnc, uk/ru → Очко po Etapie 17); inaczej „Oczko”.
+  cs → CZ, sk → SK, hu → HU, sh → Ajnc, uk/ru → Очко po Etapie 17); inaczej „Oczko”.
 - Tryb domyślny zestawu to tylko podpowiedź; rodzinny jest dostępny zawsze.
 - Boty: progi postaci (14–20) dobrane dla wartości 2/3/4; dla zestawów
   z innymi wartościami (1/1/2, figury 10, talia 36) decyduje pomiar turnieju.

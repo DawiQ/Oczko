@@ -26,8 +26,8 @@ poziomy różnią się istotnie: **tak**.
 
 ## Zestawy zasad (PLAN.md §13)
 
-Ten sam turniej na kartach zestawu (2000 rozdań na tryb). Ajnc ma karty
-17 und 4.
+Ten sam turniej na kartach zestawu (2000 rozdań na tryb). Huszonegyes i Ajnc
+mają karty 17 und 4.
 
 | Zestaw | Zosia | Kuba | Witek | Hela | Ola | Marek | Profesor | Hrabia | Rosną monotonicznie |
 |---|---|---|---|---|---|---|---|---|---|

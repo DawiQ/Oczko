@@ -26,6 +26,7 @@ TypeScript. Gra na punkty, bez obstawiania: wygrana runda = +1 punkt.
 | 16 | Zestawy reguł: Oczko, 17 und 4, Oko bere/berie, Ajnc; dwa asy w trzech wariantach | gotowe |
 | 17 | Talia 36 kart, „bank dobiera do 17”, zestaw Очко | gotowe |
 | 18 | Pontoon (pontoon, pięć kart) | gotowe |
+| 19 | Zestaw Huszonegyes (Węgry) | gotowe |
 
 ## Uruchomienie
 
@@ -222,7 +223,8 @@ tools/                  render-art.js (ikona, adaptive icon, splash), render-gam
 ## Zestawy zasad
 
 - `src/engine/presets.ts`: Oczko (PL), 17 und 4 (DE/AT), Oko bere/berie
-  (CZ/SK), Ajnc (Bałkany), Очко (UA/KZ/MD: talia 36, bank dobiera do 17),
+  (CZ/SK), Huszonegyes (HU: karty 17 und 4, research w
+  `docs/HUSZONEGYES.md`), Ajnc (Bałkany), Очко (UA/KZ/MD: talia 36, bank dobiera do 17),
   Pontoon (GB/IE/AU/NZ: figury 10, as 1 lub 11, najwyżej 5 kart) — talia,
   wartości figur, as, dwa asy, tryb
   (`PLAN.md` §13). Nazwy w słownikach.
