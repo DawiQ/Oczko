@@ -16,7 +16,7 @@ export const home: typeof pl.home = {
   history: "Előzmények",
   historySub: "Lejátszott partik és visszajátszások",
   /** House rules in two short lines (until the rules come from the onboarding). */
-  defaultRulesSummary: ["Családi játék · B 2, D 3, K 4 · 52 kártya", "Két ász · Ász = 11"],
+  defaultRulesSummary: ["Családi játék · A 2, F 3, K 4 · 52 kártya", "Két ász · Ász = 11"],
   /** A row for screen readers: "Előzmények. Lejátszott partik…" */
   rowA11y: (title: string, subtitle: string) => `${title}. ${subtitle}`,
   resume: {

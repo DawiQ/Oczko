@@ -16,7 +16,9 @@ export const common: typeof pl.common = {
 };
 
 export const cards: typeof pl.cards = {
-  rankLetters: { 11: "B", 12: "D", 13: "K", 14: "A" },
+  // Alsó, felső, király, ász (Hungarian names of the face cards; "Á" keeps
+  // the ace apart from the alsó).
+  rankLetters: { 11: "A", 12: "F", 13: "K", 14: "Á" },
   suits: ["kőr", "káró", "treff", "pikk"],
   ranks: {
     2: "kettes",
@@ -28,12 +30,12 @@ export const cards: typeof pl.cards = {
     8: "nyolcas",
     9: "kilences",
     10: "tízes",
-    11: "bubi",
-    12: "dáma",
+    11: "alsó",
+    12: "felső",
     13: "király",
     14: "ász",
   },
-  /** "pikk dáma" */
+  /** "pikk felső" */
   spoken: (rank: string, suit: string) => `${suit} ${rank}`,
   faceDown: "lefelé fordított lap",
 };

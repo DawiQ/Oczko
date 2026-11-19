@@ -4,7 +4,7 @@ import type { pl } from "../pl";
 export const profile: typeof pl.profile = {
   title: "Profil",
   /** Ranks named after cards, weakest first (progress.ts). */
-  ranks: ["Kilences", "Tízes", "Bubi", "Dáma", "Király", "Ász", "Két ász"],
+  ranks: ["Kilences", "Tízes", "Alsó", "Felső", "Király", "Ász", "Két ász"],
   /** Badges by id (progress.ts). */
   badges: {
     persian: { name: "Két ász", desc: "Két ász egy kézben" },

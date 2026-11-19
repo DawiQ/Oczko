@@ -38,8 +38,8 @@ HÁZI SZABÁLYAID
   Oko bere (Csehország, Szlovákia), Ajnc (Balkán), Ocsko (36 lapos pakli),
   Pontoon (Nagy-Britannia).
 • Családi játék (mindenki mindenki ellen) vagy bankárral.
-• A figurák értéke (B 2, D 3, K 4 vagy saját), 52, 36, 32 vagy 24 lapos
-  pakli.
+• A figurák értéke (alsó 2, felső 3, király 4 vagy saját), 52, 36, 32
+  vagy 24 lapos pakli.
 • Két ász igen vagy nem, az ász 11-et vagy tetszés szerint 1-et vagy 11-et
   ér, egy vagy két kezdő lap, lapkorlát a kézben, a döntetlen és a bank
   szabályai.

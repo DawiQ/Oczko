@@ -19,11 +19,11 @@ export const rules: typeof pl.rules = {
     faces: "Figurák",
     facesA11y: "A figurák értéke",
     /** Under the face presets: which cards they are. */
-    facesSub: "B · D · K",
+    facesSub: "A · F · K",
     custom: "Saját",
     customSub: "tetszőleges",
     /** Face names by rank 11..13. */
-    faceNames: { 11: "Bubi", 12: "Dáma", 13: "Király" } as Record<11 | 12 | 13, string>,
+    faceNames: { 11: "Alsó", 12: "Felső", 13: "Király" } as Record<11 | 12 | 13, string>,
     deck: "Pakli",
     deckOptions: {
       52: { label: common.cards(52) },
@@ -79,7 +79,7 @@ export const rules: typeof pl.rules = {
 
   /** The lobby's / settings' short lines. */
   summary: {
-    faces: (w: number, d: number, k: number) => `B ${w}, D ${d}, K ${k}`,
+    faces: (w: number, d: number, k: number) => `A ${w}, F ${d}, K ${k}`,
     deck: (n: DeckSize) => common.cards(n),
     persian: "Két ász",
     noPersian: "Két ász nélkül",

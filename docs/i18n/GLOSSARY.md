@@ -120,8 +120,8 @@ ma rodzaju), zwracamy się na „ty” (CS/SK „ty”, HU tegeződés).
 |---|---|---|---|
 | litery J/Q/K/A | J / Q / K / A | J / Q / K / A | B / D / K / A |
 | kolory ♥ ♦ ♣ ♠ | srdce, káry, kříže, piky | srdcia, káry, kríže, piky | kőr, káró, treff, pikk |
-| figury dla czytnika | kluk, dáma, král, eso | chlapec, dáma, kráľ, eso | bubi, dáma, király, ász |
-| wartości (domyślne) | J 2, Q 3, K 4, A 11 | J 2, Q 3, K 4, A 11 | B 2, D 3, K 4, A 11 |
+| figury dla czytnika | kluk, dáma, král, eso | chlapec, dáma, kráľ, eso | alsó, felső, király, ász (litery A, F, K, Á) |
+| wartości (domyślne) | J 2, Q 3, K 4, A 11 | J 2, Q 3, K 4, A 11 | A 2, F 3, K 4, Á 11 |
 
 ## Postacie
 
