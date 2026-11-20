@@ -18,7 +18,7 @@
 //                                                  (default development)
 //   --device <UDID or name>                        with several iPhones connected
 //   --clean                                        regenerate ios/ from scratch
-// The team id can also come from PAN_IOS_TEAM_ID. A free Apple ID works with
+// The team id can also come from OCZKO_IOS_TEAM_ID. A free Apple ID works with
 // --method development (the app then runs for 7 days on your own iPhone); a
 // paid Apple Developer account also signs ad-hoc / App Store builds. The
 // iPhone needs Developer Mode on (Settings -> Privacy & Security).
@@ -36,8 +36,8 @@
 // result to dist/.
 //
 // Android signing: with the upload key in ~/.gradle/gradle.properties
-// (PAN_UPLOAD_STORE_FILE, PAN_UPLOAD_STORE_PASSWORD, PAN_UPLOAD_KEY_ALIAS,
-// PAN_UPLOAD_KEY_PASSWORD — see plugins/withReleaseSigning.js) the build is
+// (OCZKO_UPLOAD_STORE_FILE, OCZKO_UPLOAD_STORE_PASSWORD, OCZKO_UPLOAD_KEY_ALIAS,
+// OCZKO_UPLOAD_KEY_PASSWORD — see plugins/withReleaseSigning.js) the build is
 // signed with it; otherwise with the debug key (testing only — --aab refuses).
 // Every upload to Google Play needs a higher android.versionCode in app.json.
 const { spawnSync } = require("child_process");
@@ -87,10 +87,10 @@ function fail(msg) {
 
 /** Is the upload key configured (Gradle user properties or environment)? */
 function hasUploadKey() {
-  if (process.env.ORG_GRADLE_PROJECT_PAN_UPLOAD_STORE_FILE) return true;
+  if (process.env.ORG_GRADLE_PROJECT_OCZKO_UPLOAD_STORE_FILE) return true;
   const home = process.env.GRADLE_USER_HOME || path.join(os.homedir(), ".gradle");
   try {
-    return /^\s*PAN_UPLOAD_STORE_FILE\s*=/m.test(fs.readFileSync(path.join(home, "gradle.properties"), "utf8"));
+    return /^\s*OCZKO_UPLOAD_STORE_FILE\s*=/m.test(fs.readFileSync(path.join(home, "gradle.properties"), "utf8"));
   } catch {
     return false;
   }
@@ -216,7 +216,7 @@ async function menu() {
   const local = !out.includes("--eas");
   if (out.includes("--ios") && local) {
     if (!mac) return out; // the build explains what to do instead
-    if (!process.env.PAN_IOS_TEAM_ID) {
+    if (!process.env.OCZKO_IOS_TEAM_ID) {
       const team = await ask("Identyfikator zespołu Apple (Team ID)");
       if (team) out.push("--team", team);
     }
@@ -251,8 +251,8 @@ function buildAndroid() {
   if (aab && !signed)
     fail(
       "a Play Store bundle must be signed with your upload key.\n" +
-        "Add PAN_UPLOAD_STORE_FILE / PAN_UPLOAD_STORE_PASSWORD / PAN_UPLOAD_KEY_ALIAS /\n" +
-        "PAN_UPLOAD_KEY_PASSWORD to ~/.gradle/gradle.properties (see plugins/withReleaseSigning.js)."
+        "Add OCZKO_UPLOAD_STORE_FILE / OCZKO_UPLOAD_STORE_PASSWORD / OCZKO_UPLOAD_KEY_ALIAS /\n" +
+        "OCZKO_UPLOAD_KEY_PASSWORD to ~/.gradle/gradle.properties (see plugins/withReleaseSigning.js)."
     );
 
   installDeps();
@@ -295,10 +295,10 @@ function buildIos() {
     );
   if (!capture("xcodebuild", ["-version"])) fail("xcodebuild not found — install Xcode from the App Store and run it once.");
 
-  const team = option("--team") || process.env.PAN_IOS_TEAM_ID;
+  const team = option("--team") || process.env.OCZKO_IOS_TEAM_ID;
   if (!team)
     fail(
-      "say which Apple team signs the app: --team <TEAM ID> (or PAN_IOS_TEAM_ID).\n" +
+      "say which Apple team signs the app: --team <TEAM ID> (or OCZKO_IOS_TEAM_ID).\n" +
         "Xcode -> Settings -> Accounts: add your Apple ID; the team id is on developer.apple.com -> Membership\n" +
         "(a free Apple ID: open the account in Xcode, the id of the Personal Team shows in signing errors and in\n" +
         "Keychain Access as the 'Apple Development: ... (TEAM ID)' certificate)."
@@ -374,7 +374,7 @@ function buildIos() {
 function installOnIphone(appsDir) {
   const app = fs.existsSync(appsDir) && fs.readdirSync(appsDir).find((f) => f.endsWith(".app"));
   if (!app) fail(`no .app in ${appsDir}`);
-  let device = option("--device") || process.env.PAN_IOS_DEVICE;
+  let device = option("--device") || process.env.OCZKO_IOS_DEVICE;
   if (!device) {
     const json = path.join(os.tmpdir(), `oczko-devices-${process.pid}.json`);
     capture("xcrun", ["devicectl", "list", "devices", "--json-output", json]);

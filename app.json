@@ -85,6 +85,7 @@
         }
       ],
       "./plugins/withReleaseSigning",
+      "./plugins/withOptionalFeatures",
       "expo-localization"
     ],
     "extra": {

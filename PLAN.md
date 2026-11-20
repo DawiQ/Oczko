@@ -79,7 +79,7 @@ Skrypty `package.json`: `test`, `typecheck`, `lint`, `stats`
 
 ```
 App.tsx, index.ts, app.json, eas.json, build.js
-plugins/                withReleaseSigning.js (z Pana)
+plugins/                withReleaseSigning.js (z Pana), withOptionalFeatures.js
 assets/                 ikona, splash, sukna, rewersy, dźwięki
 tools/                  stats.ts, tournament.ts, find-tutorial-seed.ts, render-*.js, render-sounds.py
 store/                  listing-pl.md, privacy.md, RELEASE.md, rating-answers.md

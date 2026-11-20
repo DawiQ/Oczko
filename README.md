@@ -342,6 +342,9 @@ Pełna checklista: `store/RELEASE.md`. W skrócie:
 2. **Podpisywanie Androida**: klucz uploadu (`keytool …`, alias
    `oczko-upload`) i wpisy `OCZKO_UPLOAD_*` w `~/.gradle/gradle.properties`
    (plugin `plugins/withReleaseSigning.js`); Play App Signing włączone.
+   Plugin `plugins/withOptionalFeatures.js` oznacza Wi‑Fi, ekran pionowy
+   i aparat jako opcjonalne (`android:required="false"`), żeby Google Play
+   nie ukrywał aplikacji przed tabletami, ChromeOS, Play Games na PC i XR.
 3. **Build**: `node build.js --aab` (lokalnie, wymaga Android SDK i NDK)
    albo `npx eas build -p android|ios --profile production`.
 4. **RevenueCat**: projekt, uprawnienie `pro`, oferta z dowolnymi pakietami

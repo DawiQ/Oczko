@@ -33,6 +33,8 @@
       (plugin `plugins/withReleaseSigning.js`; bez nich — klucz debug).
       Nigdy nie commituj `.jks` (jest w `.gitignore`).
 - [ ] Włącz Play App Signing w Play Console.
+- [x] Funkcje sprzętowe opcjonalne (Wi‑Fi, ekran pionowy, aparat) — plugin
+      `plugins/withOptionalFeatures.js`; Play nie ogranicza dostępności.
 - [ ] iOS: certyfikaty i profile zarządza EAS (`eas credentials`) albo Xcode
       (`node build.js --ios --team <TEAM_ID>`).
 
