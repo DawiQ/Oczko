@@ -5,7 +5,7 @@ import { act, create, type ReactTestInstance, type ReactTestRenderer } from "rea
 import { cardOf } from "../../engine/cards";
 import { BottomSheet } from "../BottomSheet";
 import { Button3D } from "../Button3D";
-import { CardBack, CardFace, cardLabel, cardSpoken } from "../cards";
+import { CardBack, CardFace, cardLabel, cardSpoken, rankLine } from "../cards";
 import { DialogProvider, useConfirm, type ConfirmOptions } from "../Dialog";
 import { Header } from "../Header";
 import { Portrait, splitCopy } from "../Portrait";
@@ -168,5 +168,16 @@ describe("Portrait", () => {
     const r = render(<Portrait name="Hela II" size={48} color="#B9D86A" />);
     expect(r.root.findAll((n) => n.props.source !== undefined).length).toBeGreaterThan(0);
     expect(textOf(r)).toContain("II");
+  });
+});
+
+describe("the corner letter", () => {
+  it("an accented letter (Hungarian Á) gets room above and keeps its place", () => {
+    const plain = rankLine("A", 20);
+    const accented = rankLine("Á", 20);
+    expect(plain).toEqual({ fontSize: 20, lineHeight: 22, marginTop: 0 });
+    expect(accented.lineHeight).toBeGreaterThan(plain.lineHeight);
+    // The extra line height is pulled back up: the index takes no more room.
+    expect(accented.lineHeight + accented.marginTop).toBe(plain.lineHeight);
   });
 });

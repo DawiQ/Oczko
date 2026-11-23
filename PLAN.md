@@ -20,7 +20,7 @@ Makiety zaakceptowane przez właściciela (akcent Miedź) — obowiązują w Eta
 
 | Decyzja | Wartość |
 |---|---|
-| Nazwa / bundle id | „Oczko — gra w karty”, `pl.dawiq.oczko` |
+| Nazwa / bundle id | „Oczko — gra w karty”, `com.dawikk.oczko` |
 | Akcent kolorystyczny | Miedź `#E8925A` (ciemniejszy `#A85E2E`, tekst na akcencie `#1E0F06`); reszta palety z Pana |
 | Tryb domyślny | Rodzinne (wszyscy na wszystkich, punkt dla najbliższego 21) |
 | Talia | 52 karty (opcje: 24 karty 9–A, 32 karty 7–A w regułach zaawansowanych) |
@@ -673,6 +673,9 @@ partie, profil, historia ostatnich 10 partii, Wi‑Fi do 4 osób.
 - trener bez limitu (poza Wi‑Fi), analiza decyzji bez limitu,
 - pełna historia (50), powtórki, eksport, rozszerzone statystyki,
 - talie, sukna, rewersy; host Pro narzuca wygląd gościom.
+
+Produkty, identyfikatory i ceny (propozycja): `docs/SKLEPY-KONFIGURACJA.md` —
+roczny z 7 dniami próby (29,99 zł / 6,99 €) i „na zawsze” (59,99 zł / 13,99 €).
 
 **Portfel dzienny (bez Pro):** 3 podpowiedzi trenera, 1 analiza partii,
 1 stół 7–8 osób; reklama z nagrodą: +1 do wybranego limitu albo wygląd

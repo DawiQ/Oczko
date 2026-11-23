@@ -59,12 +59,21 @@ export function CardFace({
     >
       {/* Corner index (rank + suit): the only part visible when cards overlap. */}
       <View style={[s.index, size === "sm" && s.indexSm]}>
-        <Text style={[s.rank, { color, fontSize: Math.round(d.rank * scale), lineHeight: Math.round(d.rank * scale * 1.1) }, font]}>{rankLabel(card, str)}</Text>
+        <Text style={[s.rank, rankLine(rankLabel(card, str), Math.round(d.rank * scale)), { color }, font]}>{rankLabel(card, str)}</Text>
         <Text style={[s.indexSuit, { color, fontSize: Math.round(d.rank * 0.8), lineHeight: Math.round(d.rank * 0.9) }]}>{suit}</Text>
       </View>
       {d.suit > 0 && <Text style={[s.suit, { color, fontSize: d.suit }]}>{suit}</Text>}
     </View>
   );
+}
+
+/** The corner letter's size and line. A letter with an accent on top
+ *  (Hungarian "Á") gets a taller line, pulled up by as much, so the accent is
+ *  not cut off and the letter stays about where the others are. */
+export function rankLine(label: string, size: number): { fontSize: number; lineHeight: number; marginTop: number } {
+  const accent = /[\u00C0-\u024F]/.test(label);
+  const lineHeight = Math.round(size * (accent ? 1.4 : 1.1));
+  return { fontSize: size, lineHeight, marginTop: accent ? Math.round(size * 1.1) - lineHeight : 0 };
 }
 
 export function CardBack({ size = "sm", style, back: backIn }: { size?: CardSize | "xs"; style?: StyleProp<ViewStyle>; /** A back instead of the one in use (a preview). */ back?: BackLook }) {

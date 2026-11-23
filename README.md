@@ -347,15 +347,17 @@ Pełna checklista: `store/RELEASE.md`. W skrócie:
    nie ukrywał aplikacji przed tabletami, ChromeOS, Play Games na PC i XR.
 3. **Build**: `node build.js --aab` (lokalnie, wymaga Android SDK i NDK)
    albo `npx eas build -p android|ios --profile production`.
-4. **RevenueCat**: projekt, uprawnienie `pro`, oferta z dowolnymi pakietami
+4. **Sklepy i RevenueCat krok po kroku** (Google Cloud, Play Console,
+   App Store Connect, produkty i ceny): `docs/SKLEPY-KONFIGURACJA.md`.
+5. **RevenueCat**: projekt, uprawnienie `pro`, oferta z dowolnymi pakietami
    (np. roczny z okresem próbnym i dożywotni); klucze w `app.json` →
    `extra.monetization` (`offering` — opcjonalnie inna niż bieżąca).
-5. **AdMob**: aplikacje i jednostki „Rewarded” (ID w `app.json`);
+6. **AdMob**: aplikacje i jednostki „Rewarded” (ID w `app.json`);
    **zablokuj kategorie „Gambling & Betting” i „Social Casino”**; komunikat
    zgód UMP dla EOG/UK/CH.
-6. **Kwestionariusze ocen**: `store/rating-answers.md` (Simulated Gambling:
+7. **Kwestionariusze ocen**: `store/rating-answers.md` (Simulated Gambling:
    None / No).
-7. **Opis i grafiki**: `store/listing-pl.md`, `store/icon-512.png`,
+8. **Opis i grafiki**: `store/listing-pl.md`, `store/icon-512.png`,
    `store/feature-graphic.png`; polityka prywatności `store/privacy.md`
    pod publicznym adresem (`privacyUrl`).
 

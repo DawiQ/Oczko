@@ -5,7 +5,7 @@
 
 ## 0. Decyzje i wersja
 
-- [x] Nazwa „Oczko — gra w karty”, bundle id / package `pl.dawiq.oczko`
+- [x] Nazwa „Oczko — gra w karty”, bundle id / package `com.dawikk.oczko`
       (`app.json`).
 - [x] Expo SDK 58, React Native 0.88 (New Architecture), `expo-dev-client`.
 - [x] `version` 1.0.0, Android `versionCode` 1 (podbijaj przy każdym
