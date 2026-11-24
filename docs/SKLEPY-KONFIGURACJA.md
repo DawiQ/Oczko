@@ -39,7 +39,21 @@ a potem poprawia się ręcznie kraje z tabeli. App Store robi to samo przez
 
 ## 2. Google Cloud: konto usługi dla RevenueCat
 
-W [Cloud Shell](https://shell.cloud.google.com) (konto Google właściciela Play Console):
+**Stan (24.11.2026):** zrobione w konsoli na koncie dawikk.apps@gmail.com.
+
+| | |
+|---|---|
+| Projekt | „Oczko Play”, ID `oczko-play` |
+| Włączone API | Google Play Android Developer API, Google Play Developer Reporting API, Cloud Pub/Sub API |
+| Konto usługi | `revenuecat@oczko-play.iam.gserviceaccount.com` (opis: RevenueCat – Oczko) |
+| Role w projekcie | Pub/Sub Editor, Monitoring Viewer |
+| Klucz JSON | jeszcze nie utworzony (właściciel, krok 2) |
+
+Klucz: IAM → Konta usługi → `revenuecat` → Klucze → Dodaj klucz → JSON
+(albo `gcloud iam service-accounts keys create revenuecat-key.json
+--iam-account=revenuecat@oczko-play.iam.gserviceaccount.com`).
+
+Pełna procedura od zera w [Cloud Shell](https://shell.cloud.google.com) (konto Google właściciela Play Console):
 
 ```bash
 PROJECT=oczko-play-$RANDOM          # identyfikator musi być unikalny
