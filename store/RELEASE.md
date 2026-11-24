@@ -131,7 +131,7 @@
    Sensitive categories: zablokuj **„Gambling & Betting”**
    i **„Social Casino”** dla obu aplikacji. Oczko to gra na punkty, bez pieniędzy
    i nagród — reklamy hazardu nie mogą się w niej pojawiać. Ustawione na całym
-   koncie: „Hazard i zakłady (18+)”, „Alkohol”, „Społecznościowe gry
+   koncie: „Gambling & Betting” (kategoria hazardowa 18+), „Alkohol”, „Społecznościowe gry
    hazardowe” zablokowane; ocena treści reklam MA (decyzja właściciela).
 4. [x] **Formularz zgód (UMP)**: AdMob → Privacy & messaging, komunikat GDPR
    dla EOG/UK/CH. Bez zgody reklamy są niespersonalizowane; zmiana zgody
