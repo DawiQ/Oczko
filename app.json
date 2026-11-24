@@ -3,7 +3,7 @@
     "name": "Oczko",
     "slug": "oczko",
     "description": "Oczko — polska gra w 21. Gra na punkty: rodzinnie albo z bankierem, z postaciami komputerowymi i ze znajomymi przez Wi‑Fi.",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "orientation": "portrait",
     "userInterfaceStyle": "dark",
     "icon": "./assets/icon.png",
@@ -34,7 +34,7 @@
     },
     "android": {
       "package": "com.dawikk.oczko",
-      "versionCode": 1,
+      "versionCode": 2,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#123D30"
@@ -44,6 +44,10 @@
         "android.permission.WRITE_EXTERNAL_STORAGE",
         "android.permission.SYSTEM_ALERT_WINDOW",
         "android.permission.RECORD_AUDIO"
+      ],
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
       ]
     },
     "plugins": [
@@ -98,6 +102,9 @@
         "rewardedIos": "",
         "termsUrl": "https://dawikk-apps.vercel.app/Oczko/termsOfUse.html",
         "privacyUrl": "https://dawikk-apps.vercel.app/Oczko/privacyPolicy.html"
+      },
+      "eas": {
+        "projectId": "b61b55e6-ffe5-46e1-8a5c-910f2249ffc8"
       }
     }
   }
