@@ -19,23 +19,20 @@ Kod nie zna nazw produktów: paywall pokazuje pakiety z oferty RevenueCat
 
 Oba produkty dają uprawnienie **`pro`** (`app.json` → `extra.monetization.entitlement`).
 
-Ceny (propozycja do decyzji; dożywotni ≈ 2× roczny):
+Ceny w Google Play (decyzja 24.11.2026): **tylko cena w PLN**, pozostałe kraje
+przelicza sklep automatycznie, bez ręcznych korekt regionalnych.
 
-| Rynek | Roczny | Na zawsze |
+| Produkt | Polska (z VAT) | Wpisana cena bazowa (netto, PLN) |
 |---|---|---|
-| Polska | 29,99 zł | 59,99 zł |
-| Strefa euro (DE, AT, SK, IE) | 6,99 € | 13,99 € |
-| Wielka Brytania | 5,99 £ | 11,99 £ |
-| USA i reszta (cena bazowa) | 6,99 $ | 12,99 $ |
-| Czechy | 149 Kč | 299 Kč |
-| Węgry | 2 490 Ft | 4 990 Ft |
-| Ukraina | 149 ₴ | 299 ₴ |
-| Bałkany (RS, BA, HR — HR w euro) | przeliczenie sklepu z ceny bazowej, potem ręcznie w dół o ok. 30% | jw. |
+| `oczko_pro` / `roczny` | 29,99 zł | 24,38 zł |
+| `oczko_pro_lifetime` | 59,99 zł | 48,77 zł |
 
-Ceny regionalne w Europie Środkowo-Wschodniej są konieczne (`docs/RYNKI.md`).
-W Play Console ustawia się cenę bazową, sklep przelicza ją na lokalne waluty,
-a potem poprawia się ręcznie kraje z tabeli. App Store robi to samo przez
-„Price Schedule”.
+Play traktuje cenę z „Edytuj zbiorczo ceny” jako kwotę bez VAT — dlatego baza
+to 24,38 / 48,77 zł, a w Polsce wychodzi 29,99 / 59,99 zł. Przykładowe
+przeliczenia (roczny / na zawsze): DE 6,49 € / 12,99 €, UK 5,49 £ / 10,99 £,
+US 5,99 $ / 11,99 $, CZ 159,99 Kč / 319,99 Kč, HU 2 590 Ft / 5 099 Ft,
+UA 324,99 ₴ / 649,99 ₴. Regionalne obniżki (`docs/RYNKI.md`) można dodać
+później ręcznie per kraj.
 
 ## 2. Google Cloud: konto usługi dla RevenueCat
 
@@ -47,7 +44,7 @@ a potem poprawia się ręcznie kraje z tabeli. App Store robi to samo przez
 | Włączone API | Google Play Android Developer API, Google Play Developer Reporting API, Cloud Pub/Sub API |
 | Konto usługi | `revenuecat@oczko-play.iam.gserviceaccount.com` (opis: RevenueCat – Oczko) |
 | Role w projekcie | Pub/Sub Editor, Monitoring Viewer |
-| Klucz JSON | jeszcze nie utworzony (właściciel, krok 2) |
+| Klucz JSON | utworzony przez właściciela i wgrany do RevenueCat (nie w repo) |
 
 Klucz: IAM → Konta usługi → `revenuecat` → Klucze → Dodaj klucz → JSON
 (albo `gcloud iam service-accounts keys create revenuecat-key.json
@@ -79,6 +76,17 @@ echo "$SA"
 
 ## 3. Google Play Console
 
+**Stan (24.11.2026):** kroki 1–6 zrobione. Aplikacja „Oczko — gra w karty”
+(ID 4973404874280568304); konto usługi zaproszone (informacje o aplikacji,
+dane finansowe, zamówienia i subskrypcje); produkty aktywne:
+`oczko_pro_lifetime` (opcja zakupu `na-zawsze`, zgodność wsteczna) i
+`oczko_pro` / `roczny` / `proba-7-dni`; powiadomienia w czasie rzeczywistym:
+`projects/oczko-play/topics/Play-Store-Notifications`, wszystkie typy —
+testowe dotarło do RevenueCat; testerzy licencji: lista „Oczko testerzy”.
+Temat utworzył RevenueCat, ale rola Pub/Sub Editor nie pozwala mu nadać
+uprawnień — `google-play-developer-notifications@system.gserviceaccount.com`
+dostał ręcznie rolę Pub/Sub Publisher na tym temacie.
+
 1. Utwórz aplikację „Oczko” (gra, bezpłatna), pakiet zostanie ustalony przy
    pierwszym wgraniu AAB `com.dawikk.oczko`.
 2. Wgraj AAB na ścieżkę testów wewnętrznych (`npx eas build -p android
@@ -103,6 +111,13 @@ Uprawnienia konta usługi zaczynają działać po kilku godzinach, czasem do 36 
 Do tego czasu RevenueCat zgłasza „credentials need attention”.
 
 ## 4. RevenueCat
+
+**Stan (24.11.2026):** kroki 1, 3–7 zrobione dla Androida. Projekt „Oczko”,
+aplikacja Play Store „Oczko (Android)” (credentials: valid), uprawnienie `pro`,
+produkty `oczko_pro:roczny` i `oczko_pro_lifetime` (non-consumable) podpięte do
+`pro`, oferta `default` (current): `$rc_annual` → `oczko_pro:roczny`,
+`$rc_lifetime` → `oczko_pro_lifetime`. Publiczny klucz SDK Androida jest w
+`app.json`. App Store (krok 2, 8) — do zrobienia.
 
 1. Utwórz projekt „Oczko”. Dodaj aplikację **Play Store**: pakiet
    `com.dawikk.oczko`, wgraj `revenuecat-key.json`.
