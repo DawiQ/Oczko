@@ -2,6 +2,7 @@
 // Wi‑Fi, a portrait screen or a camera (the game needs none of them).
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { withFeaturesOptional, OPTIONAL_FEATURES } = require("../../plugins/withOptionalFeatures");
+const { withMinifyOff } = require("../../plugins/withNoMinify");
 const app = require("../../app.json");
 
 type Feature = { $: Record<string, string> };
@@ -38,5 +39,28 @@ describe("withOptionalFeatures", () => {
 
   it("is in app.json", () => {
     expect(app.expo.plugins).toContain("./plugins/withOptionalFeatures");
+  });
+});
+
+describe("withNoMinify", () => {
+  type Prop = { type: string; key?: string; value?: string };
+  const value = (props: Prop[], key: string) => props.filter((p) => p.key === key).map((p) => p.value);
+
+  it("turns R8 off in release builds (the template turns it on)", () => {
+    const template: Prop[] = [
+      { type: "comment", value: "Enable R8 in release builds" },
+      { type: "property", key: "android.enableMinifyInReleaseBuilds", value: "true" },
+      { type: "property", key: "hermesEnabled", value: "true" },
+    ];
+    const out: Prop[] = withMinifyOff(template);
+    expect(value(out, "android.enableMinifyInReleaseBuilds")).toEqual(["false"]);
+    expect(value(out, "android.enableShrinkResourcesInReleaseBuilds")).toEqual(["false"]);
+    expect(value(out, "hermesEnabled")).toEqual(["true"]);
+    expect(template[1].value).toBe("true");
+    expect(withMinifyOff(out)).toEqual(out);
+  });
+
+  it("is in app.json", () => {
+    expect(app.expo.plugins).toContain("./plugins/withNoMinify");
   });
 });

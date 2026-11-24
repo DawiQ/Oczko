@@ -33,6 +33,8 @@
       (plugin `plugins/withReleaseSigning.js`; bez nich — klucz debug).
       Nigdy nie commituj `.jks` (jest w `.gitignore`).
 - [ ] Włącz Play App Signing w Play Console.
+- [x] Release bez R8 (`plugins/withNoMinify.js`) — z R8 start kończył się
+      błędem `Failed to create an instance of androidx.work.impl.WorkDatabase`.
 - [x] Funkcje sprzętowe opcjonalne (Wi‑Fi, ekran pionowy, aparat) — plugin
       `plugins/withOptionalFeatures.js`; Play nie ogranicza dostępności.
 - [ ] iOS: certyfikaty i profile zarządza EAS (`eas credentials`) albo Xcode
