@@ -83,8 +83,8 @@
       [
         "react-native-google-mobile-ads",
         {
-          "androidAppId": "ca-app-pub-3940256099942544~3347511713",
-          "iosAppId": "ca-app-pub-3940256099942544~1458002511",
+          "androidAppId": "ca-app-pub-9126999532727987~5595292122",
+          "iosAppId": "ca-app-pub-9126999532727987~9203364641",
           "delayAppMeasurementInit": true
         }
       ],
@@ -98,8 +98,8 @@
         "revenueCatIosKey": "",
         "entitlement": "pro",
         "offering": "",
-        "rewardedAndroid": "",
-        "rewardedIos": "",
+        "rewardedAndroid": "ca-app-pub-9126999532727987/9485475218",
+        "rewardedIos": "ca-app-pub-9126999532727987/5714264516",
         "termsUrl": "https://dawikk-apps.vercel.app/Oczko/termsOfUse.html",
         "privacyUrl": "https://dawikk-apps.vercel.app/Oczko/privacyPolicy.html"
       },
