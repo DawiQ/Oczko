@@ -91,8 +91,11 @@
       urządzeniu; szyfrowanie w tranzycie — tak; usuwanie danych — przez
       odinstalowanie.
 - [ ] Reklamy: „Aplikacja zawiera reklamy” — tak.
-- [ ] Polityka prywatności: opublikuj `store/privacy.md` pod adresem i wpisz
-      go w Play Console oraz w `app.json` → `extra.monetization.privacyUrl`.
+- [x] Strona, polityka prywatności i regulamin (repo DawikkApps, `public/Oczko/`):
+      https://dawikk-apps.vercel.app/Oczko,
+      https://dawikk-apps.vercel.app/Oczko/privacyPolicy.html,
+      https://dawikk-apps.vercel.app/Oczko/termsOfUse.html — w `app.json`.
+- [ ] Adres polityki prywatności wpisz w Play Console i App Store Connect.
 - [ ] Produkty: np. subskrypcja roczna z okresem próbnym i produkt
       jednorazowy (te same w RevenueCat; nazwy dowolne — kod ich nie zna).
 

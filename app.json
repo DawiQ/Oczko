@@ -96,8 +96,8 @@
         "offering": "",
         "rewardedAndroid": "",
         "rewardedIos": "",
-        "termsUrl": "",
-        "privacyUrl": ""
+        "termsUrl": "https://dawikk-apps.vercel.app/Oczko/termsOfUse.html",
+        "privacyUrl": "https://dawikk-apps.vercel.app/Oczko/privacyPolicy.html"
       }
     }
   }
