@@ -122,17 +122,23 @@
    wydania. Klucze publiczne SDK w `app.json` → `expo.extra.monetization`
    (`revenueCatAndroidKey`, `revenueCatIosKey`). Bez kluczy zakupy są
    niedostępne, aplikacja działa.
-2. [ ] **AdMob**: aplikacja Android i iOS, jednostka „Rewarded”. ID aplikacji
-   w pluginie `react-native-google-mobile-ads` (`app.json`, teraz testowe),
-   ID jednostek w `expo.extra.monetization.rewardedAndroid / rewardedIos`.
-3. [ ] **AdMob — zablokowane kategorie (obowiązkowo)**: Blocking controls →
+2. [x] **AdMob**: aplikacja Android i iOS, jednostka „Rewarded” („Oczko —
+   nagroda”, 1 × bonus). ID aplikacji w pluginie `react-native-google-mobile-ads`
+   (`app.json`), ID jednostek w `expo.extra.monetization.rewardedAndroid /
+   rewardedIos`; build deweloperski używa testowej jednostki Google.
+   Po publikacji: AdMob → aplikacja → Ustawienia → połącz ze sklepem.
+3. [x] **AdMob — zablokowane kategorie (obowiązkowo)**: Blocking controls →
    Sensitive categories: zablokuj **„Gambling & Betting”**
    i **„Social Casino”** dla obu aplikacji. Oczko to gra na punkty, bez pieniędzy
-   i nagród — reklamy hazardu nie mogą się w niej pojawiać.
-4. [ ] **Formularz zgód (UMP)**: AdMob → Privacy & messaging, komunikat GDPR
+   i nagród — reklamy hazardu nie mogą się w niej pojawiać. Ustawione na całym
+   koncie: „Hazard i zakłady (18+)”, „Alkohol”, „Społecznościowe gry
+   hazardowe” zablokowane; ocena treści reklam MA (decyzja właściciela).
+4. [x] **Formularz zgód (UMP)**: AdMob → Privacy & messaging, komunikat GDPR
    dla EOG/UK/CH. Bez zgody reklamy są niespersonalizowane; zmiana zgody
-   w Ustawieniach → „Prywatność reklam”.
-5. [ ] **Regulamin i polityka prywatności**: `termsUrl` / `privacyUrl`.
+   w Ustawieniach → „Prywatność reklam”. Komunikat „Oczko — zgoda RODO”
+   opublikowany (Android + iOS; pl, en, cs, de, hr, hu, ru, sk, sr, uk;
+   „Zgadzam się” + „Zarządzaj opcjami”). Komunikat stanów USA — pominięty.
+5. [x] **Regulamin i polityka prywatności**: `termsUrl` / `privacyUrl`.
 
 ## Zasady reklam w aplikacji
 
