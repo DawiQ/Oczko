@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocalNetworkUsageDescription": "Oczko соединяет телефоны в одной сети Wi‑Fi, чтобы играть за одним столом.",
+    "NSCameraUsageDescription": "Камера сканирует QR-код стола, чтобы присоединиться к игре с друзьями."
+  }
+}

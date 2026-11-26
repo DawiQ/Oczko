@@ -1,0 +1,112 @@
+{
+  "expo": {
+    "name": "Oczko",
+    "slug": "oczko",
+    "description": "Oczko — polska gra w 21. Gra na punkty: rodzinnie albo z bankierem, z postaciami komputerowymi i ze znajomymi przez Wi‑Fi.",
+    "version": "1.0.5",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "icon": "./assets/icon.png",
+    "backgroundColor": "#0F1720",
+    "ios": {
+      "bundleIdentifier": "com.dawikk.oczko",
+      "supportsTablet": false,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false,
+        "NSLocalNetworkUsageDescription": "Oczko łączy telefony w tej samej sieci Wi‑Fi, żeby grać przy wspólnym stole.",
+        "NSBonjourServices": [
+          "_oczko._tcp"
+        ]
+      }
+    },
+    "locales": {
+      "pl": "./locales/pl.json",
+      "en": "./locales/en.json",
+      "de": "./locales/de.json",
+      "cs": "./locales/cs.json",
+      "sk": "./locales/sk.json",
+      "hu": "./locales/hu.json",
+      "uk": "./locales/uk.json",
+      "ru": "./locales/ru.json",
+      "hr": "./locales/sh.json",
+      "sr": "./locales/sh.json",
+      "bs": "./locales/sh.json"
+    },
+    "android": {
+      "package": "com.dawikk.oczko",
+      "versionCode": 6,
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#123D30"
+      },
+      "blockedPermissions": [
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE",
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.RECORD_AUDIO"
+      ],
+      "permissions": [
+        "android.permission.MODIFY_AUDIO_SETTINGS",
+        "android.permission.CAMERA"
+      ]
+    },
+    "plugins": [
+      "expo-dev-client",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/splash-icon.png",
+          "imageWidth": 200,
+          "resizeMode": "contain",
+          "backgroundColor": "#0F1720"
+        }
+      ],
+      "expo-font",
+      "expo-asset",
+      [
+        "expo-audio",
+        {
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "enableBackgroundPlayback": false
+        }
+      ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Aparat skanuje kod QR stołu, żeby dołączyć do gry ze znajomymi.",
+          "microphonePermission": false,
+          "recordAudioAndroid": false,
+          "barcodeScannerEnabled": true
+        }
+      ],
+      [
+        "react-native-google-mobile-ads",
+        {
+          "androidAppId": "ca-app-pub-9126999532727987~5595292122",
+          "iosAppId": "ca-app-pub-9126999532727987~9203364641",
+          "delayAppMeasurementInit": true
+        }
+      ],
+      "./plugins/withReleaseSigning",
+      "./plugins/withOptionalFeatures",
+      "./plugins/withNoMinify",
+      "expo-localization"
+    ],
+    "extra": {
+      "monetization": {
+        "revenueCatAndroidKey": "goog_SrtxuCyTRfDdkoQsTRxdhcleVkr",
+        "revenueCatIosKey": "",
+        "entitlement": "pro",
+        "offering": "",
+        "rewardedAndroid": "ca-app-pub-9126999532727987/9485475218",
+        "rewardedIos": "ca-app-pub-9126999532727987/5714264516",
+        "termsUrl": "https://dawikk-apps.vercel.app/Oczko/termsOfUse.html",
+        "privacyUrl": "https://dawikk-apps.vercel.app/Oczko/privacyPolicy.html"
+      },
+      "eas": {
+        "projectId": "b61b55e6-ffe5-46e1-8a5c-910f2249ffc8"
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocalNetworkUsageDescription": "Oczko łączy telefony w tej samej sieci Wi‑Fi, żeby grać przy wspólnym stole.",
+    "NSCameraUsageDescription": "Aparat skanuje kod QR stołu, żeby dołączyć do gry ze znajomymi."
+  }
+}

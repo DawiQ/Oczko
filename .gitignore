@@ -1,0 +1,28 @@
+# Node
+node_modules/
+
+# Expo / prebuild output (continuous native generation)
+/android/
+/ios/
+.expo/
+expo-env.d.ts
+web-build/
+
+# Native build artifacts
+**/.cxx/
+**/build/
+**/Pods/
+*.xcworkspace
+
+# Editor / OS
+.DS_Store
+*.swp
+
+# APK / AAB from build.js
+/dist/
+
+# Signing keys and store credentials (never commit)
+*.jks
+*.keystore
+credentials.json
+*-service-account*.json

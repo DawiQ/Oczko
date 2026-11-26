@@ -1,0 +1,6 @@
+{
+  "ios": {
+    "NSLocalNetworkUsageDescription": "Oczko propojí telefony ve stejné síti Wi‑Fi, aby se dalo hrát u jednoho stolu.",
+    "NSCameraUsageDescription": "Fotoaparát naskenuje QR kód stolu a připojí tě ke hře s přáteli."
+  }
+}

@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="pl">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Oczko Pro — makiety</title>
+<style>
+:root { --bg:#0F1720; --surface:#17222E; --surface2:#1F2C3A; --line:#2A3A4B; --text:#EEF2F6; --soft:#C9D3DD; --muted:#9AA8B7; --acc:#E8925A; --accDark:#A85E2E; --onAcc:#1E0F06; --ok:#6FCF97; }
+* { box-sizing:border-box; margin:0; padding:0 }
+body { background:#0A0F15; color:var(--text); font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif; padding:24px 16px 48px }
+h1 { font-family:Georgia,serif; font-size:28px; max-width:1100px; margin:0 auto 6px }
+.lead { color:var(--muted); max-width:1100px; margin:0 auto 22px; font-size:14px }
+.grid { display:flex; flex-wrap:wrap; gap:28px; justify-content:center }
+.phone { width:340px; max-width:100%; height:700px; border:8px solid #1A1F26; border-radius:36px; background:var(--bg); overflow:hidden; position:relative; display:flex; flex-direction:column; padding:18px 16px }
+.h { font-family:Georgia,serif; font-weight:800; font-size:24px }
+.sub { color:var(--muted); font-size:13px; margin-top:4px }
+.pro { display:inline-block; background:var(--acc); color:var(--onAcc); font-weight:800; font-size:11px; padding:3px 8px; border-radius:6px; margin-bottom:10px }
+.perk { display:flex; gap:10px; padding:9px 0; border-bottom:1px solid var(--line) }
+.perk b { display:block; font-size:14px } .perk span { color:var(--muted); font-size:12px }
+.check { color:var(--ok); font-weight:800 }
+.plan { border:1px solid var(--line); background:var(--surface2); border-radius:14px; padding:12px; margin-top:10px; display:flex; justify-content:space-between; align-items:center }
+.plan.on { border-color:var(--acc) } .badge { background:var(--acc); color:var(--onAcc); font-size:10px; font-weight:800; padding:2px 6px; border-radius:6px }
+.btn { height:54px; border-radius:16px; background:var(--acc); color:var(--onAcc); font-family:Georgia,serif; font-weight:800; font-size:17px; display:flex; align-items:center; justify-content:center; border-bottom:5px solid var(--accDark); margin-top:14px }
+.btn.dark { background:var(--surface2); color:var(--text); border-bottom-color:#0B1118 }
+.fine { color:var(--muted); font-size:11px; margin-top:8px; line-height:1.4 }
+.sheet { position:absolute; left:0; right:0; bottom:0; background:var(--surface); border-radius:22px 22px 0 0; padding:14px 16px 20px; border-top:1px solid var(--line) }
+.dim { position:absolute; inset:0; background:rgba(5,10,16,.6) }
+.ad { display:flex; gap:12px; align-items:center; border:1px solid var(--line); border-radius:14px; padding:12px; margin-top:12px }
+.play { width:40px; height:40px; border-radius:20px; background:#123D30; display:grid; place-items:center; color:#9FD8C0 }
+.looks { display:grid; grid-template-columns:repeat(3,1fr); gap:8px; margin-top:12px }
+.look { border:1px solid var(--line); border-radius:12px; padding:8px; text-align:center; font-size:11px; color:var(--soft); background:var(--surface2) }
+.sw { height:46px; border-radius:8px; margin-bottom:6px }
+.lock { color:var(--acc); font-weight:800; font-size:10px }
+figcaption { color:var(--muted); font-size:13px; margin-top:10px; width:340px }
+</style>
+</head>
+<body>
+<h1>Oczko Pro — makiety</h1>
+<p class="lead">Paywall, arkusz limitu dziennego (reklama tylko na żądanie, nigdy w trakcie rundy) i wybór wyglądu. Nic kupionego nie zmienia gry między ludźmi.</p>
+<div class="grid">
+<figure><div class="phone">
+  <span class="pro">PRO</span>
+  <div class="h">Trener bez limitu</div>
+  <div class="sub">Gra jak dotąd — a trener, analiza i duże stoły bez limitów.</div>
+  <div style="margin-top:12px">
+    <div class="perk"><span class="check">✓</span><div><b>Trener bez limitu</b><span>szansa na furę i szanse wygranej przy każdym ruchu</span></div></div>
+    <div class="perk"><span class="check">✓</span><div><b>Analiza każdej partii</b><span>50 ostatnich partii, powtórki, eksport</span></div></div>
+    <div class="perk"><span class="check">✓</span><div><b>Stoły dla 7–8 osób</b><span>przy telefonie i przez Wi‑Fi</span></div></div>
+    <div class="perk"><span class="check">✓</span><div><b>Rozszerzone statystyki</b><span>tryby, rywale, następny rywal</span></div></div>
+    <div class="perk"><span class="check">✓</span><div><b>Talie, sukna i rewersy</b><span>przy stole Wi‑Fi widzą je wszyscy</span></div></div>
+  </div>
+  <div class="plan on"><div><b>Rocznie</b><div class="sub">7 dni za darmo, potem 19,99 zł / rok</div></div><span class="badge">7 DNI ZA DARMO</span></div>
+  <div class="plan"><div><b>Na zawsze</b><div class="sub">Jednorazowo 39,99 zł</div></div></div>
+  <div class="btn">Wypróbuj 7 dni za darmo</div>
+  <div class="fine">Bez opłaty przez 7 dni. Potem 19,99 zł rocznie, dopóki nie anulujesz w ustawieniach sklepu. · Przywróć zakupy · Mam kod</div>
+</div><figcaption><b>Paywall</b> — nagłówek zależny od powodu otwarcia.</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="h">Historia</div><div class="sub">… (ekran w tle)</div>
+  <div class="dim"></div>
+  <div class="sheet">
+    <div class="h" style="font-size:20px">Dzisiejsza analiza wykorzystana</div>
+    <div class="sub">Bez Oczko Pro jedna analiza partii dziennie. Jutro kolejna — albo jeszcze jedna teraz, za reklamę.</div>
+    <div class="ad"><div class="play">▶</div><div><b>Obejrzyj reklamę</b><div class="sub">+1 analiza dziś</div></div></div>
+    <div class="btn">Analiza bez limitu · Oczko Pro</div>
+    <div class="btn dark">Może później</div>
+  </div>
+</div><figcaption><b>Limit dzienny</b> — tylko gdy gracz sam po coś sięga; przy stole w trakcie rundy bez reklamy.</figcaption></figure>
+
+<figure><div class="phone">
+  <div class="h">Wygląd</div>
+  <div class="sub">Talie · Sukna · Rewersy</div>
+  <div class="looks">
+    <div class="look"><div class="sw" style="background:#1F7358"></div>Zielone</div>
+    <div class="look"><div class="sw" style="background:#4A1626"></div>Bordowe<div class="lock">PRO · 24 h za reklamę</div></div>
+    <div class="look"><div class="sw" style="background:#13304D"></div>Granatowe<div class="lock">PRO</div></div>
+    <div class="look"><div class="sw" style="background:#4A2E18"></div>Orzech<div class="lock">PRO</div></div>
+    <div class="look"><div class="sw" style="background:#262C33"></div>Grafit<div class="lock">PRO</div></div>
+  </div>
+  <div class="btn" style="margin-top:auto">Wypróbuj na 24 h (reklama)</div>
+</div><figcaption><b>Wygląd</b> — klasyczny zestaw za darmo; reszta w Pro lub na 24 h za reklamę.</figcaption></figure>
+</div>
+</body>
+</html>

@@ -1,0 +1,186 @@
+// A rival at the table: portrait (in the seat's colour, with the score),
+// name, the cards (backs, or faces once shown), status, bank / dealer marks.
+import { useEffect, useState } from "react";
+import { Animated, StyleSheet, Text, View } from "react-native";
+
+import type { SeatInfo } from "../game/TableGame";
+import { useStrings } from "../i18n";
+import { pl, type Strings } from "../i18n/pl";
+import { CardBack, CardFace } from "../ui/cards";
+import { DISPLAY } from "../ui/fonts";
+import { P } from "../ui/palette";
+import { Portrait } from "../ui/Portrait";
+import { PORTRAIT_SIZE, type SeatSize } from "./layout";
+import { statusLabel } from "./texts";
+
+/** A card that flips into view (scaleX 0 → 1) when it appears. */
+export function FlipIn({ children, delay = 0, reduceMotion }: { children: React.ReactNode; delay?: number; reduceMotion: boolean }) {
+  const v = useState(() => new Animated.Value(reduceMotion ? 1 : 0))[0];
+  useEffect(() => {
+    if (reduceMotion) return;
+    Animated.timing(v, { toValue: 1, duration: 220, delay, useNativeDriver: true }).start();
+  }, [v, delay, reduceMotion]);
+  return <Animated.View style={{ transform: [{ scaleX: v }], opacity: v }}>{children}</Animated.View>;
+}
+
+/** The score: a "pop" and a "+N" flying up when it grows. */
+export function ScorePop({ value, children, reduceMotion }: { value: number; children: React.ReactNode; reduceMotion: boolean }) {
+  const s = useState(() => new Animated.Value(1))[0];
+  const fly = useState(() => new Animated.Value(1))[0];
+  const [prev, setPrev] = useState(value);
+  const [gain, setGain] = useState(0);
+  if (value !== prev) {
+    // Derived during render: remember the gain for the "+N" label.
+    setGain(value > prev ? value - prev : 0);
+    setPrev(value);
+  }
+  useEffect(() => {
+    if (gain <= 0 || reduceMotion) return;
+    s.setValue(1.6);
+    fly.setValue(0);
+    Animated.parallel([
+      Animated.spring(s, { toValue: 1, friction: 4, useNativeDriver: true }),
+      Animated.timing(fly, { toValue: 1, duration: 900, useNativeDriver: true }),
+    ]).start();
+  }, [gain, value, s, fly, reduceMotion]);
+  return (
+    <View>
+      <Animated.View style={{ transform: [{ scale: s }] }}>{children}</Animated.View>
+      {gain > 0 && !reduceMotion && (
+        <Animated.Text
+          style={[
+            ps.plus,
+            { opacity: fly.interpolate({ inputRange: [0, 0.7, 1], outputRange: [1, 1, 0] }), transform: [{ translateY: fly.interpolate({ inputRange: [0, 1], outputRange: [0, -30] }) }] },
+          ]}
+          accessibilityElementsHidden
+        >
+          {`+${gain}`}
+        </Animated.Text>
+      )}
+    </View>
+  );
+}
+
+const ps = StyleSheet.create({
+  plus: { position: "absolute", top: -6, left: -4, right: -4, textAlign: "center", color: P.accent, fontFamily: DISPLAY, fontSize: 16 },
+});
+
+export function seatA11y(seat: SeatInfo, s: Strings = pl): string {
+  const t = s.table.seat;
+  const parts = [seat.name, s.common.cards(seat.cards)];
+  const st = statusLabel(seat, s);
+  if (st) parts.push(st);
+  if (seat.value && !seat.value.persian) parts.push(seat.value.bust ? t.bust(seat.value.total) : t.total(seat.value.total));
+  if (seat.value?.special) parts.push(s.table.specials[seat.value.special]);
+  if (seat.isBank) parts.push(t.bank);
+  if (seat.isDealer) parts.push(t.dealer);
+  parts.push(s.common.points(seat.score));
+  return parts.join(", ");
+}
+
+export function OpponentSeat({ seat, size, reduceMotion }: { seat: SeatInfo; size: SeatSize; reduceMotion: boolean }) {
+  const str = useStrings();
+  const p = PORTRAIT_SIZE[size];
+  const status = statusLabel(seat, str);
+  const shown = seat.hand;
+  return (
+    <View style={[s.seat, { width: p + 56 }, seat.status === "bust" && s.dim]} accessible accessibilityLabel={seatA11y(seat, str)}>
+      <View>
+        <Portrait name={seat.name} persona={seat.persona} size={p} color={seat.color} ring={seat.color} />
+        <View style={[s.score, { borderColor: seat.color }]}>
+          <ScorePop value={seat.score} reduceMotion={reduceMotion}>
+            <Text style={s.scoreText}>{seat.score}</Text>
+          </ScorePop>
+        </View>
+        {seat.isBank && (
+          <View style={s.bank}>
+            <Text style={s.bankText}>{str.table.seat.bankMark}</Text>
+          </View>
+        )}
+        {seat.isDealer && !seat.isBank && (
+          <View style={s.dealer}>
+            <Text style={s.dealerText}>{str.table.seat.dealerMark}</Text>
+          </View>
+        )}
+      </View>
+      <Text style={[s.name, size === "sm" && s.nameSm]} numberOfLines={1}>
+        {seat.name}
+      </Text>
+      <View style={s.cards}>
+        {shown
+          ? shown.map((c, i) => (
+              <View key={c} style={{ marginLeft: i ? (size === "sm" ? -18 : -14) : 0 }}>
+                <FlipIn delay={i * 60} reduceMotion={reduceMotion}>
+                  <CardFace card={c} size="sm" />
+                </FlipIn>
+              </View>
+            ))
+          : Array.from({ length: seat.cards }, (_, i) => (
+              <View key={i} style={{ marginLeft: i ? -13 : 0 }}>
+                <FlipIn reduceMotion={reduceMotion}>
+                  <CardBack size="xs" />
+                </FlipIn>
+              </View>
+            ))}
+      </View>
+      {seat.value && !seat.value.bust && !seat.value.persian && (
+        <Text style={[s.total, seat.value.special && s.totalSpecial]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+          {seat.value.special ? `${seat.value.total} · ${str.table.specials[seat.value.special]}` : seat.value.total}
+        </Text>
+      )}
+      {status && (
+        <View style={[s.pill, pillStyle(seat)]}>
+          <Text style={[s.pillText, pillText(seat)]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{status}</Text>
+        </View>
+      )}
+    </View>
+  );
+}
+
+function pillStyle(seat: SeatInfo) {
+  if (seat.thinking) return s.pillThink;
+  if (seat.persian) return s.pillAccent;
+  if (seat.status === "bust") return s.pillBust;
+  if (seat.status === "stood" || seat.status === "maxed") return s.pillOk;
+  return s.pillThink;
+}
+function pillText(seat: SeatInfo) {
+  if (seat.persian) return { color: P.onAccent };
+  if (seat.status === "bust" && !seat.thinking) return { color: P.danger, fontFamily: DISPLAY, fontWeight: "normal" as const };
+  if ((seat.status === "stood" || seat.status === "maxed") && !seat.thinking) return { color: P.ok };
+  return { color: P.feltText };
+}
+
+const s = StyleSheet.create({
+  seat: { alignItems: "center", gap: 3 },
+  dim: { opacity: 0.75 },
+  score: {
+    position: "absolute",
+    right: -8,
+    bottom: -4,
+    minWidth: 22,
+    height: 22,
+    borderRadius: 11,
+    paddingHorizontal: 4,
+    backgroundColor: P.bg,
+    borderWidth: 2,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  scoreText: { color: P.text, fontFamily: DISPLAY, fontSize: 12 },
+  bank: { position: "absolute", top: -10, alignSelf: "center", backgroundColor: P.accent, borderRadius: 6, paddingHorizontal: 6, paddingVertical: 2, elevation: 3 },
+  bankText: { color: P.onAccent, fontSize: 9, fontWeight: "800", letterSpacing: 0.4 },
+  dealer: { position: "absolute", left: -8, top: -6, width: 22, height: 22, borderRadius: 11, backgroundColor: "#F3EEE2", alignItems: "center", justifyContent: "center", elevation: 3 },
+  dealerText: { color: P.black, fontFamily: DISPLAY, fontSize: 11 },
+  name: { color: P.feltText, fontSize: 12, fontWeight: "700", maxWidth: 100 },
+  nameSm: { fontSize: 10.5 },
+  cards: { flexDirection: "row", minHeight: 32, alignItems: "center" },
+  total: { color: P.text, fontFamily: DISPLAY, fontSize: 13, maxWidth: 100 },
+  totalSpecial: { color: P.accent },
+  pill: { borderRadius: 999, paddingHorizontal: 8, paddingVertical: 2 },
+  pillText: { fontSize: 11, fontWeight: "700" },
+  pillThink: { backgroundColor: "rgba(255,255,255,0.12)" },
+  pillOk: { backgroundColor: "rgba(111,207,151,0.16)" },
+  pillBust: { backgroundColor: P.dangerBg, borderWidth: 1.5, borderColor: P.danger, transform: [{ rotate: "-6deg" }] },
+  pillAccent: { backgroundColor: P.accent },
+});
