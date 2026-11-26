@@ -347,7 +347,9 @@ Pełna checklista: `store/RELEASE.md`. W skrócie:
    nie ukrywał aplikacji przed tabletami, ChromeOS, Play Games na PC i XR.
    Plugin `plugins/withNoMinify.js` wyłącza R8 w wersji release (szablon
    Expo go włącza; z R8 aplikacja padała przy starcie — WorkManager z Google
-   Mobile Ads nie tworzył bazy `WorkDatabase`).
+   Mobile Ads nie tworzył bazy `WorkDatabase`): `gradle.properties`,
+   `minifyEnabled false` wprost w `app/build.gradle` i reguły `-keep` dla
+   Room/WorkManager.
 3. **Build**: `node build.js --aab` (lokalnie, wymaga Android SDK i NDK)
    albo `npx eas build -p android|ios --profile production`.
 4. **Sklepy i RevenueCat krok po kroku** (Google Cloud, Play Console,

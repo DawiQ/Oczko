@@ -2,7 +2,7 @@
 // Wi‑Fi, a portrait screen or a camera (the game needs none of them).
 /* eslint-disable @typescript-eslint/no-require-imports */
 const { withFeaturesOptional, OPTIONAL_FEATURES } = require("../../plugins/withOptionalFeatures");
-const { withMinifyOff } = require("../../plugins/withNoMinify");
+const { withMinifyOff, gradleMinifyOff, withKeepRules } = require("../../plugins/withNoMinify");
 const app = require("../../app.json");
 
 type Feature = { $: Record<string, string> };
@@ -58,6 +58,30 @@ describe("withNoMinify", () => {
     expect(value(out, "hermesEnabled")).toEqual(["true"]);
     expect(template[1].value).toBe("true");
     expect(withMinifyOff(out)).toEqual(out);
+  });
+
+  it("writes R8 off into the release build type, whatever the properties say", () => {
+    const gradle = [
+      "        release {",
+      "            def enableShrinkResources = findProperty('android.enableShrinkResourcesInReleaseBuilds') ?: 'false'",
+      "            shrinkResources enableShrinkResources.toBoolean()",
+      "            minifyEnabled enableMinifyInReleaseBuilds",
+      '            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"',
+      "        }",
+    ].join("\n");
+    const out: string = gradleMinifyOff(gradle);
+    expect(out).toMatch(/^\s*minifyEnabled false\b/m);
+    expect(out).toMatch(/^\s*shrinkResources false\b/m);
+    expect(out).not.toMatch(/minifyEnabled enableMinify/);
+    expect(out).toContain("proguardFiles");
+    expect(gradleMinifyOff(out)).toBe(out);
+  });
+
+  it("keeps Room's database and WorkManager if R8 runs anyway (added once)", () => {
+    const once: string = withKeepRules("# Add any project specific keep options here:\n");
+    expect(once).toContain("-keep class * extends androidx.room.RoomDatabase { <init>(); }");
+    expect(once).toContain("androidx.work.impl.WorkDatabase_Impl");
+    expect(withKeepRules(once)).toBe(once);
   });
 
   it("is in app.json", () => {
