@@ -45,6 +45,7 @@ npm start               # serwer Metro dla dev clienta
 | `npm run lint` | ESLint (konfiguracja Expo) |
 | `npm run tournament` | kalibracja poziomów botów → `docs/BOTS.md`, `src/ai/calibration.ts` |
 | `npm run stats` | statystyki reguł z symulacji → `docs/STATS.md` |
+| `npm run screenshots` | zrzuty do sklepu 1080×1920 PL/EN (`tools/render-screenshots.js`, ekrany z `store/screenshots/src/`) |
 | `npm run art` | ikona, adaptive icon, splash, grafiki sklepu, ikony, sukno, bandy, portrety (`tools/render-*.js`, Chromium przez Playwright) |
 | `node build.js` | build: menu (APK / AAB / iOS przez Xcode lub EAS); `--aab`, `--install`, `--clean`, `--ios --team …`, `--ios --eas` |
 | `npx tsx tools/find-tutorial-seed.ts` | szuka ziarna samouczka (sprawdzane testem) |

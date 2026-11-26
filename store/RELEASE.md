@@ -71,9 +71,11 @@
 
 ## 5. Zrzuty ekranu
 
-- [ ] Telefon (Play: min. 2, App Store 6,7" i 5,5"): lobby, stół w trakcie
-      rundy (z trenerem), perskie oczko, koniec rundy, profil, Wi‑Fi (kod
-      stołu). Bez motywów kojarzących się z hazardem; wygląd „Zielone” lub „Orzech”.
+- [x] Telefon, Google Play (1080×1920): `store/screenshots/pl/` (5) i
+      `store/screenshots/en/` (5) — `npm run screenshots` z ekranów w
+      `store/screenshots/src/` (zrzuty z telefonu bez pasków systemu).
+- [ ] Wgrać do Play Console: pl-PL ← `pl/`, pozostałe języki ← `en/`.
+- [ ] App Store (6,7" i 5,5") i zrzuty pozostałych języków — później.
 
 ## 6. Google Play Console
 
