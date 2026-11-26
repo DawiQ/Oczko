@@ -6,6 +6,7 @@ import { cardOf } from "../../engine/cards";
 import { BottomSheet } from "../BottomSheet";
 import { Button3D } from "../Button3D";
 import { CardBack, CardFace, cardLabel, cardSpoken, rankLine } from "../cards";
+import { segmentRows } from "../controls";
 import { DialogProvider, useConfirm, type ConfirmOptions } from "../Dialog";
 import { Header } from "../Header";
 import { Portrait, splitCopy } from "../Portrait";
@@ -179,5 +180,21 @@ describe("the corner letter", () => {
     expect(accented.lineHeight).toBeGreaterThan(plain.lineHeight);
     // The extra line height is pulled back up: the index takes no more room.
     expect(accented.lineHeight + accented.marginTop).toBe(plain.lineHeight);
+  });
+});
+
+describe("segmented rows", () => {
+  it("one row up to four options, then rows of four with empty cells at the end", () => {
+    expect(segmentRows([1, 2, 3])).toEqual([[1, 2, 3]]);
+    expect(segmentRows([1, 2, 3, 4])).toEqual([[1, 2, 3, 4]]);
+    // Seven rule sets: 4 + 3 (and one empty cell, so all keep one width).
+    expect(segmentRows([1, 2, 3, 4, 5, 6, 7])).toEqual([
+      [1, 2, 3, 4],
+      [5, 6, 7, null],
+    ]);
+    expect(segmentRows([1, 2, 3, 4, 5], 3)).toEqual([
+      [1, 2, 3],
+      [4, 5, null],
+    ]);
   });
 });

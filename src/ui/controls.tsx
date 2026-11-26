@@ -14,12 +14,26 @@ export function Label({ children }: { children: string }) {
   );
 }
 
+/** Options per row: one row up to 4, then rows of 4 (the last one filled
+ *  with empty cells so every option keeps the same width). */
+export const segmentRows = <T,>(options: readonly T[], columns = 4): (T | null)[][] => {
+  const per = Math.max(1, Math.min(columns, options.length));
+  const rows: (T | null)[][] = [];
+  for (let i = 0; i < options.length; i += per) {
+    const row: (T | null)[] = options.slice(i, i + per);
+    if (rows.length > 0) while (row.length < per) row.push(null);
+    rows.push(row);
+  }
+  return rows;
+};
+
 export function Segmented<T extends string | number>({
   options,
   value,
   onChange,
   label,
   style,
+  columns,
 }: {
   options: { value: T; label: string; sub?: string }[];
   value: T;
@@ -27,25 +41,36 @@ export function Segmented<T extends string | number>({
   /** For screen readers: what is being chosen. */
   label: string;
   style?: StyleProp<ViewStyle>;
+  /** Options per row (default 4). */
+  columns?: number;
 }) {
+  // Explicit rows, not flexWrap: with flex: 1 items Yoga mis-measures wrapped
+  // lines, and a second row of rule sets covered the next section.
   return (
     <View style={[s.seg, style]} accessibilityRole="radiogroup" accessibilityLabel={label}>
-      {options.map((o) => {
-        const on = o.value === value;
-        return (
-          <Pressable
-            key={String(o.value)}
-            style={[s.segItem, on && s.segOn]}
-            onPress={() => onChange(o.value)}
-            accessibilityRole="radio"
-            accessibilityState={{ checked: on }}
-            accessibilityLabel={o.sub ? `${o.label}, ${o.sub}` : o.label}
-          >
-            <Text style={[s.segText, on && s.segTextOn]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>{o.label}</Text>
-            {o.sub ? <Text style={s.segSub}>{o.sub}</Text> : null}
-          </Pressable>
-        );
-      })}
+      {segmentRows(options, columns).map((row, r) => (
+        <View key={r} style={s.segRow}>
+          {row.map((o, i) => {
+            if (!o) return <View key={`empty-${i}`} style={s.segEmpty} />;
+            const on = o.value === value;
+            return (
+              <Pressable
+                key={String(o.value)}
+                style={[s.segItem, on && s.segOn]}
+                onPress={() => onChange(o.value)}
+                accessibilityRole="radio"
+                accessibilityState={{ checked: on }}
+                accessibilityLabel={o.sub ? `${o.label}, ${o.sub}` : o.label}
+              >
+                <Text style={[s.segText, on && s.segTextOn]} numberOfLines={1} adjustsFontSizeToFit minimumFontScale={0.7}>
+                  {o.label}
+                </Text>
+                {o.sub ? <Text style={s.segSub}>{o.sub}</Text> : null}
+              </Pressable>
+            );
+          })}
+        </View>
+      ))}
     </View>
   );
 }
@@ -105,7 +130,9 @@ export function SwitchRow({ label, sub, value, onChange }: { label: string; sub?
 
 const s = StyleSheet.create({
   label: { color: P.muted, fontSize: 12, fontWeight: "700", textTransform: "uppercase", letterSpacing: 0.7, marginTop: 14, marginBottom: 7 },
-  seg: { flexDirection: "row", gap: 6, flexWrap: "wrap" },
+  seg: { gap: 6 },
+  segRow: { flexDirection: "row", gap: 6 },
+  segEmpty: { flex: 1, minWidth: 64 },
   segItem: {
     flex: 1,
     minWidth: 64,
